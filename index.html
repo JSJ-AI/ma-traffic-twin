@@ -474,7 +474,7 @@ function resize(){
   draw();
 }
 window.addEventListener('resize',resize);
-resize();
+// resize() called after all vars defined - see INIT section
 
 /* &#9472;&#9472; PROJECT GEO TO CANVAS &#9472;&#9472; */
 function project(lat,lon){
@@ -1635,6 +1635,7 @@ function startLiveData(){
 }
 
 /* &#9472;&#9472; INIT &#9472;&#9472; */
+resize();
 logEvent('clear','MA Traffic Twin initialized');
 populateSelects();
 logEvent('clear',`${ROUTES.length} routes loaded - ${SENSORS.length} sensors active`);
