@@ -706,42 +706,47 @@ function routeOpacity(type){
 }
 
 /* ── Draw / update all route polylines ── */
+function makeRoutePolyline(r) {
+  const col = speedColor(r.speed, r.type);
+  const latlngs = r.pts.map(([lat,lon])=>[lat,lon]);
+  const pl = L.polyline(latlngs, {
+    color: col,
+    weight: routeWeight(r.type),
+    opacity: routeOpacity(r.type),
+    interactive: true,
+    smoothFactor: 1
+  }).addTo(routeLayerGroup);
+  pl.on('mouseover', function(e){
+    const tip = document.getElementById('tooltip');
+    const npts = r.pts.length;
+    const est = npts * 0.8 / (r.speed / 60);
+    const st = r.speed>55?'Free Flow':r.speed>35?'Slow':'Congested';
+    document.getElementById('tip-title').textContent = r.label;
+    document.getElementById('tip-speed').textContent = r.speed.toFixed(0)+' mph';
+    document.getElementById('tip-vol').textContent = Math.round(r.volume)+' veh/hr';
+    document.getElementById('tip-time').textContent = est.toFixed(1)+' min';
+    document.getElementById('tip-status').textContent = st;
+    tip.style.display='block';
+    tip.style.left=(e.originalEvent.clientX+14)+'px';
+    tip.style.top=(e.originalEvent.clientY-10)+'px';
+  });
+  pl.on('mousemove', function(e){
+    document.getElementById('tooltip').style.left=(e.originalEvent.clientX+14)+'px';
+    document.getElementById('tooltip').style.top=(e.originalEvent.clientY-10)+'px';
+  });
+  pl.on('mouseout', function(){
+    document.getElementById('tooltip').style.display='none';
+  });
+  return pl;
+}
+
 function updateRoutePolylines(){
   ROUTES.forEach(r=>{
     const col = speedColor(r.speed, r.type);
-    const latlngs = r.pts.map(([lat,lon])=>[lat,lon]);
     if(routePolylines[r.id]){
       routePolylines[r.id].setStyle({color:col});
     } else {
-      const pl = L.polyline(latlngs, {
-        color: col,
-        weight: routeWeight(r.type),
-        opacity: routeOpacity(r.type),
-        interactive: true,
-        smoothFactor: 1
-      }).addTo(routeLayerGroup);
-      pl.on('mouseover', function(e){
-        const tip = document.getElementById('tooltip');
-        const est = r.pts.length*0.8/(r.speed/60);
-        const st = r.speed>55?'[OK] Free Flow':r.speed>35?'[Y] Slow':'[R] Congested';
-        document.getElementById('tip-title').textContent = r.label;
-        document.getElementById('tip-speed').textContent = r.speed.toFixed(0)+' mph';
-        document.getElementById('tip-vol').textContent = Math.round(r.volume)+' veh/hr';
-        document.getElementById('tip-time').textContent = est.toFixed(1)+' min';
-        document.getElementById('tip-status').textContent = st;
-        tip.style.display='block';
-        tip.style.left=(e.originalEvent.clientX+14)+'px';
-        tip.style.top=(e.originalEvent.clientY-10)+'px';
-      });
-      pl.on('mousemove', function(e){
-        const tip = document.getElementById('tooltip');
-        tip.style.left=(e.originalEvent.clientX+14)+'px';
-        tip.style.top=(e.originalEvent.clientY-10)+'px';
-      });
-      pl.on('mouseout', function(){
-        document.getElementById('tooltip').style.display='none';
-      });
-      routePolylines[r.id] = pl;
+      routePolylines[r.id] = makeRoutePolyline(r);
     }
   });
 }
@@ -1386,6 +1391,238 @@ function startLiveData(){
   setInterval(()=>{if(activeRoute)recalcRoute();},POLL_MS);
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   OVERPASS API — fetch real OSM road geometries so polylines align
+   with CartoDB basemap. Falls back to hardcoded pts if fetch fails.
+══════════════════════════════════════════════════════════════════ */
+
+// Maps our route id -> OSM ref value(s) to query
+const ROUTE_OSM_REFS = {
+  'I-90':       ['I 90'],
+  'I-93N':      ['I 93'],
+  'I-93S':      ['I 93'],
+  'SE-EXP':     ['I 93'],
+  'I-95N':      ['I 95','MA 128'],
+  'RT128S':     ['MA 128','I 95'],
+  'RT128N-EXT': ['MA 128','I 95'],
+  'I-495':      ['I 495'],
+  'I-290':      ['I 290'],
+  'I-291':      ['I 291'],
+  'I-91':       ['I 91'],
+  'RT2':        ['MA 2'],
+  'RT2A':       ['MA 2A'],
+  'RT3':        ['MA 3'],
+  'RT6':        ['MA 6'],
+  'RT9':        ['MA 9'],
+  'RT18':       ['MA 18'],
+  'RT20':       ['MA 20'],
+  'RT24':       ['MA 24'],
+  'RT28':       ['MA 28'],
+  'RT30':       ['MA 30'],
+  'RT38':       ['MA 38'],
+  'RT44':       ['MA 44'],
+  'RT62':       ['MA 62'],
+  'RT109':      ['MA 109'],
+  'RT110':      ['MA 110'],
+  'RT119':      ['MA 119'],
+  'RT135':      ['MA 135'],
+  'RT138':      ['MA 138'],
+  'RT140':      ['MA 140'],
+  'RT1':        ['US 1'],
+  'STORROW':    ['MA 3'],     // fallback only
+  'MEMORIAL':   ['MA 3'],     // fallback only
+  'RT9E':       ['MA 9'],
+  'RT1A-BOSTON':['MA 1A'],
+  'RT16':       ['MA 16'],
+};
+
+// Bounding box for Massachusetts
+const MA_BBOX = '41.1,-73.6,42.95,-69.85';
+
+// Stitch an array of OSM ways (each with .nodes[] and .geometry[{lat,lon}])
+// into one ordered [lat,lon] array covering the longest connected path.
+function stitchWays(ways) {
+  if (!ways.length) return null;
+
+  // Remove ways with no geometry
+  ways = ways.filter(w => w.geometry && w.geometry.length >= 2);
+  if (!ways.length) return null;
+
+  // Build node->wayIds index
+  const nodeToWay = {};
+  ways.forEach(w => {
+    [w.nodes[0], w.nodes[w.nodes.length-1]].forEach(n => {
+      if (!nodeToWay[n]) nodeToWay[n] = [];
+      nodeToWay[n].push(w.id);
+    });
+  });
+
+  const wayMap = {};
+  ways.forEach(w => wayMap[w.id] = w);
+
+  // Find a good start: prefer a node that appears only once (true endpoint)
+  let startWayId = ways[0].id;
+  outer: for (const w of ways) {
+    for (const endNode of [w.nodes[0], w.nodes[w.nodes.length-1]]) {
+      if ((nodeToWay[endNode] || []).length === 1) {
+        startWayId = w.id;
+        break outer;
+      }
+    }
+  }
+
+  const usedIds = new Set();
+  const result = [];
+
+  function appendWay(w, forward) {
+    const geom = forward ? w.geometry : [...w.geometry].reverse();
+    if (result.length > 0) {
+      // skip duplicate first point
+      geom.slice(1).forEach(n => result.push([n.lat, n.lon]));
+    } else {
+      geom.forEach(n => result.push([n.lat, n.lon]));
+    }
+    usedIds.add(w.id);
+    return forward ? w.nodes[w.nodes.length-1] : w.nodes[0];
+  }
+
+  let startW = wayMap[startWayId];
+  // Orient: find which end has no connection, start there
+  let lastNode = appendWay(startW, true);
+
+  let safeIter = ways.length * 3;
+  while (usedIds.size < ways.length && safeIter-- > 0) {
+    const candidates = (nodeToWay[lastNode] || []).filter(id => !usedIds.has(id));
+    if (!candidates.length) break;
+
+    const nextW = wayMap[candidates[0]];
+    if (nextW.nodes[0] === lastNode) {
+      lastNode = appendWay(nextW, true);
+    } else {
+      lastNode = appendWay(nextW, false);
+    }
+  }
+
+  return result.length >= 2 ? result : null;
+}
+
+// Clip coords to rough MA bounding box + small buffer
+function clipToMA(coords) {
+  return coords.filter(([lat,lon]) =>
+    lat >= 41.0 && lat <= 43.1 && lon >= -74.0 && lon <= -69.7
+  );
+}
+
+// Fetch all highway geometries in one Overpass call, group by ref
+async function fetchOverpassGeometries() {
+  // Collect unique refs we need
+  const allRefs = new Set();
+  ROUTES.forEach(r => {
+    (ROUTE_OSM_REFS[r.id] || []).forEach(ref => allRefs.add(ref));
+  });
+
+  // Build union query for all refs
+  const refFilter = [...allRefs].map(ref =>
+    `way["ref"="${ref}"]["highway"~"motorway|motorway_link|trunk|primary|secondary"](${MA_BBOX});`
+  ).join('\n  ');
+
+  const query = `[out:json][timeout:30];\n(\n  ${refFilter}\n);\nout geom;`;
+
+  const resp = await fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'data=' + encodeURIComponent(query),
+    signal: AbortSignal.timeout(35000)
+  });
+  if (!resp.ok) throw new Error('Overpass HTTP ' + resp.status);
+  const data = await resp.json();
+  return data.elements || [];
+}
+
+// Group overpass ways by ref tag, stitch each group, update route pts
+async function loadRealRoadGeometries() {
+  logEvent('info', '◌ Fetching real road geometries from OpenStreetMap...');
+  let elements;
+  try {
+    elements = await fetchOverpassGeometries();
+  } catch(e) {
+    logEvent('warn', '⚠ OSM fetch failed — using approximate coordinates');
+    return;
+  }
+
+  // Index ways by ref
+  const waysByRef = {};
+  elements.forEach(el => {
+    if (el.type !== 'way' || !el.ref && !el.tags?.ref) return;
+    const ref = el.tags?.ref;
+    if (!ref) return;
+    // A way may have multiple refs (e.g. "I 95;MA 128")
+    ref.split(/[;,]/).map(r => r.trim()).forEach(r => {
+      if (!waysByRef[r]) waysByRef[r] = [];
+      waysByRef[r].push(el);
+    });
+  });
+
+  let updated = 0;
+  ROUTES.forEach(r => {
+    const refs = ROUTE_OSM_REFS[r.id];
+    if (!refs) return;
+
+    // Try each ref, use whichever gives the most coverage
+    let bestCoords = null;
+    refs.forEach(ref => {
+      const ways = waysByRef[ref];
+      if (!ways || !ways.length) return;
+
+      // Filter to ways that are geographically near this route's hardcoded pts
+      // (avoids pulling in neighboring-state segments)
+      const midPt = r.pts[Math.floor(r.pts.length / 2)];
+      const nearby = ways.filter(w => {
+        if (!w.geometry || !w.geometry.length) return false;
+        const midG = w.geometry[Math.floor(w.geometry.length/2)];
+        const dlat = midG.lat - midPt[0];
+        const dlon = midG.lon - midPt[1];
+        return Math.sqrt(dlat*dlat + dlon*dlon) < 1.2; // ~80 miles max
+      });
+      if (!nearby.length) return;
+
+      const stitched = stitchWays(nearby);
+      if (!stitched) return;
+      const clipped = clipToMA(stitched);
+      if (clipped.length < 2) return;
+      if (!bestCoords || clipped.length > bestCoords.length) bestCoords = clipped;
+    });
+
+    if (bestCoords && bestCoords.length >= 2) {
+      r.pts = bestCoords;
+      // Update the Leaflet polyline geometry
+      if (routePolylines[r.id]) {
+        routePolylines[r.id].setLatLngs(bestCoords);
+      }
+      updated++;
+    }
+  });
+
+  logEvent('clear', `✓ Road geometries loaded — ${updated}/${ROUTES.length} routes aligned to OSM`);
+  // Rebuild sensors after pts updated
+  SENSORS.length = 0;
+  ROUTES.forEach(r => {
+    const step = Math.max(1, Math.floor(r.pts.length / 5));
+    for (let i = step; i < r.pts.length - 1; i += step) {
+      SENSORS.push({
+        id: `${r.id}-S${i}`, route: r.id, routeLabel: r.label,
+        lat: r.pts[i][0], lon: r.pts[i][1],
+        speed: 65, volume: 1200, type: 'loop', active: true, incident: null
+      });
+    }
+  });
+  if (showSensors) {
+    sensorLayerGroup.clearLayers();
+    Object.keys(sensorMarkers).forEach(k => delete sensorMarkers[k]);
+    updateSensorMarkers();
+  }
+}
+
 /* ── INIT ── */
 logEvent('clear','MA Traffic Twin initialized - Leaflet.js map');
 populateSelects();
@@ -1397,6 +1634,9 @@ updateExitMarkers();
 updateSensorMarkers();
 startLiveData();
 startSim();
+
+// Load real OSM geometries async — updates polylines in-place when ready
+loadRealRoadGeometries();
 </script>
 </body>
 </html>
