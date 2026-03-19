@@ -800,7 +800,7 @@ function buildSegments(){
 ═══════════════════════════════════════════════════════════════════════════ */
 const map=new maplibregl.Map({
   container:'map',
-  style:'https://tiles.openfreemap.org/styles/positron',
+  style:'https://tiles.openfreemap.org/styles/bright',
   center:[-71.5,42.0],
   zoom:8,
   maxBounds:[[-74.5,40.8],[-69.5,43.4]],
@@ -928,9 +928,45 @@ function updateRoutePathSource(){
 
 /* ── Map load: add sources, layers, interactivity ── */
 map.on('load',()=>{
+  // ── Boost secondary/tertiary road visibility in the base style ────────────
+  // Iterate style layers; find road-line layers by ID pattern and beef them up
+  map.getStyle().layers.forEach(layer=>{
+    if(layer.type!=='line') return;
+    const id=layer.id;
+    // Secondary & tertiary roads: make them medium-brown, clearly visible
+    if(/secondary|tertiary/.test(id)){
+      try{
+        map.setPaintProperty(id,'line-color','#b0956e');
+        map.setPaintProperty(id,'line-width',
+          ['interpolate',['linear'],['zoom'],7,1.2,10,2.5,13,4,16,7]);
+        map.setPaintProperty(id,'line-opacity',0.75);
+      }catch(e){}
+    }
+    // Residential / service: slightly darker than default
+    if(/residential|living_street|service/.test(id)){
+      try{
+        map.setPaintProperty(id,'line-color','#c8b898');
+        map.setPaintProperty(id,'line-opacity',0.65);
+      }catch(e){}
+    }
+  });
+  // Boost secondary road LABELS (symbol layers) — make ref shields visible
+  map.getStyle().layers.forEach(layer=>{
+    if(layer.type!=='symbol') return;
+    const id=layer.id;
+    if(/road.*label|highway.*ref|route.*ref|secondary.*label|road_label/.test(id)){
+      try{
+        map.setLayoutProperty(id,'text-size',
+          ['interpolate',['linear'],['zoom'],9,9,12,11,15,13]);
+        map.setPaintProperty(id,'text-color','#4a3520');
+        map.setPaintProperty(id,'text-halo-color','rgba(255,252,240,0.9)');
+        map.setPaintProperty(id,'text-halo-width',1.5);
+      }catch(e){}
+    }
+  });
+
   const styleLayerIds=map.getStyle().layers.map(l=>l.id);
-  // Insert traffic below labels but above road fills
-  // Look for first symbol layer
+  // Insert traffic below labels but above road fills — find first symbol layer
   const firstLabel=map.getStyle().layers.find(l=>l.type==='symbol')?.id;
 
   /* Traffic source */
@@ -946,7 +982,11 @@ map.on('load',()=>{
     layout:{'line-join':'round','line-cap':'round'},
     paint:{
       'line-color':'rgba(20,10,5,0.45)',
-      'line-width':['match',['get','roadType'],'interstate',9,'expressway',7,5],
+      'line-width':['interpolate',['linear'],['zoom'],
+        7,['match',['get','roadType'],'interstate',6,'expressway',5,4],
+        10,['match',['get','roadType'],'interstate',10,'expressway',8,6],
+        13,['match',['get','roadType'],'interstate',13,'expressway',10,8],
+        16,['match',['get','roadType'],'interstate',18,'expressway',14,10]],
       'line-opacity':0.7
     }
   },firstLabel);
@@ -957,7 +997,11 @@ map.on('load',()=>{
     layout:{'line-join':'round','line-cap':'round'},
     paint:{
       'line-color':['get','color'],
-      'line-width':['match',['get','roadType'],'interstate',6,'expressway',4,'arterial',3,2],
+      'line-width':['interpolate',['linear'],['zoom'],
+        7,['match',['get','roadType'],'interstate',4,'expressway',3,'arterial',2,1.5],
+        10,['match',['get','roadType'],'interstate',7,'expressway',5,'arterial',4,2.5],
+        13,['match',['get','roadType'],'interstate',10,'expressway',7,'arterial',5,3],
+        16,['match',['get','roadType'],'interstate',14,'expressway',10,'arterial',7,4]],
       'line-opacity':0.90
     }
   },firstLabel);
@@ -1220,19 +1264,22 @@ function tick(){
     r.congestionFactor=r.speed/r.baseSpd;
   });
 
-  // Per-segment variation adds granularity to route-level speed
+  // Per-segment variation — low noise, strong EMA so colors are stable
   SEGMENTS.forEach(seg=>{
     const route=ROUTES.find(r=>r.id===seg.routeId);
     if(!route)return;
-    const noise=(Math.random()-0.5)*0.22;
+    // ±3% noise max — stays in same colour band unless real condition changes
+    const noise=(Math.random()-0.5)*0.06;
     const incPen=seg.incidents.length>0?0.45:1.0;
-    seg.speed=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));
-    seg.volume=route.volume*(1+(Math.random()-0.5)*0.15);
+    const target=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));
+    // 92% EMA: takes ~12 ticks (~6 sec) to move through a full speed range
+    seg.speed=seg.speed*0.92+target*0.08;
+    seg.volume=route.volume*(1+(Math.random()-0.5)*0.08);
     seg.history.push(seg.speed);seg.history.shift();
   });
 
-  // Push to map
-  if(map.getSource)updateTrafficSource();
+  // Push to map every 2 ticks (~1 sec) to avoid WebGL thrash
+  if(map.getSource&&simTime%2===0)updateTrafficSource();
 
   // Gauges
   const allSpeeds=ROUTES.filter(r=>r.type!=='local').map(r=>r.speed);
