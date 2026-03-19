@@ -995,7 +995,7 @@ map.on('load',()=>{
   map.addLayer({
     id:'traffic-casing',type:'line',source:'traffic',
     filter:['in',['get','roadType'],['literal',['interstate','expressway']]],
-    layout:{'line-join':'round','line-cap':'round'},
+    layout:{'line-join':'round','line-cap':'round','visibility':'none'},
     paint:{
       'line-color':'rgba(20,10,5,0.45)',
       'line-width':['interpolate',['linear'],['zoom'],
@@ -1010,7 +1010,7 @@ map.on('load',()=>{
   /* Traffic color fill */
   map.addLayer({
     id:'traffic-fill',type:'line',source:'traffic',
-    layout:{'line-join':'round','line-cap':'round'},
+    layout:{'line-join':'round','line-cap':'round','visibility':'none'},
     paint:{
       'line-color':['get','color'],
       'line-width':['interpolate',['linear'],['zoom'],
@@ -1188,6 +1188,10 @@ out geom qt;`;
     badge.textContent='⚠ OSM unavailable — using route geometry';
     badge.style.color='#cc8800';
     if(ftOsm)ftOsm.textContent='fallback';
+    // Still show traffic with approximate coords rather than blank map
+    ['traffic-casing','traffic-fill'].forEach(id=>{
+      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
+    });
     logEvent('warn','⚠ OSM Overpass unreachable — using approximate route geometry');
     return;
   }
@@ -1230,6 +1234,10 @@ out geom qt;`;
     osmFeatures=newFeatures;
     osmWaysLoaded=true;
     updateTrafficSource();
+    // Reveal traffic layers now that real geometry is loaded
+    ['traffic-casing','traffic-fill'].forEach(id=>{
+      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
+    });
     badge.textContent=`✓ ${matched} OSM road segments`;
     badge.style.color='#1a5c1a';
     if(ftOsm)ftOsm.textContent=`${matched} ways`;
@@ -1239,7 +1247,10 @@ out geom qt;`;
     badge.textContent='⚠ No OSM matches — using route geometry';
     badge.style.color='#cc8800';
     if(ftOsm)ftOsm.textContent='no match';
-    logEvent('warn','OSM returned no matching ways — check Overpass');
+    ['traffic-casing','traffic-fill'].forEach(id=>{
+      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
+    });
+    logEvent('warn','OSM returned no matching ways — using approximate geometry');
   }
 }
 
@@ -1420,17 +1431,22 @@ function triggerAccident(){
   logEvent('crit','🚨 Emergency response dispatched');
 }
 function triggerWeather(){
-  sliders.weather=75;
   const sl=document.getElementById('sl-weather'),sv=document.getElementById('sv-weather');
-  if(sl)sl.value=75;if(sv)sv.textContent='75%';
-  weatherActive=true;
-  document.getElementById('btn-weather').classList.add('on');
-  logEvent('warn','❄ Winter storm warning — reduced visibility statewide');
-  setTimeout(()=>{
-    weatherActive=false;document.getElementById('btn-weather').classList.remove('on');
-    sliders.weather=10;if(sl)sl.value=10;if(sv)sv.textContent='10%';
-    logEvent('clear','🌤 Storm clearing — conditions improving');
-  },30000);
+  // Toggle: if already active, turn off; if off, turn on
+  if(weatherActive){
+    weatherActive=false;
+    document.getElementById('btn-weather').classList.remove('on');
+    sliders.weather=0;
+    if(sl)sl.value=0;if(sv)sv.textContent='0%';
+    logEvent('clear','🌤 Storm cleared — conditions returning to normal');
+  } else {
+    weatherActive=true;
+    sliders.weather=75;
+    document.getElementById('btn-weather').classList.add('on');
+    if(sl)sl.value=75;if(sv)sv.textContent='75%';
+    logEvent('warn','❄ Winter storm warning — reduced visibility statewide');
+    logEvent('warn','Speed limits reduced — use caution on all routes');
+  }
 }
 function toggleRush(){
   rushHour=!rushHour;
