@@ -5,64 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MA Traffic Twin - Massachusetts Road Network Digital Twin</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#f4efe0;--surface:#ede8d8;--panel:#e8e0cc;--border:#c8b890;
   --cyan:#003399;--green:#1a5c1a;--yellow:#886600;--orange:#cc4400;--red:#cc1100;
   --text:#1a1008;--muted:#6a5840;--dim:#ddd5c0;
-  --free:#1a8c1a;--slow:#cc8800;--stop:#cc1100;--unknown:#8a7050;
+  --free:#1a8c1a;--slow:#cc8800;--stop:#cc1100;
 }
-html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden;position:fixed;width:100%;}
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;position:fixed;top:0;left:0;right:0;bottom:0;}
-.hdr{background:#3a2010;border-bottom:3px solid #c8a060;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:8px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.3);min-height:44px;flex-shrink:0;}
+html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;overflow:hidden;position:fixed;width:100%;}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;position:fixed;top:0;left:0;}
+.hdr{background:#3a2010;border-bottom:3px solid #c8a060;display:flex;align-items:center;
+  justify-content:space-between;padding:0 14px;gap:8px;flex-wrap:wrap;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);min-height:44px;flex-shrink:0;}
 .logo{font-family:Georgia,serif;font-size:16px;font-weight:bold;letter-spacing:.1em;color:#ffe8b0;white-space:nowrap;}
 .sys-status{display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:.15em;color:#ffe8b0;}
 .dot{width:7px;height:7px;border-radius:50%;background:#888;}
-.dot.ok{background:#1a8c1a;}
-.dot.warn{background:#cc8800;}
-.dot.crit{background:#cc1100;animation:blink .6s infinite;}
+.dot.ok{background:#1a8c1a;}.dot.warn{background:#cc8800;}.dot.crit{background:#cc1100;animation:blink .6s infinite;}
 @keyframes blink{50%{opacity:.3}}
 .hdr-btns{display:flex;gap:5px;flex-wrap:wrap;}
-.hbtn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.12em;padding:4px 10px;border:1px solid rgba(255,220,160,0.3);background:rgba(255,220,160,0.1);color:#c8a060;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase;}
+.hbtn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.12em;padding:4px 10px;
+  border:1px solid rgba(255,220,160,0.3);background:rgba(255,220,160,0.1);color:#c8a060;
+  cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase;}
 .hbtn:hover{border-color:#ffe0a0;color:#ffe0a0;}
 .hbtn.on{background:#ffe0a0;border-color:#ffe0a0;color:#2a1808;font-weight:700;}
 .hbtn.danger:hover{border-color:#ff8866;color:#ff8866;}
 .hbtn.danger.on{background:#cc2200;border-color:#ff4422;color:#fff;}
 .hdr-clock{font-size:10px;color:#ffe0a0;letter-spacing:.1em;white-space:nowrap;}
 .content{display:grid;grid-template-columns:1fr 280px;grid-template-rows:1fr;overflow:hidden;flex:1;min-height:0;}
-.map-area{position:relative;overflow:hidden;background:var(--bg);min-height:0;height:100%;}
-#leaflet-map{position:absolute;inset:0;z-index:1;}
-
-/* Override Leaflet attribution for our style */
-.leaflet-control-attribution{font-size:7px;background:rgba(244,239,224,0.85)!important;color:#6a5840;}
-.leaflet-control-zoom{border:1px solid #a09070!important;}
-.leaflet-control-zoom a{background:rgba(244,239,224,0.97)!important;color:#2a1808!important;border-color:#a09070!important;font-family:'Share Tech Mono',monospace;}
-.leaflet-control-zoom a:hover{background:#fff!important;border-color:#6a4828!important;}
-
-.legend{position:absolute;bottom:50px;left:12px;background:rgba(244,239,224,0.97);border:1px solid #a09070;border-radius:3px;padding:8px 10px;font-size:8px;letter-spacing:.08em;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:900;}
-.legend-title{color:#1a1008;margin-bottom:6px;font-size:9px;font-weight:700;font-family:Georgia,serif;border-bottom:1px solid #c8b890;padding-bottom:4px;}
+.map-area{position:relative;overflow:hidden;background:#e8e4d8;min-height:0;height:100%;}
+#map{position:absolute;inset:0;}
+.maplibregl-ctrl-attrib{font-size:7px!important;}
+.maplibregl-ctrl-group{border:1px solid #a09070!important;border-radius:2px!important;}
+.maplibregl-ctrl-group button{font-family:'Share Tech Mono',monospace;}
+.legend{position:absolute;bottom:50px;left:12px;background:rgba(244,239,224,0.97);
+  border:1px solid #a09070;border-radius:3px;padding:8px 10px;font-size:8px;
+  letter-spacing:.08em;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:10;pointer-events:none;}
+.legend-title{color:#1a1008;margin-bottom:6px;font-size:9px;font-weight:700;
+  font-family:Georgia,serif;border-bottom:1px solid #c8b890;padding-bottom:4px;}
 .leg-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;color:#2a1808;}
 .leg-line{width:24px;height:4px;border-radius:1px;}
 .leg-dot{width:8px;height:8px;border-radius:50%;border:1px solid rgba(0,0,0,0.3);}
-.tooltip-panel{position:absolute;background:rgba(244,239,224,0.98);border:1px solid #8a7050;border-radius:3px;padding:8px 10px;font-size:8px;pointer-events:none;display:none;z-index:1000;min-width:160px;box-shadow:2px 2px 8px rgba(0,0,0,0.25);}
-.tip-title{color:#2a1808;font-size:10px;margin-bottom:5px;font-family:Georgia,serif;font-weight:bold;border-bottom:1px solid #c8b890;padding-bottom:3px;}
+.osm-badge{position:absolute;bottom:10px;left:12px;background:rgba(244,239,224,0.95);
+  border:1px solid #a09070;border-radius:2px;padding:3px 7px;font-size:7px;
+  color:#6a5840;z-index:10;pointer-events:none;}
+.api-note{position:absolute;top:12px;right:12px;background:rgba(244,239,224,0.97);
+  border:1px solid #a09070;border-radius:3px;padding:7px 10px;font-size:7px;
+  color:#4a3828;max-width:200px;line-height:1.7;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:10;}
+.api-note strong{color:#1a1008;font-family:Georgia,serif;}
+.api-note a{color:#003399;text-decoration:none;}
+.tooltip-panel{position:absolute;background:rgba(244,239,224,0.98);border:1px solid #8a7050;
+  border-radius:3px;padding:8px 10px;font-size:8px;pointer-events:none;
+  display:none;z-index:20;min-width:160px;box-shadow:2px 2px 8px rgba(0,0,0,0.25);}
+.tip-title{color:#2a1808;font-size:10px;margin-bottom:5px;font-family:Georgia,serif;
+  font-weight:bold;border-bottom:1px solid #c8b890;padding-bottom:3px;}
 .tip-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;color:#3a2818;}
 .tip-val{color:#883300;font-weight:700;}
-.right-panel{background:var(--surface);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
+.right-panel{background:var(--surface);border-left:2px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
 .psec{border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;}
-.psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;}
+.psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;
+  color:#2a1008;margin-bottom:8px;text-transform:uppercase;
+  border-bottom:1px solid var(--border);padding-bottom:4px;}
 .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .gauge{background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:6px 8px;text-align:center;}
 .gauge-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;line-height:1.1;}
 .gauge-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;margin-top:2px;}
 .gauge-bar{height:2px;background:var(--border);border-radius:1px;margin-top:5px;overflow:hidden;}
 .gauge-fill{height:100%;border-radius:1px;transition:width .4s,background .4s;}
-.incidents{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;background:var(--panel);}
+.incidents{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;background:var(--panel);}
 .inc-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;}
-.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;border-left:2px solid;font-size:8px;animation:slideIn .3s ease;cursor:pointer;transition:background .15s;color:#2a1808;}
+.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;
+  border-left:2px solid;font-size:8px;animation:slideIn .3s ease;cursor:pointer;
+  transition:background .15s;color:#2a1808;}
 .inc-item:hover{background:var(--dim);}
 @keyframes slideIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 .inc-crit{border-color:#cc1100;background:rgba(200,30,0,0.07);}
@@ -73,131 +92,105 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .inc-body{flex:1;line-height:1.5;}
 .inc-route{color:#883300;font-weight:700;}
 .inj-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-.inj-btn{font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 4px;border:1px solid var(--border);background:var(--dim);cursor:pointer;border-radius:2px;text-align:center;line-height:1.4;transition:all .15s;color:#3a2818;}
+.inj-btn{font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 4px;
+  border:1px solid var(--border);background:var(--dim);cursor:pointer;
+  border-radius:2px;text-align:center;line-height:1.4;transition:all .15s;color:#3a2818;}
 .inj-btn:hover{border-color:#883300;color:#883300;background:#f0e8d0;}
 .sl-row{display:flex;align-items:center;gap:6px;font-size:7px;margin-bottom:5px;}
 .sl-lbl{width:70px;color:var(--muted);}
 .sl-val{width:30px;text-align:right;color:#883300;font-weight:700;}
 input[type=range]{flex:1;-webkit-appearance:none;height:2px;background:var(--border);border-radius:1px;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#883300;cursor:pointer;}
-.footer{border-top:2px solid #6a4828;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:8px;color:#c8a060;letter-spacing:.1em;background:linear-gradient(90deg,#2a1808,#3a2010,#2a1808);flex-shrink:0;min-height:30px;}
+.footer{border-top:2px solid #6a4828;display:flex;align-items:center;
+  justify-content:space-between;padding:0 16px;font-size:8px;color:#c8a060;
+  letter-spacing:.1em;background:linear-gradient(90deg,#2a1808,#3a2010,#2a1808);
+  flex-shrink:0;min-height:30px;}
 .ft-stats{display:flex;gap:16px;}
 .ft-stat span{color:#ffe0a0;font-weight:700;}
-.api-note{position:absolute;top:12px;right:12px;background:rgba(244,239,224,0.97);border:1px solid #a09070;border-radius:3px;padding:7px 10px;font-size:7px;color:#4a3828;max-width:200px;line-height:1.7;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:900;}
-.api-note strong{color:#1a1008;font-family:Georgia,serif;}
-.api-note a{color:#003399;text-decoration:none;}
-.api-note a:hover{text-decoration:underline;}
-/* Pulse animation for incident markers */
-@keyframes pulse-ring {
-  0%{transform:scale(0.5);opacity:1;}
-  100%{transform:scale(2.5);opacity:0;}
-}
-.incident-pulse{animation:pulse-ring 1.5s ease-out infinite;}
-/* Alt route styles */
-.alt-route-item{border:1px solid var(--border);border-radius:2px;padding:5px 6px;margin-bottom:3px;cursor:pointer;font-size:7px;background:var(--dim);transition:background .15s;}
+.alt-route-item{border:1px solid var(--border);border-radius:2px;padding:5px 6px;
+  margin-bottom:3px;cursor:pointer;font-size:7px;background:var(--dim);transition:background .15s;}
 .alt-route-item:hover{background:#e8d8c0;}
 .alt-route-item.selected-alt{border-color:#003399;background:rgba(0,50,150,0.08);}
 .alt-head{display:flex;justify-content:space-between;margin-bottom:2px;font-size:8px;font-weight:700;}
 #route-result{display:none;}
 #route-result.visible{display:block;}
+/* MapLibre exit marker */
+.exit-dot{width:7px;height:7px;background:#1a5c1a;border:1.5px solid #fff;
+  border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);}
+.sensor-dot{width:5px;height:5px;background:#0044aa;border:1px solid #fff;
+  border-radius:50%;pointer-events:none;}
+/* Incident pulse marker */
+@keyframes pulse-ring{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
+.inc-marker-wrap{position:relative;width:28px;height:28px;}
+.inc-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(204,0,0,.65);animation:pulse-ring 1.4s ease-out infinite;}
+.inc-dot{position:absolute;top:8px;left:8px;width:12px;height:12px;border-radius:50%;
+  background:#cc1100;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:8px;}
+/* MapLibre popup */
+.maplibregl-popup-content{font-family:'Share Tech Mono',monospace;font-size:8px;
+  background:rgba(244,239,224,0.98)!important;border:1px solid #8a7050;padding:6px 8px;}
 @media(max-width:768px){.content{grid-template-columns:1fr;}.right-panel{display:none;}}
 </style>
 </head>
 <body>
 <div class="app">
-
 <!-- HEADER -->
 <div class="hdr">
   <div style="display:flex;align-items:center;gap:12px">
     <div class="logo">MA TRAFFIC TWIN</div>
-    <div class="sys-status">
-      <div class="dot ok" id="sys-dot"></div>
-      <span id="sys-label">NOMINAL</span>
-    </div>
+    <div class="sys-status"><div class="dot ok" id="sys-dot"></div><span id="sys-label">NOMINAL</span></div>
   </div>
-  <div class="hdr-mid">
-    <div class="hdr-btns">
-      <button class="hbtn on" id="btn-run" onclick="toggleSim()">|| LIVE</button>
-      <button class="hbtn" onclick="resetSim()">⟳ RESET</button>
-      <button class="hbtn" id="btn-rush" onclick="toggleRush()">⚡ RUSH HOUR</button>
-      <button class="hbtn danger" id="btn-accident" onclick="triggerAccident()">! ACCIDENT</button>
-      <button class="hbtn danger" id="btn-weather" onclick="triggerWeather()">❄ STORM</button>
-      <button class="hbtn" id="btn-sensors" onclick="toggleSensors()">◉ SENSORS</button>
-      <button class="hbtn" id="btn-labels" onclick="toggleLabels()">⊞ LABELS</button>
-    </div>
+  <div class="hdr-btns">
+    <button class="hbtn on" id="btn-run" onclick="toggleSim()">|| LIVE</button>
+    <button class="hbtn" onclick="resetSim()">⟳ RESET</button>
+    <button class="hbtn" id="btn-rush" onclick="toggleRush()">⚡ RUSH HOUR</button>
+    <button class="hbtn danger" id="btn-accident" onclick="triggerAccident()">! ACCIDENT</button>
+    <button class="hbtn danger" id="btn-weather" onclick="triggerWeather()">❄ STORM</button>
+    <button class="hbtn on" id="btn-sensors" onclick="toggleSensors()">◉ SENSORS</button>
+    <button class="hbtn on" id="btn-labels" onclick="toggleLabels()">⊞ EXITS</button>
   </div>
   <div class="hdr-clock" id="sim-clock">Loading...</div>
 </div>
-
 <!-- CONTENT -->
 <div class="content">
   <div class="map-area" id="map-area">
-    <!-- Leaflet Map -->
-    <div id="leaflet-map"></div>
-
-    <!-- API Note -->
-    <div class="api-note">
-      <strong>Data Sources:</strong><br>
-      Simulated twin - ready for live data.<br>
-      <strong>MassDOT APIs available:</strong><br>
-      * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">GoTime Travel Times</a> (requires key)<br>
-      * <a href="https://geo-massdot.opendata.arcgis.com/" target="_blank">GeoDOT Open Data</a><br>
-      * Traffic cameras via TrafficLand<br>
-      * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">Highway event feed</a>
-    </div>
-
-    <!-- Legend -->
+    <div id="map"></div>
     <div class="legend">
       <div class="legend-title">Traffic Speed</div>
-      <div class="leg-row"><div class="leg-line" style="background:var(--free)"></div><span>Free Flow (&gt;45mph)</span></div>
-      <div class="leg-row"><div class="leg-line" style="background:var(--slow)"></div><span>Slow (25-45mph)</span></div>
-      <div class="leg-row"><div class="leg-line" style="background:var(--stop)"></div><span>Stopped (&lt;25mph)</span></div>
-      <div class="leg-row" style="margin-top:4px"><div class="leg-dot" style="background:var(--red)"></div><span>Incident</span></div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--cyan)"></div><span>Sensor</span></div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--free)"></div><span>Free Flow (&gt;45 mph)</span></div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--slow)"></div><span>Slow (25–45 mph)</span></div>
+      <div class="leg-row"><div class="leg-line" style="background:var(--stop)"></div><span>Congested (&lt;25 mph)</span></div>
+      <div class="leg-row" style="margin-top:4px"><div class="leg-dot" style="background:#cc1100"></div><span>Incident</span></div>
+      <div class="leg-row"><div class="leg-dot" style="background:#1a5c1a"></div><span>Exit / Sensor</span></div>
     </div>
-
-    <!-- Tooltip -->
+    <div class="osm-badge" id="osm-badge">⏳ Loading road geometry…</div>
+    <div class="api-note">
+      <strong>Data Sources:</strong><br>
+      <strong>Map:</strong> MapLibre GL + OpenFreeMap<br>
+      <strong>Roads:</strong> OpenStreetMap via Overpass<br>
+      <strong>MassDOT APIs:</strong><br>
+      * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">GoTime Travel Times</a><br>
+      * <a href="https://geo-massdot.opendata.arcgis.com/" target="_blank">GeoDOT Open Data</a>
+    </div>
     <div class="tooltip-panel" id="tooltip">
-      <div class="tip-title" id="tip-title">Route</div>
+      <div class="tip-title" id="tip-title">Segment</div>
       <div class="tip-row"><span>Speed</span><span class="tip-val" id="tip-speed">-</span></div>
       <div class="tip-row"><span>Volume</span><span class="tip-val" id="tip-vol">-</span></div>
-      <div class="tip-row"><span>Travel Time</span><span class="tip-val" id="tip-time">-</span></div>
+      <div class="tip-row"><span>Segment</span><span class="tip-val" id="tip-time">-</span></div>
       <div class="tip-row"><span>Status</span><span class="tip-val" id="tip-status">-</span></div>
     </div>
   </div>
-
   <!-- RIGHT PANEL -->
   <div class="right-panel">
-
-    <!-- System Gauges -->
     <div class="psec">
       <div class="psec-title">Network Status</div>
       <div class="gauge-grid">
-        <div class="gauge">
-          <div class="gauge-val" id="g-avgspeed" style="color:var(--green)">0</div>
-          <div class="gauge-lbl">AVG MPH</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="gf-speed" style="width:0%;background:var(--green)"></div></div>
-        </div>
-        <div class="gauge">
-          <div class="gauge-val" id="g-volume" style="color:var(--cyan)">0</div>
-          <div class="gauge-lbl">VEH/HR</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="gf-vol" style="width:0%;background:var(--cyan)"></div></div>
-        </div>
-        <div class="gauge">
-          <div class="gauge-val" id="g-incidents" style="color:var(--red)">0</div>
-          <div class="gauge-lbl">INCIDENTS</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="gf-inc" style="width:0%;background:var(--red)"></div></div>
-        </div>
-        <div class="gauge">
-          <div class="gauge-val" id="g-congestion" style="color:var(--yellow)">0</div>
-          <div class="gauge-lbl">CONGESTION%</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="gf-cong" style="width:0%;background:var(--yellow)"></div></div>
-        </div>
+        <div class="gauge"><div class="gauge-val" id="g-avgspeed" style="color:var(--green)">0</div><div class="gauge-lbl">AVG MPH</div><div class="gauge-bar"><div class="gauge-fill" id="gf-speed" style="width:0%"></div></div></div>
+        <div class="gauge"><div class="gauge-val" id="g-volume" style="color:var(--cyan)">0</div><div class="gauge-lbl">VEH/HR</div><div class="gauge-bar"><div class="gauge-fill" id="gf-vol" style="width:0%"></div></div></div>
+        <div class="gauge"><div class="gauge-val" id="g-incidents" style="color:var(--red)">0</div><div class="gauge-lbl">INCIDENTS</div><div class="gauge-bar"><div class="gauge-fill" id="gf-inc" style="width:0%"></div></div></div>
+        <div class="gauge"><div class="gauge-val" id="g-congestion" style="color:var(--yellow)">0</div><div class="gauge-lbl">CONGESTION%</div><div class="gauge-bar"><div class="gauge-fill" id="gf-cong" style="width:0%"></div></div></div>
       </div>
     </div>
-
-    <!-- Route Planner -->
-    <div class="psec" style="flex-shrink:0">
+    <div class="psec">
       <div class="psec-title">⊕ Route Planner</div>
       <div style="font-size:7px;color:var(--muted);margin-bottom:2px">FROM EXIT</div>
       <select id="sel-from" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:7px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
@@ -210,7 +203,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
         <button onclick="calcAltRoutes()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:rgba(0,50,150,0.1);color:#003399;border:1px solid rgba(0,50,150,0.3);border-radius:2px;cursor:pointer">&lt;&gt; ALTS</button>
         <button onclick="clearRoute()" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:var(--dim);color:var(--muted);border:1px solid var(--border);border-radius:2px;cursor:pointer">X</button>
       </div>
-      <!-- Result -->
       <div id="route-result" style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:7px 8px;font-size:8px;">
         <div id="rr-head" style="font-family:Georgia,serif;font-size:9px;font-weight:bold;color:#1a1008;margin-bottom:5px;"></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Distance</span><span id="rr-dist" style="color:#883300;font-weight:700">-</span></div>
@@ -225,89 +217,52 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
         </div>
       </div>
     </div>
-
-    <!-- Operating Conditions -->
     <div class="psec">
       <div class="psec-title">Conditions</div>
-      <div class="sl-row">
-        <div class="sl-lbl">Traffic Load</div>
-        <input type="range" id="sl-traffic" min="10" max="100" value="85" oninput="updateSl('traffic',this.value)">
-        <div class="sl-val" id="sv-traffic">85%</div>
-      </div>
-      <div class="sl-row">
-        <div class="sl-lbl">Weather Impact</div>
-        <input type="range" id="sl-weather" min="0" max="100" value="0" oninput="updateSl('weather',this.value)">
-        <div class="sl-val" id="sv-weather">0%</div>
-      </div>
-      <div class="sl-row">
-        <div class="sl-lbl">Construction</div>
-        <input type="range" id="sl-const" min="0" max="100" value="20" oninput="updateSl('const',this.value)">
-        <div class="sl-val" id="sv-const">20%</div>
-      </div>
+      <div class="sl-row"><div class="sl-lbl">Traffic Load</div><input type="range" id="sl-traffic" min="10" max="100" value="85" oninput="updateSl('traffic',this.value)"><div class="sl-val" id="sv-traffic">85%</div></div>
+      <div class="sl-row"><div class="sl-lbl">Weather Impact</div><input type="range" id="sl-weather" min="0" max="100" value="0" oninput="updateSl('weather',this.value)"><div class="sl-val" id="sv-weather">0%</div></div>
+      <div class="sl-row"><div class="sl-lbl">Construction</div><input type="range" id="sl-const" min="0" max="100" value="20" oninput="updateSl('const',this.value)"><div class="sl-val" id="sv-const">20%</div></div>
     </div>
-
-    <!-- Inject -->
     <div class="psec">
       <div class="psec-title">Inject Event</div>
       <div class="inj-grid">
         <button class="inj-btn" onclick="injectEvent('accident')">! Accident<br>I-93</button>
         <button class="inj-btn" onclick="injectEvent('breakdown')">⚠ Breakdown<br>Route 128</button>
-        <button class="inj-btn" onclick="injectEvent('construction')">[WZ] Lane Closure<br>Mass Pike</button>
-        <button class="inj-btn" onclick="injectEvent('flood')">🌊 Flooding<br>Southeast Exp</button>
+        <button class="inj-btn" onclick="injectEvent('construction')">🚧 Lane Closure<br>Mass Pike</button>
+        <button class="inj-btn" onclick="injectEvent('flood')">🌊 Flooding<br>SE Expressway</button>
         <button class="inj-btn" onclick="injectEvent('event')">🏟 Stadium<br>Event</button>
         <button class="inj-btn" onclick="injectEvent('clearall')">[OK] Clear<br>All Events</button>
       </div>
     </div>
-
-    <!-- LIVE DATA PANEL -->
-    <div class="psec" style="flex-shrink:0">
+    <div class="psec">
       <div class="psec-title" style="display:flex;justify-content:space-between;align-items:center">
         <span>⚡ Live Feeds</span>
         <span id="live-badge" style="font-size:7px;color:#886600;letter-spacing:.1em;font-family:'Share Tech Mono',monospace">○ SIM</span>
       </div>
-      <div id="live-data-panel" style="font-size:7px;color:var(--muted);line-height:1.8">
-        Connecting to live feeds...
-      </div>
+      <div id="live-data-panel" style="font-size:7px;color:var(--muted);line-height:1.8">Connecting…</div>
     </div>
-
-    <!-- Incidents log -->
     <div class="incidents">
       <div class="inc-title">Event Log</div>
       <div id="incident-log"></div>
     </div>
-
   </div>
 </div>
-
 <!-- FOOTER -->
 <div class="footer">
   <div class="ft-stats">
     <div class="ft-stat">ROUTES <span id="ft-routes">0</span></div>
-    <div class="ft-stat">SENSORS <span id="ft-sensors">0</span></div>
+    <div class="ft-stat">SEGMENTS <span id="ft-segs">0</span></div>
     <div class="ft-stat">SIM TIME <span id="ft-time">0s</span></div>
-    <div class="ft-stat">TICK <span id="ft-tick">1×</span></div>
+    <div class="ft-stat">OSM <span id="ft-osm">loading</span></div>
   </div>
-  <div>MA TRAFFIC TWIN - MassDOT Digital Twin - J2AI - Data: Simulated (hook to GoTime API for live)</div>
+  <div>MA TRAFFIC TWIN v3 · MapLibre GL · OpenStreetMap · J2AI</div>
 </div>
-
 </div>
-
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   MASSACHUSETTS ROAD NETWORK DIGITAL TWIN
-   Leaflet.js map with CartoDB Positron tiles
-   MA center: lat 42.0, lon -71.5, zoom 8
-══════════════════════════════════════════════════════════════════ */
 
-/* ── SPEED COLOR ── */
-function speedColor(spd,type){
-  if(type==='local') return spd<15?'#cc1100':spd<25?'#cc8800':'#8a7050';
-  if(type==='arterial') return spd<20?'#cc1100':spd<35?'#cc8800':'#1a8c1a';
-  return spd>45?'#1a8c1a':spd>25?'#cc8800':spd>12?'#cc5500':'#cc1100';
-}
-
-/* ── MA ROAD NETWORK DATA ── */
-// Dense GPS-accurate waypoints – every route hand-verified against OSM satellite
+/* ═══════════════════════════════════════════════════════════════════════════
+   DATA  —  ROUTES, EXITS, TOD
+═══════════════════════════════════════════════════════════════════════════ */
 const ROUTES=[
   {id:'I-90',label:'Mass Pike (I-90)',type:'interstate',pts:[
     [42.348,-71.059],[42.346,-71.073],[42.348,-71.083],[42.350,-71.100],
@@ -610,6 +565,8 @@ const ROUTES=[
 ];
 
 
+
+
 /* ── EXIT DATABASE ── */
 const EXITS=[
   {id:'I90-9', route:'I-90',exit:'9', name:'Mass Ave Boston',       lat:42.343,lon:-71.073,mi:1},
@@ -756,382 +713,10 @@ const EXITS=[
   {id:'RT18-B', route:'RT18',exit:'3',name:'Abington',             lat:42.040,lon:-70.918,mi:8},
   {id:'RT18-C', route:'RT18',exit:'5',name:'Rockland',             lat:41.980,lon:-70.906,mi:16},
 ];
+
 EXITS.forEach((e,i)=>{if(!e.id)e.id=`exit_${i}`;if(e.mi===undefined)e.mi=i*2;});
 const EXITS_DB=EXITS;
 
-/* ── SENSORS ── */
-const SENSORS=[];
-ROUTES.forEach(r=>{
-  const step=Math.max(1,Math.floor(r.pts.length/4));
-  for(let i=step;i<r.pts.length-1;i+=step){
-    SENSORS.push({
-      id:`${r.id}-S${i}`,route:r.id,routeLabel:r.label,
-      lat:r.pts[i][0],lon:r.pts[i][1],
-      speed:65,volume:1200,type:'loop',active:true,incident:null
-    });
-  }
-});
-
-/* ── STATE ── */
-let simRunning=true,simTime=0,tickRate=1,simInterval=null;
-let showSensors=true,showLabels=true;
-let rushHour=false,weatherActive=false;
-let incidents=[],eventCount=0;
-let sliders={traffic:85,weather:0,const:20};
-
-/* ── ROUTE STATE ── */
-ROUTES.forEach(r=>{
-  r.speed=r.type==='local'?30:65;
-  r.volume=r.type==='local'?400:1200;
-  r.incidents=[];
-  r.congestionFactor=1.0;
-  r.history=new Array(60).fill(65);
-  r.baseSpd=r.type==='local'?35:r.type==='arterial'?45:65;
-});
-
-/* ══════════════════════════════════════════════════════════════════
-   LEAFLET MAP  –  Segment-based architecture
-   Each section between consecutive exits = its own polyline + speed.
-   OSRM routes-API (steps=true) fetches exact road geometry per segment.
-══════════════════════════════════════════════════════════════════ */
-const map = L.map('leaflet-map',{center:[42.05,-71.5],zoom:8,
-  zoomControl:true,attributionControl:true});
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
-  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains:'abcd', maxZoom:19
-}).addTo(map);
-
-/* ── Layer groups ── */
-const segmentLayer  = L.layerGroup().addTo(map);
-const exitLayer     = L.layerGroup().addTo(map);
-const sensorLayer   = L.layerGroup().addTo(map);
-const incidentLayer = L.layerGroup().addTo(map);
-const routePathGroup= L.layerGroup().addTo(map);
-
-/* ── Segment data ──────────────────────────────────────────────────────────
-   One entry per consecutive-exit pair on the same route.
-   Routes without exits in EXITS_DB keep their pts[] and show as one segment.
-──────────────────────────────────────────────────────────────────────────── */
-const SEGMENTS = [];
-
-function buildSegments(){
-  // Group exits by route, sorted by mile marker
-  const byRoute={};
-  EXITS_DB.forEach(e=>{
-    if(!byRoute[e.route]) byRoute[e.route]=[];
-    byRoute[e.route].push(e);
-  });
-
-  Object.entries(byRoute).forEach(([rid, exits])=>{
-    const route = ROUTES.find(r=>r.id===rid);
-    const sorted = exits.sort((a,b)=>a.mi-b.mi);
-    for(let i=0;i<sorted.length-1;i++){
-      const A=sorted[i], B=sorted[i+1];
-      const distMi = Math.max(0.5, Math.abs(B.mi-A.mi));
-      SEGMENTS.push({
-        id:`${rid}-${i}`,
-        routeId:rid,
-        label:`${rid} Exit ${A.exit}→${B.exit}`,
-        fullLabel: (route?.label||rid)+` • Exit ${A.exit}→${B.exit} (${distMi.toFixed(1)}mi)`,
-        type: route?.type||'arterial',
-        baseSpd: route ? (route.type==='local'?35:route.type==='arterial'?45:65) : 65,
-        fromExit:A, toExit:B, distMi,
-        pts:[[A.lat,A.lon],[B.lat,B.lon]],   // will be snapped by snapSegmentGeometries
-        geoReady:false, polyline:null,
-        speed:route?(route.type==='local'?30:65):65,
-        volume:1200, incidents:[], congestionFactor:1.0,
-        history:new Array(60).fill(65),
-      });
-    }
-  });
-
-  // Routes with NO exits → one segment using their pts[] directly
-  ROUTES.forEach(route=>{
-    const hasExits = EXITS_DB.some(e=>e.route===route.id);
-    if(hasExits) return;
-    // Split into ~5 subsegments for some granularity
-    const pts = route.pts;
-    const chunk = Math.max(2, Math.ceil(pts.length/5));
-    for(let i=0;i<pts.length-1;i+=chunk){
-      const slice = pts.slice(i, Math.min(i+chunk+1, pts.length));
-      if(slice.length<2) continue;
-      SEGMENTS.push({
-        id:`${route.id}-pts-${i}`,
-        routeId:route.id,
-        label:route.label,
-        fullLabel:route.label,
-        type:route.type,
-        baseSpd:route.type==='local'?35:route.type==='arterial'?45:65,
-        fromExit:{lat:slice[0][0],lon:slice[0][1],exit:i},
-        toExit:{lat:slice[slice.length-1][0],lon:slice[slice.length-1][1],exit:i+chunk},
-        distMi:3, pts:slice, geoReady:true, polyline:null,
-        speed:route.type==='local'?30:65,
-        volume:1200, incidents:[], congestionFactor:1.0,
-        history:new Array(60).fill(65),
-      });
-    }
-  });
-}
-
-/* ── Line weight / opacity by road type ── */
-function segWeight(type){return type==='interstate'?5:type==='expressway'?3.5:type==='arterial'?2.5:1.8;}
-function segOpacity(type){return type==='local'?0.55:0.88;}
-
-/* ── Create & register all Leaflet polylines ── */
-const segPolylines = {};
-const exitMarkers  = {};
-const sensorMarkers= {};
-const incidentMarkers = {};
-
-function initSegmentPolylines(){
-  SEGMENTS.forEach(seg=>{
-    const pl = L.polyline(seg.pts,{
-      color: speedColor(seg.speed, seg.type),
-      weight: segWeight(seg.type),
-      opacity: segOpacity(seg.type),
-      interactive:true,
-    }).addTo(segmentLayer);
-
-    pl.on('mouseover',(e)=>{
-      const tip=document.getElementById('tooltip');
-      const st=seg.speed>55?'Free Flow':seg.speed>35?'Slow':'Congested';
-      document.getElementById('tip-title').textContent=seg.fullLabel;
-      document.getElementById('tip-speed').textContent=seg.speed.toFixed(0)+' mph';
-      document.getElementById('tip-vol').textContent=Math.round(seg.volume)+' veh/hr';
-      const travelMin=(seg.distMi/seg.speed*60);
-      document.getElementById('tip-time').textContent=travelMin.toFixed(1)+' min';
-      document.getElementById('tip-status').textContent=st;
-      tip.style.display='block';
-      tip.style.left=(e.originalEvent.clientX+14)+'px';
-      tip.style.top=(e.originalEvent.clientY-10)+'px';
-    });
-    pl.on('mousemove',(e)=>{
-      document.getElementById('tooltip').style.left=(e.originalEvent.clientX+14)+'px';
-      document.getElementById('tooltip').style.top=(e.originalEvent.clientY-10)+'px';
-    });
-    pl.on('mouseout',()=>{ document.getElementById('tooltip').style.display='none'; });
-
-    seg.polyline = pl;
-    segPolylines[seg.id] = pl;
-  });
-}
-
-/* ── Pts-based segment geometry ─────────────────────────────────────────────
-   For each (fromExit→toExit) segment, find where those exits land on the
-   route's pts[] spine and slice out that portion as the polyline geometry.
-   This gives road-accurate shapes with zero external API dependency.
-────────────────────────────────────────────────────────────────────────── */
-function nearestPtIdx(pts, lat, lon){
-  // Scale lat/lon to approximate meters for fair distance comparison
-  let best=0, bestD=Infinity;
-  pts.forEach((p,i)=>{
-    const d=Math.hypot((p[0]-lat)*111320,(p[1]-lon)*78470);
-    if(d<bestD){bestD=d;best=i;}
-  });
-  return best;
-}
-
-function segmentPtsFromRoute(route, fromExit, toExit){
-  if(!route||!route.pts||route.pts.length<2)
-    return [[fromExit.lat,fromExit.lon],[toExit.lat,toExit.lon]];
-  const iA=nearestPtIdx(route.pts,fromExit.lat,fromExit.lon);
-  const iB=nearestPtIdx(route.pts,toExit.lat,toExit.lon);
-  const lo=Math.min(iA,iB), hi=Math.max(iA,iB);
-  if(hi-lo<1)
-    return [[fromExit.lat,fromExit.lon],[toExit.lat,toExit.lon]];
-  // Prepend/append actual exit coords for precision at endpoints
-  const slice=route.pts.slice(lo,hi+1);
-  return [[fromExit.lat,fromExit.lon],...slice.slice(1,-1),[toExit.lat,toExit.lon]];
-}
-
-// Snap all segment polylines to route pts geometry (called once after buildSegments)
-function snapSegmentGeometries(){
-  let snapped=0;
-  SEGMENTS.forEach(seg=>{
-    if(seg.geoReady) return;
-    const route=ROUTES.find(r=>r.id===seg.routeId);
-    const pts=segmentPtsFromRoute(route,seg.fromExit,seg.toExit);
-    seg.pts=pts;
-    seg.geoReady=true;
-    seg.polyline?.setLatLngs(pts);
-    snapped++;
-  });
-  logEvent('clear',`✓ ${snapped} segments road-aligned to route geometry`);
-}
-
-
-function updateSegmentColors(){
-  SEGMENTS.forEach(seg=>{
-    seg.polyline?.setStyle({color:speedColor(seg.speed,seg.type)});
-  });
-}
-
-/* ── Exit markers ── */
-function updateExitMarkers(){
-  if(!showLabels){exitLayer.clearLayers();Object.keys(exitMarkers).forEach(k=>delete exitMarkers[k]);return;}
-  EXITS_DB.forEach(ex=>{
-    if(exitMarkers[ex.id]) return;
-    const cm = L.circleMarker([ex.lat,ex.lon],{
-      radius:4, fillColor:'#1a5c1a', color:'#fff', weight:1.2, fillOpacity:0.9
-    }).addTo(exitLayer);
-    cm.bindTooltip(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`,
-      {sticky:true,direction:'top'});
-    exitMarkers[ex.id]=cm;
-  });
-}
-
-/* ── Sensor markers ── */
-function updateSensorMarkers(){
-  if(!showSensors){sensorLayer.clearLayers();Object.keys(sensorMarkers).forEach(k=>delete sensorMarkers[k]);return;}
-  SENSORS.forEach(s=>{
-    if(sensorMarkers[s.id]) return;
-    const cm = L.circleMarker([s.lat,s.lon],{
-      radius:3, fillColor:'#0044aa', color:'#fff', weight:1, fillOpacity:0.8
-    }).addTo(sensorLayer);
-    cm.bindTooltip(`Sensor: ${s.routeLabel}`,{sticky:true,direction:'top'});
-    sensorMarkers[s.id]=cm;
-  });
-}
-
-/* ── Incident markers ── */
-function redrawIncidentMarkers(){
-  incidentLayer.clearLayers();
-  Object.keys(incidentMarkers).forEach(k=>delete incidentMarkers[k]);
-  incidents.forEach(inc=>{
-    const icon=L.divIcon({
-      className:'',
-      html:`<div style="position:relative;width:30px;height:30px">
-        <div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(200,0,0,.6);animation:pulse-ring 1.5s ease-out infinite"></div>
-        <div style="position:absolute;top:7px;left:7px;width:16px;height:16px;border-radius:50%;background:#cc1100;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px">${inc.icon}</div>
-      </div>`,
-      iconSize:[30,30],iconAnchor:[15,15]
-    });
-    const m=L.marker([inc.lat,inc.lon],{icon,zIndexOffset:500}).addTo(incidentLayer);
-    m.bindTooltip(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br>${inc.route}<br>${inc.msg}`,
-      {sticky:true,direction:'top'});
-    incidentMarkers[inc.id]=m;
-  });
-}
-
-/* ── Route path (planner result) ── */
-let routePathMain=null, routePathAlt=null;
-
-function drawLeafletRoutePath(pathObj,color,isAlt){
-  if(!pathObj?.path?.length<2) return null;
-  const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);
-  const latlngs=pathObj.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lat,e.lon]);
-  if(latlngs.length<2) return null;
-  return L.polyline(latlngs,{
-    color,weight:isAlt?4:6,opacity:isAlt?0.65:0.9,
-    dashArray:isAlt?'8,6':null,zIndexOffset:isAlt?100:200
-  }).addTo(routePathGroup);
-}
-
-function clearLeafletRoutePath(){
-  routePathGroup.clearLayers();
-  routePathMain=null;routePathAlt=null;
-}
-
-function drawRouteEndpoints(pathObj){
-  const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);
-  const first=exitMap[pathObj.path[0]?.node];
-  const last=exitMap[pathObj.path[pathObj.path.length-1]?.node];
-  const pin=(latlng,lbl,col)=>L.marker(latlng,{icon:L.divIcon({
-    className:'',
-    html:`<div style="background:${col};color:#fff;border:2px solid #fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;font-family:Arial;box-shadow:0 2px 6px rgba(0,0,0,.4)">${lbl}</div>`,
-    iconSize:[22,22],iconAnchor:[11,11]
-  }),zIndexOffset:1000}).addTo(routePathGroup);
-  if(first) pin([first.lat,first.lon],'S','#ff8800');
-  if(last)  pin([last.lat,last.lon],'E','#ff8800');
-}
-
-/* ── Draw sensor markers ── */
-/* ── Draw sensor markers ── */
-function updateSensorMarkers(){
-  if(!showSensors){ sensorLayerGroup.clearLayers(); return; }
-  SENSORS.forEach(s=>{
-    if(sensorMarkers[s.id]) return;
-    const cm = L.circleMarker([s.lat, s.lon],{
-      radius:3, fillColor:'#0044aa', color:'#fff', weight:1, fillOpacity:0.8
-    }).addTo(sensorLayerGroup);
-    cm.bindTooltip(`Sensor: ${s.routeLabel}`,{sticky:true,direction:'top'});
-    sensorMarkers[s.id] = cm;
-  });
-}
-
-/* ── Incident markers with pulsing ring ── */
-function redrawIncidentMarkers(){
-  incidentLayerGroup.clearLayers();
-  Object.keys(incidentMarkerMap).forEach(k=>delete incidentMarkerMap[k]);
-
-  incidents.forEach(inc=>{
-    // Pulsing outer circle via CSS div icon
-    const pulseIcon = L.divIcon({
-      className:'',
-      html:`<div style="position:relative;width:30px;height:30px;">
-        <div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(200,0,0,0.6);animation:pulse-ring 1.5s ease-out infinite;"></div>
-        <div style="position:absolute;top:7px;left:7px;width:16px;height:16px;border-radius:50%;background:#cc1100;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;">${inc.icon}</div>
-      </div>`,
-      iconSize:[30,30],
-      iconAnchor:[15,15]
-    });
-    const m = L.marker([inc.lat, inc.lon], {icon: pulseIcon, zIndexOffset:500})
-      .addTo(incidentLayerGroup);
-    m.bindTooltip(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br>${inc.route}<br>${inc.msg}`,
-      {sticky:true, direction:'top'});
-    incidentMarkerMap[inc.id] = m;
-  });
-}
-
-/* ── Active route path polylines ── */
-
-function drawLeafletRoutePath(pathObj, color, isAlt){
-  if(!pathObj||!pathObj.path||pathObj.path.length<2) return null;
-  const exitMap={};
-  EXITS_DB.forEach(e=>exitMap[e.id]=e);
-  const latlngs=[];
-  for(let i=0;i<pathObj.path.length;i++){
-    const e=exitMap[pathObj.path[i].node];
-    if(e) latlngs.push([e.lat,e.lon]);
-  }
-  if(latlngs.length<2) return null;
-  const pl = L.polyline(latlngs,{
-    color: color,
-    weight: isAlt?4:6,
-    opacity: isAlt?0.65:0.9,
-    dashArray: isAlt?'8,6':null,
-    zIndexOffset: isAlt?100:200
-  }).addTo(routePathGroup);
-  // Arrows using decorator-style pattern via repeated dots
-  return pl;
-}
-
-function clearLeafletRoutePath(){
-  routePathGroup.clearLayers();
-  routePathMain=null; routePathAlt=null;
-  routeStartMarker=null; routeEndMarker=null;
-}
-
-function drawRouteEndpoints(pathObj){
-  const exitMap={};
-  EXITS_DB.forEach(e=>exitMap[e.id]=e);
-  const first = exitMap[pathObj.path[0]?.node];
-  const last  = exitMap[pathObj.path[pathObj.path.length-1]?.node];
-  const makePin = (latlng, label, color) => L.marker(latlng, {
-    icon: L.divIcon({
-      className:'',
-      html:`<div style="background:${color};color:#fff;border:2px solid #fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;font-family:Arial;box-shadow:0 2px 6px rgba(0,0,0,0.4);">${label}</div>`,
-      iconSize:[22,22],iconAnchor:[11,11]
-    }), zIndexOffset:1000
-  }).addTo(routePathGroup);
-  if(first) makePin([first.lat,first.lon],'S','#ff8800');
-  if(last)  makePin([last.lat,last.lon],'E','#ff8800');
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   TIME-OF-DAY TRAFFIC MODEL
-══════════════════════════════════════════════════════════════════ */
 const TOD_PAT={
   interstate:[0.95,0.95,0.95,0.95,0.92,0.85,0.72,0.58,0.65,0.82,0.88,0.87,0.85,0.84,0.83,0.80,0.68,0.60,0.70,0.82,0.88,0.92,0.94,0.95],
   expressway: [0.95,0.95,0.95,0.92,0.88,0.80,0.65,0.52,0.60,0.78,0.86,0.85,0.83,0.82,0.80,0.76,0.62,0.55,0.67,0.80,0.86,0.90,0.93,0.95],
@@ -1140,17 +725,479 @@ const TOD_PAT={
 };
 const RUSH_HOURS=[7,8,16,17,18];
 
-function todMult(type,hour){
-  const pat=TOD_PAT[type]||TOD_PAT.arterial;
-  const h=Math.floor(hour)%24,m=hour-Math.floor(hour),n=(h+1)%24;
-  return pat[h]*(1-m)+pat[n]*m;
-}
+
+function todMult(type,hour){const pat=TOD_PAT[type]||TOD_PAT.arterial;const h=Math.floor(hour)%24,m=hour-Math.floor(hour),n=(h+1)%24;return pat[h]*(1-m)+pat[n]*m;}
 function todSpeed(route,hour){return route.baseSpd*todMult(route.type,hour);}
 function formatTT(min){if(min<60)return Math.round(min)+'min';const h=Math.floor(min/60),m=Math.round(min%60);return h+'h '+m+'min';}
 
-/* ══════════════════════════════════════════════════════════════════
+/* ── Route state ── */
+ROUTES.forEach(r=>{
+  r.speed=r.type==='local'?30:65;
+  r.volume=r.type==='local'?400:1200;
+  r.incidents=[];r.congestionFactor=1.0;
+  r.history=new Array(60).fill(65);
+  r.baseSpd=r.type==='local'?35:r.type==='arterial'?45:65;
+});
+
+/* ── Sensors ── */
+const SENSORS=[];
+ROUTES.forEach(r=>{
+  const step=Math.max(1,Math.floor(r.pts.length/4));
+  for(let i=step;i<r.pts.length-1;i+=step){
+    SENSORS.push({id:`${r.id}-S${i}`,route:r.id,routeLabel:r.label,
+      lat:r.pts[i][0],lon:r.pts[i][1],speed:65,volume:1200,type:'loop',active:true});
+  }
+});
+
+/* ── Speed color ── */
+function speedColor(spd,type){
+  if(type==='local')return spd<15?'#cc1100':spd<25?'#cc8800':'#8a7050';
+  if(type==='arterial')return spd<20?'#cc1100':spd<35?'#cc8800':'#1a8c1a';
+  return spd>45?'#1a8c1a':spd>25?'#cc8800':spd>12?'#cc5500':'#cc1100';
+}
+
+/* ── Simulation state ── */
+let simRunning=true,simTime=0,simInterval=null;
+let rushHour=false,weatherActive=false;
+let incidents=[],eventCount=0;
+let sliders={traffic:85,weather:0,const:20};
+let showSensors=true,showLabels=true;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEGMENTS  —  one per consecutive exit pair on each route
+   Each segment tracks its own speed, giving per-segment traffic granularity
+═══════════════════════════════════════════════════════════════════════════ */
+const SEGMENTS=[];
+
+function buildSegments(){
+  const byRoute={};
+  EXITS_DB.forEach(e=>{
+    if(!byRoute[e.route])byRoute[e.route]=[];
+    byRoute[e.route].push(e);
+  });
+  Object.entries(byRoute).forEach(([rid,exits])=>{
+    const route=ROUTES.find(r=>r.id===rid);
+    const sorted=exits.sort((a,b)=>a.mi-b.mi);
+    for(let i=0;i<sorted.length-1;i++){
+      const A=sorted[i],B=sorted[i+1];
+      const distMi=Math.max(0.5,Math.abs(B.mi-A.mi));
+      SEGMENTS.push({
+        id:`${rid}-${i}`,routeId:rid,
+        label:(route?.label||rid)+` • Exit ${A.exit}→${B.exit}`,
+        type:route?.type||'arterial',
+        baseSpd:route?(route.type==='local'?35:route.type==='arterial'?45:65):65,
+        exitA:A,exitB:B,distMi,
+        speed:65,volume:1200,incidents:[],history:new Array(60).fill(65),
+      });
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAPLIBRE GL MAP  —  OpenFreeMap positron style
+   Traffic overlay: GeoJSON sources updated on every simulation tick
+   OSM geometry: loaded async from Overpass, replaces approximate coords
+═══════════════════════════════════════════════════════════════════════════ */
+const map=new maplibregl.Map({
+  container:'map',
+  style:'https://tiles.openfreemap.org/styles/positron',
+  center:[-71.5,42.0],
+  zoom:8,
+  maxBounds:[[-74.5,40.8],[-69.5,43.4]],
+});
+
+/* DOM markers / popup objects */
+const exitMarkerMap={};
+const sensorMarkerMap={};
+const incidentMarkerMap={};
+let osmWaysLoaded=false;
+let osmFeatures=[];   // will hold real OSM way features after load
+
+/* ── Build GeoJSON FeatureCollection from current SEGMENTS state ── */
+function buildTrafficGeoJSON(){
+  return{
+    type:'FeatureCollection',
+    features:SEGMENTS.map(seg=>{
+      const coords=segCoords(seg);
+      return{
+        type:'Feature',
+        geometry:{type:'LineString',coordinates:coords},
+        properties:{
+          id:seg.id,routeId:seg.routeId,
+          label:seg.label,
+          speed:Math.round(seg.speed),
+          color:speedColor(seg.speed,seg.type),
+          roadType:seg.type,
+          distMi:seg.distMi,
+          volume:Math.round(seg.volume),
+        }
+      };
+    })
+  };
+}
+
+/* Get GeoJSON coords [lon,lat][] for a segment from its route pts spine */
+function segCoords(seg){
+  const route=ROUTES.find(r=>r.id===seg.routeId);
+  if(!route?.pts?.length) return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];
+  const pts=route.pts;
+  // Find nearest spine indices to each exit
+  let iA=0,iB=0,dA=Infinity,dB=Infinity;
+  pts.forEach((p,i)=>{
+    const da=(p[0]-seg.exitA.lat)**2+(p[1]-seg.exitA.lon)**2;
+    const db=(p[0]-seg.exitB.lat)**2+(p[1]-seg.exitB.lon)**2;
+    if(da<dA){dA=da;iA=i;}
+    if(db<dB){dB=db;iB=i;}
+  });
+  const lo=Math.min(iA,iB),hi=Math.max(iA,iB);
+  const spine=pts.slice(lo,hi+1).map(p=>[p[1],p[0]]); // flip to [lon,lat]
+  if(spine.length<2) return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];
+  // Replace first/last with exact exit coords for endpoint accuracy
+  spine[0]=[seg.exitA.lon,seg.exitA.lat];
+  spine[spine.length-1]=[seg.exitB.lon,seg.exitB.lat];
+  return spine;
+}
+
+/* ── Push updated GeoJSON to the map source on each tick ── */
+function updateTrafficSource(){
+  const src=map.getSource('traffic');
+  if(!src)return;
+  if(osmWaysLoaded){
+    // Update colors on OSM features from current segment speeds
+    osmFeatures.forEach(f=>{
+      const seg=SEGMENTS.find(s=>s.id===f.properties.segId);
+      const route=ROUTES.find(r=>r.id===f.properties.routeId);
+      const spd=seg?.speed??route?.speed??65;
+      const type=f.properties.roadType||route?.type||'arterial';
+      f.properties.color=speedColor(spd,type);
+      f.properties.speed=Math.round(spd);
+    });
+    src.setData({type:'FeatureCollection',features:osmFeatures});
+  } else {
+    src.setData(buildTrafficGeoJSON());
+  }
+}
+
+/* ── Update incidents source ── */
+function updateIncidentSource(){
+  const src=map.getSource('incidents');
+  if(!src)return;
+  src.setData({
+    type:'FeatureCollection',
+    features:incidents.map(inc=>({
+      type:'Feature',
+      geometry:{type:'Point',coordinates:[inc.lon,inc.lat]},
+      properties:{id:String(inc.id),icon:inc.icon,msg:inc.msg,route:inc.route,sev:inc.severity}
+    }))
+  });
+}
+
+/* ── Update route planner path on map ── */
+let activeRoute=null,activeAlt=null;
+
+function updateRoutePathSource(){
+  const src=map.getSource('route-path');
+  if(!src)return;
+  const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);
+  const features=[];
+  if(activeRoute?.path?.length>=2){
+    const coords=activeRoute.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);
+    if(coords.length>=2) features.push({type:'Feature',
+      geometry:{type:'LineString',coordinates:coords},
+      properties:{color:'#ff8800',width:7,opacity:0.92,isAlt:false}});
+  }
+  if(activeAlt?.path?.length>=2){
+    const coords=activeAlt.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);
+    if(coords.length>=2) features.push({type:'Feature',
+      geometry:{type:'LineString',coordinates:coords},
+      properties:{color:'#003399',width:5,opacity:0.7,isAlt:true}});
+  }
+  // Endpoint markers
+  if(features.length&&activeRoute){
+    const first=exitMap[activeRoute.path[0]?.node];
+    const last=exitMap[activeRoute.path[activeRoute.path.length-1]?.node];
+    if(first) features.push({type:'Feature',
+      geometry:{type:'Point',coordinates:[first.lon,first.lat]},
+      properties:{marker:'S',color:'#ff8800'}});
+    if(last) features.push({type:'Feature',
+      geometry:{type:'Point',coordinates:[last.lon,last.lat]},
+      properties:{marker:'E',color:'#ff8800'}});
+  }
+  src.setData({type:'FeatureCollection',features});
+}
+
+/* ── Map load: add sources, layers, interactivity ── */
+map.on('load',()=>{
+  const styleLayerIds=map.getStyle().layers.map(l=>l.id);
+  // Insert traffic below labels but above road fills
+  // Look for first symbol layer
+  const firstLabel=map.getStyle().layers.find(l=>l.type==='symbol')?.id;
+
+  /* Traffic source */
+  map.addSource('traffic',{type:'geojson',
+    data:{type:'FeatureCollection',features:[]},
+    buffer:4,tolerance:0.3
+  });
+
+  /* Casing (dark outline) for interstates/expressways */
+  map.addLayer({
+    id:'traffic-casing',type:'line',source:'traffic',
+    filter:['in',['get','roadType'],['literal',['interstate','expressway']]],
+    layout:{'line-join':'round','line-cap':'round'},
+    paint:{
+      'line-color':'rgba(20,10,5,0.45)',
+      'line-width':['match',['get','roadType'],'interstate',9,'expressway',7,5],
+      'line-opacity':0.7
+    }
+  },firstLabel);
+
+  /* Traffic color fill */
+  map.addLayer({
+    id:'traffic-fill',type:'line',source:'traffic',
+    layout:{'line-join':'round','line-cap':'round'},
+    paint:{
+      'line-color':['get','color'],
+      'line-width':['match',['get','roadType'],'interstate',6,'expressway',4,'arterial',3,2],
+      'line-opacity':0.90
+    }
+  },firstLabel);
+
+  /* Incidents */
+  map.addSource('incidents',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'incident-circles',type:'circle',source:'incidents',
+    paint:{'circle-radius':['interpolate',['linear'],['zoom'],7,5,13,9],
+      'circle-color':'#cc1100','circle-stroke-width':2,'circle-stroke-color':'#fff','circle-opacity':0.95}});
+  map.addLayer({id:'incident-icons',type:'symbol',source:'incidents',
+    layout:{'text-field':['get','icon'],'text-size':10,'text-allow-overlap':true,
+      'text-offset':[0,0]}});
+
+  /* Route planner path */
+  map.addSource('route-path',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'route-path-main',type:'line',source:'route-path',
+    filter:['==',['get','isAlt'],false],
+    layout:{'line-join':'round','line-cap':'round'},
+    paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity']}});
+  map.addLayer({id:'route-path-alt',type:'line',source:'route-path',
+    filter:['==',['get','isAlt'],true],
+    layout:{'line-join':'round','line-cap':'round'},
+    paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity'],
+      'line-dasharray':[8,5]}});
+  map.addLayer({id:'route-endpoint-labels',type:'symbol',source:'route-path',
+    filter:['has','marker'],
+    layout:{'text-field':['get','marker'],'text-size':11,'text-font':['Noto Sans Bold','Arial Unicode MS Bold'],
+      'text-allow-overlap':true},
+    paint:{'text-color':'#ffffff','text-halo-color':['get','color'],'text-halo-width':6}});
+
+  /* Hover on traffic segments */
+  map.on('mousemove','traffic-fill',(e)=>{
+    if(!e.features?.length)return;
+    map.getCanvas().style.cursor='pointer';
+    const p=e.features[0].properties;
+    const tip=document.getElementById('tooltip');
+    document.getElementById('tip-title').textContent=p.label||p.routeId;
+    document.getElementById('tip-speed').textContent=(p.speed||0)+' mph';
+    document.getElementById('tip-vol').textContent=Math.round(p.volume||0)+' veh/hr';
+    document.getElementById('tip-time').textContent=(p.distMi||0).toFixed(1)+' mi segment';
+    const st=p.speed>45?'Free Flow':p.speed>25?'Slow':'Congested';
+    document.getElementById('tip-status').textContent=st;
+    tip.style.display='block';
+    tip.style.left=(e.point.x+14)+'px';
+    tip.style.top=(e.point.y-10)+'px';
+  });
+  map.on('mouseleave','traffic-fill',()=>{
+    map.getCanvas().style.cursor='';
+    document.getElementById('tooltip').style.display='none';
+  });
+
+  /* Initial data push */
+  updateTrafficSource();
+  updateExitMarkers();
+  updateSensorMarkers();
+
+  /* Start systems */
+  buildSegments();
+  populateSelects();
+  startLiveData();
+  startSim();
+  logEvent('clear','MA Traffic Twin v3 — MapLibre GL + OpenStreetMap');
+  logEvent('clear',`${ROUTES.length} routes • ${SEGMENTS.length} segments • ${SENSORS.length} sensors`);
+
+  /* Async: load real OSM road geometry */
+  loadOSMGeometry();
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OSM GEOMETRY LOADER  —  Overpass API → real road shapes per way
+   Each OSM way becomes its own GeoJSON feature, colored by nearest segment.
+   No stitching, no stitching bugs.
+═══════════════════════════════════════════════════════════════════════════ */
+const REF_MAP={
+  'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N',
+  'I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91',
+  'MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6',
+  'MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20',
+  'MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38',
+  'MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110',
+  'MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140',
+  'US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON',
+};
+
+function refToRouteId(ref){
+  if(!ref)return null;
+  for(const r of ref.split(/[;,]/).map(s=>s.trim())){
+    if(REF_MAP[r])return REF_MAP[r];
+  }
+  return null;
+}
+
+function nearestSegment(lat,lon,routeId){
+  const segs=SEGMENTS.filter(s=>s.routeId===routeId);
+  if(!segs.length)return null;
+  let best=null,bestD=Infinity;
+  segs.forEach(s=>{
+    const mLat=(s.exitA.lat+s.exitB.lat)/2, mLon=(s.exitA.lon+s.exitB.lon)/2;
+    const d=Math.hypot((lat-mLat)*111320,(lon-mLon)*78470);
+    if(d<bestD){bestD=d;best=s;}
+  });
+  return best;
+}
+
+async function loadOSMGeometry(){
+  const badge=document.getElementById('osm-badge');
+  const ftOsm=document.getElementById('ft-osm');
+  badge.textContent='⏳ Fetching OSM roads…';
+
+  const query=`[out:json][timeout:60];
+way["highway"~"motorway|trunk|primary|secondary"]["ref"](41.1,-73.6,42.9,-69.8);
+out geom qt;`;
+
+  let elements;
+  try{
+    const r=await fetch('https://overpass-api.de/api/interpreter',{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'data='+encodeURIComponent(query),
+      signal:AbortSignal.timeout(65000)
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    elements=data.elements||[];
+  }catch(e){
+    badge.textContent='⚠ OSM unavailable — using route geometry';
+    badge.style.color='#cc8800';
+    if(ftOsm)ftOsm.textContent='fallback';
+    logEvent('warn','⚠ OSM Overpass unreachable — using approximate route geometry');
+    return;
+  }
+
+  const newFeatures=[];
+  let matched=0,skipped=0;
+
+  elements.filter(el=>el.type==='way'&&el.geometry?.length>=2).forEach(way=>{
+    const ref=way.tags?.ref;
+    const routeId=refToRouteId(ref);
+    if(!routeId){skipped++;return;}
+    const route=ROUTES.find(r=>r.id===routeId);
+    if(!route){skipped++;return;}
+
+    // GeoJSON uses [lon,lat]
+    const coords=way.geometry.map(n=>[n.lon,n.lat]);
+    // Mid-point for segment assignment
+    const mid=coords[Math.floor(coords.length/2)];
+    const seg=nearestSegment(mid[1],mid[0],routeId);
+
+    newFeatures.push({
+      type:'Feature',
+      geometry:{type:'LineString',coordinates:coords},
+      properties:{
+        osmId:way.id,routeId,
+        segId:seg?.id||null,
+        label:(route.label)+(seg?` • Exit ${seg.exitA.exit}→${seg.exitB.exit}`:''),
+        speed:Math.round(seg?.speed||route.speed||65),
+        color:speedColor(seg?.speed||route.speed||65,route.type),
+        roadType:route.type,
+        distMi:seg?.distMi||1,
+        volume:Math.round(seg?.volume||route.volume||1200),
+        ref:ref||''
+      }
+    });
+    matched++;
+  });
+
+  if(matched>0){
+    osmFeatures=newFeatures;
+    osmWaysLoaded=true;
+    updateTrafficSource();
+    badge.textContent=`✓ ${matched} OSM road segments`;
+    badge.style.color='#1a5c1a';
+    if(ftOsm)ftOsm.textContent=`${matched} ways`;
+    logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);
+    document.getElementById('ft-segs').textContent=matched;
+  } else {
+    badge.textContent='⚠ No OSM matches — using route geometry';
+    badge.style.color='#cc8800';
+    if(ftOsm)ftOsm.textContent='no match';
+    logEvent('warn','OSM returned no matching ways — check Overpass');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXIT / SENSOR / INCIDENT MARKERS  (MapLibre DOM markers)
+═══════════════════════════════════════════════════════════════════════════ */
+function updateExitMarkers(){
+  if(!showLabels){
+    Object.values(exitMarkerMap).forEach(m=>m.remove());
+    Object.keys(exitMarkerMap).forEach(k=>delete exitMarkerMap[k]);
+    return;
+  }
+  EXITS_DB.forEach(ex=>{
+    if(exitMarkerMap[ex.id])return;
+    const el=document.createElement('div');
+    el.className='exit-dot';
+    const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false})
+      .setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);
+    const m=new maplibregl.Marker({element:el})
+      .setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);
+    exitMarkerMap[ex.id]=m;
+  });
+}
+
+function updateSensorMarkers(){
+  if(!showSensors){
+    Object.values(sensorMarkerMap).forEach(m=>m.remove());
+    Object.keys(sensorMarkerMap).forEach(k=>delete sensorMarkerMap[k]);
+    return;
+  }
+  SENSORS.forEach(s=>{
+    if(sensorMarkerMap[s.id])return;
+    const el=document.createElement('div');
+    el.className='sensor-dot';
+    const m=new maplibregl.Marker({element:el}).setLngLat([s.lon,s.lat]).addTo(map);
+    sensorMarkerMap[s.id]=m;
+  });
+}
+
+function redrawIncidentMarkers(){
+  // Remove old
+  Object.values(incidentMarkerMap).forEach(m=>m.remove());
+  Object.keys(incidentMarkerMap).forEach(k=>delete incidentMarkerMap[k]);
+  // Add new
+  incidents.forEach(inc=>{
+    const wrap=document.createElement('div');
+    wrap.className='inc-marker-wrap';
+    wrap.innerHTML=`<div class="inc-ring"></div><div class="inc-dot">${inc.icon}</div>`;
+    const popup=new maplibregl.Popup({offset:16,closeButton:false})
+      .setHTML(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br><b>${inc.route}</b><br>${inc.msg}`);
+    const m=new maplibregl.Marker({element:wrap,anchor:'center'})
+      .setLngLat([inc.lon,inc.lat]).setPopup(popup).addTo(map);
+    incidentMarkerMap[inc.id]=m;
+  });
+  updateIncidentSource();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SIMULATION TICK
-══════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════════════ */
 function tick(){
   simTime++;
   const t=simTime*0.03;
@@ -1158,53 +1205,52 @@ function tick(){
   const weatherFactor=1-sliders.weather/200;
   const constFactor=1-sliders.const/400;
   const rushFactor=rushHour?0.55:1.0;
-  const noise=0.05;
 
+  // Update route-level speed (smooth average)
   ROUTES.forEach(r=>{
-    let baseSpeed=r.baseSpd;
     const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3);
     const loadFactor=0.88+(1.0-trafficLoad)*0.12;
-    let speed=baseSpeed*wave*loadFactor*weatherFactor*constFactor*rushFactor;
-    if(r.incidents&&r.incidents.length>0) speed*=0.4;
-    speed*=(1+(Math.random()-0.5)*noise*2);
-    speed=Math.max(5,Math.min(baseSpeed,speed));
+    let speed=r.baseSpd*wave*loadFactor*weatherFactor*constFactor*rushFactor;
+    if(r.incidents?.length) speed*=0.4;
+    speed*=(1+(Math.random()-0.5)*0.05*2);
+    speed=Math.max(5,Math.min(r.baseSpd,speed));
     r.speed=r.speed*0.85+speed*0.15;
     r.volume=Math.max(50,Math.min(3000,trafficLoad*2200*wave*(rushHour?1.4:1)*(r.type==='local'?0.3:1)));
     r.history.push(r.speed);r.history.shift();
-    r.congestionFactor=r.speed/baseSpeed;
+    r.congestionFactor=r.speed/r.baseSpd;
   });
 
-  // Update per-segment colors (route-level speed + segment noise)
-  ROUTES.forEach(route=>{
-    SEGMENTS.filter(s=>s.routeId===route.id).forEach((seg,idx)=>{
-      const noise=(Math.random()-0.5)*0.25;
-      const incPen=seg.incidents.length>0?0.4:1.0;
-      seg.speed=Math.max(5,Math.min(seg.baseSpd, route.speed*(1+noise)*incPen));
-      seg.history.push(seg.speed);seg.history.shift();
-      if(seg.polyline) seg.polyline.setStyle({color:speedColor(seg.speed,seg.type)});
-    });
+  // Per-segment variation adds granularity to route-level speed
+  SEGMENTS.forEach(seg=>{
+    const route=ROUTES.find(r=>r.id===seg.routeId);
+    if(!route)return;
+    const noise=(Math.random()-0.5)*0.22;
+    const incPen=seg.incidents.length>0?0.45:1.0;
+    seg.speed=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));
+    seg.volume=route.volume*(1+(Math.random()-0.5)*0.15);
+    seg.history.push(seg.speed);seg.history.shift();
   });
+
+  // Push to map
+  if(map.getSource)updateTrafficSource();
 
   // Gauges
   const allSpeeds=ROUTES.filter(r=>r.type!=='local').map(r=>r.speed);
   const avgSpeed=allSpeeds.reduce((a,b)=>a+b,0)/allSpeeds.length;
   const totalVol=ROUTES.filter(r=>r.type!=='local').reduce((a,r)=>a+r.volume,0)/ROUTES.length;
   const congestPct=allSpeeds.filter(s=>s<40).length/allSpeeds.length*100;
-
   setGauge('avgspeed',avgSpeed.toFixed(0),(avgSpeed/70)*100,avgSpeed>50?'#1a8c1a':avgSpeed>35?'#cc8800':'#cc1100');
   setGauge('volume',Math.round(totalVol),(totalVol/3000)*100,'#003399');
   setGauge('incidents',incidents.length,Math.min(100,incidents.length*20),'#cc1100');
   setGauge('congestion',congestPct.toFixed(0),congestPct,'#886600');
 
   // System status
-  const dot=document.getElementById('sys-dot');
-  const lbl=document.getElementById('sys-label');
+  const dot=document.getElementById('sys-dot'),lbl=document.getElementById('sys-label');
   if(incidents.length>3||congestPct>70){dot.className='dot crit';lbl.textContent='CRITICAL';}
   else if(incidents.length>0||congestPct>40){dot.className='dot warn';lbl.textContent='WARNING';}
   else{dot.className='dot ok';lbl.textContent='NOMINAL';}
 
-  updateClock();
-  updateFooter();
+  updateClock();updateFooter();
 }
 
 function setGauge(id,val,pct,color){
@@ -1212,23 +1258,30 @@ function setGauge(id,val,pct,color){
   const fill=document.getElementById('gf-'+id);if(fill){fill.style.width=Math.max(0,Math.min(100,pct))+'%';fill.style.background=color;}
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    INCIDENT MANAGEMENT
-══════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════════════ */
 function addIncident(type,route,lat,lon,icon,msg,severity){
   const inc={id:Date.now()+'_'+Math.random(),type,route,lat,lon,icon,msg,severity,time:simTime};
   incidents.push(inc);
   const r=ROUTES.find(r=>r.id===route);
   if(r&&r.incidents)r.incidents.push(inc.id);
-  logEvent(severity,`${icon} <span class="inc-route">${route}</span> - ${msg}`);
+  // Also mark overlapping segments
+  SEGMENTS.filter(s=>s.routeId===route).forEach(s=>{
+    const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;
+    if(Math.hypot((lat-mLat)*111320,(lon-mLon)*78470)<8000) s.incidents.push(inc.id);
+  });
+  logEvent(severity,`${icon} <span class="inc-route">${route}</span> — ${msg}`);
   eventCount++;
   redrawIncidentMarkers();
 }
+
 function clearIncidents(){
   incidents=[];
   ROUTES.forEach(r=>{r.incidents=[];});
+  SEGMENTS.forEach(s=>{s.incidents=[];});
   redrawIncidentMarkers();
-  logEvent('clear','[OK] All incidents cleared - traffic normalizing');
+  logEvent('clear','[OK] All incidents cleared — traffic normalizing');
 }
 
 function logEvent(sev,msg){
@@ -1241,74 +1294,57 @@ function logEvent(sev,msg){
   if(log.children.length>40)log.removeChild(log.lastChild);
 }
 
-/* ── INJECT EVENTS ── */
 function injectEvent(type){
   switch(type){
-    case 'accident':
-      addIncident('accident','I-93S',42.310,-71.073,'!','Multi-vehicle accident - 2 lanes blocked','crit'); break;
-    case 'breakdown':
-      addIncident('breakdown','I-95N',42.340,-71.058,'⚠','Vehicle breakdown - right lane closed','warn'); break;
-    case 'construction':
-      addIncident('construction','I-90',42.279,-71.416,'🚧','Lane closure - construction through 6pm','warn'); break;
-    case 'flood':
-      addIncident('flood','SE-EXP',42.250,-71.060,'🌊','Flooding reported - use alternate routes','crit'); break;
+    case 'accident':   addIncident('accident','I-93N',42.400,-71.058,'!','Multi-vehicle — 2 lanes blocked','crit');break;
+    case 'breakdown':  addIncident('breakdown','I-95N',42.340,-71.188,'⚠','Vehicle breakdown — right lane','warn');break;
+    case 'construction':addIncident('construction','I-90',42.279,-71.395,'🚧','Lane closure — construction to 6pm','warn');break;
+    case 'flood':      addIncident('flood','SE-EXP',42.200,-71.045,'🌊','Flooding — use alternates','crit');break;
     case 'event':
-      addIncident('event','I-90',42.360,-71.058,'🏟','TD Garden event - heavy traffic downtown','warn');
-      addIncident('event','I-93N',42.380,-71.058,'⚾','Fenway area congestion - Red Sox game','warn'); break;
-    case 'clearall':
-      clearIncidents(); break;
+      addIncident('event','I-90',42.348,-71.059,'🏟','TD Garden — heavy downtown traffic','warn');
+      addIncident('event','I-93N',42.380,-71.058,'⚾','Fenway — Red Sox game congestion','warn');break;
+    case 'clearall':   clearIncidents();break;
   }
 }
 
 function triggerAccident(){
-  addIncident('accident','I-93N',42.400,-71.058,'!','Major accident - all lanes stopped','crit');
-  addIncident('accident','RT128S',42.340,-71.058,'!','Secondary incident - rubbernecking delay','warn');
+  addIncident('accident','I-93N',42.400,-71.058,'!','Major accident — all lanes stopped','crit');
+  addIncident('accident','RT128S',42.330,-71.198,'!','Secondary — rubbernecking delay','warn');
   logEvent('crit','🚨 Emergency response dispatched');
 }
 function triggerWeather(){
   sliders.weather=75;
-  document.getElementById('sl-weather').value=75;
-  document.getElementById('sv-weather').textContent='75%';
+  const sl=document.getElementById('sl-weather'),sv=document.getElementById('sv-weather');
+  if(sl)sl.value=75;if(sv)sv.textContent='75%';
   weatherActive=true;
   document.getElementById('btn-weather').classList.add('on');
-  logEvent('warn','❄ Winter storm warning - reduced visibility and road conditions');
-  logEvent('warn','Speed limits reduced statewide - use caution');
+  logEvent('warn','❄ Winter storm warning — reduced visibility statewide');
   setTimeout(()=>{
-    weatherActive=false;
-    document.getElementById('btn-weather').classList.remove('on');
-    sliders.weather=10;
-    document.getElementById('sl-weather').value=10;
-    document.getElementById('sv-weather').textContent='10%';
-    logEvent('clear','🌤 Storm passing - conditions improving');
+    weatherActive=false;document.getElementById('btn-weather').classList.remove('on');
+    sliders.weather=10;if(sl)sl.value=10;if(sv)sv.textContent='10%';
+    logEvent('clear','🌤 Storm clearing — conditions improving');
   },30000);
 }
 function toggleRush(){
   rushHour=!rushHour;
   document.getElementById('btn-rush').classList.toggle('on',rushHour);
   if(rushHour){
-    sliders.traffic=90;
-    document.getElementById('sl-traffic').value=90;
-    document.getElementById('sv-traffic').textContent='90%';
-    logEvent('warn','⚡ Rush hour activated - peak traffic period');
-    logEvent('warn','I-93 inbound - 45 min delay | I-90 - 30 min delay');
+    sliders.traffic=90;document.getElementById('sl-traffic').value=90;document.getElementById('sv-traffic').textContent='90%';
+    logEvent('warn','⚡ Rush hour — peak period active');
   } else {
-    sliders.traffic=50;
-    document.getElementById('sl-traffic').value=50;
-    document.getElementById('sv-traffic').textContent='50%';
-    logEvent('clear','Rush hour ended - traffic returning to normal');
+    sliders.traffic=50;document.getElementById('sl-traffic').value=50;document.getElementById('sv-traffic').textContent='50%';
+    logEvent('clear','Rush hour ended — normalizing');
   }
 }
 function toggleSensors(){
   showSensors=!showSensors;
   document.getElementById('btn-sensors').classList.toggle('on',showSensors);
-  if(showSensors) updateSensorMarkers();
-  else {sensorLayer.clearLayers();Object.keys(sensorMarkers).forEach(k=>delete sensorMarkers[k]);}
+  updateSensorMarkers();
 }
 function toggleLabels(){
   showLabels=!showLabels;
   document.getElementById('btn-labels').classList.toggle('on',showLabels);
-  if(showLabels) updateExitMarkers();
-  else {exitLayer.clearLayers();Object.keys(exitMarkers).forEach(k=>delete exitMarkers[k]);}
+  updateExitMarkers();
 }
 function toggleSim(){
   simRunning=!simRunning;
@@ -1319,28 +1355,28 @@ function toggleSim(){
 function resetSim(){
   clearInterval(simInterval);simTime=0;incidents=[];eventCount=0;
   ROUTES.forEach(r=>{r.incidents=[];r.speed=r.type==='local'?30:65;r.history.fill(65);});
+  SEGMENTS.forEach(s=>{s.incidents=[];s.speed=65;s.history.fill(65);});
   document.getElementById('incident-log').innerHTML='';
   redrawIncidentMarkers();
-  logEvent('clear','System reset - all routes nominal');
+  logEvent('clear','System reset — all routes nominal');
   if(simRunning)startSim();
 }
 function updateSl(k,v){sliders[k]=parseInt(v);document.getElementById('sv-'+k).textContent=v+'%';}
 function updateClock(){
   const now=new Date();
   document.getElementById('sim-clock').textContent=
-    now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+
-    ' - SIM+'+simTime+'s';
+    now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' — SIM+'+simTime+'s';
 }
 function updateFooter(){
   document.getElementById('ft-routes').textContent=ROUTES.length;
-  document.getElementById('ft-sensors').textContent=SENSORS.length;
+  document.getElementById('ft-segs').textContent=osmWaysLoaded?osmFeatures.length:SEGMENTS.length;
   document.getElementById('ft-time').textContent=simTime+'s';
 }
 function startSim(){clearInterval(simInterval);simInterval=setInterval(tick,500);}
 
-/* ══════════════════════════════════════════════════════════════════
-   DIJKSTRA ROUTING ENGINE
-══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROUTING ENGINE  —  Dijkstra  (unchanged)
+═══════════════════════════════════════════════════════════════════════════ */
 function buildGraph(deptHr){
   const graph={};
   const byRoute={};
@@ -1413,10 +1449,11 @@ function findAlternates(fromId,toId,mainPath,deptHr){
   return alts;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   ROUTE PLANNER UI
-══════════════════════════════════════════════════════════════════ */
-let activeRoute=null,activeAlt=null,departHour=8;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROUTE PLANNER UI  (unchanged logic, MapLibre path rendering)
+═══════════════════════════════════════════════════════════════════════════ */
+let departHour=8;
 let _alts=[];
 
 function populateSelects(){
@@ -1561,9 +1598,68 @@ function drawTODChart(fromId,toId){
   ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   LIVE DATA HOOKUP – Cloudflare Worker
-══════════════════════════════════════════════════════════════════ */
+
+// Override showRouteResult to also update map
+const _origShowRoute=showRouteResult;
+function showRouteResult(result,fromId,toId,alts){
+  _origShowRoute(result,fromId,toId,alts);
+  updateRoutePathSource();
+}
+
+function clearRoute(){
+  activeRoute=null;activeAlt=null;_alts=[];
+  updateRoutePathSource();
+  const rr=document.getElementById('route-result');
+  if(rr)rr.classList.remove('visible');
+}
+
+function selectAlt(idx){
+  document.querySelectorAll('.alt-route-item').forEach((el,i)=>el.classList.toggle('selected-alt',i===idx));
+  activeAlt=_alts[idx];
+  updateRoutePathSource();
+}
+
+function drawTODChart(fromId,toId){
+  const c=document.getElementById('tod-canvas');if(!c)return;
+  const par=c.parentElement;c.width=par?par.clientWidth-12:240;c.height=55;
+  const ctx=c.getContext('2d'),W2=c.width,H2=c.height;
+  ctx.fillStyle='#f8f4e8';ctx.fillRect(0,0,W2,H2);
+  const times=[];
+  for(let h=0;h<24;h++){
+    const g=buildGraph(h);const r=dijkstra(g,fromId,toId);
+    times.push(r.totalTime<Infinity?r.totalTime:null);
+  }
+  const valid=times.filter(t=>t!==null);if(!valid.length)return;
+  const minT=Math.min(...valid)*0.92,maxT=Math.max(...valid)*1.05;
+  RUSH_HOURS.forEach(h=>{ctx.fillStyle='rgba(204,17,0,0.07)';ctx.fillRect(h/24*W2,0,W2/24,H2);});
+  ctx.strokeStyle='rgba(160,140,100,0.2)';ctx.lineWidth=0.5;
+  [6,12,18].forEach(h=>{ctx.beginPath();ctx.moveTo(h/24*W2,0);ctx.lineTo(h/24*W2,H2);ctx.stroke();});
+  ctx.beginPath();
+  times.forEach((t,h)=>{
+    if(t===null)return;
+    const x=(h+0.5)/24*W2,y=H2-(t-minT)/(maxT-minT)*(H2-14)-4;
+    h===0||times[h-1]===null?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#003399';ctx.lineWidth=1.8;ctx.stroke();
+  const ch=getHour(),ct=times[Math.floor(ch)];
+  if(ct!==null){
+    const x=(ch+0.5)/24*W2,y=H2-(ct-minT)/(maxT-minT)*(H2-14)-4;
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle='#cc1100';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
+    ctx.font='bold 7px Arial';ctx.fillStyle='#cc1100';ctx.textAlign='center';
+    ctx.fillText(formatTT(ct),x,y-6);ctx.textAlign='left';
+  }
+  ctx.font='6px Arial';ctx.fillStyle='rgba(100,80,50,0.75)';ctx.textAlign='center';
+  [0,6,12,18].forEach(h=>ctx.fillText(h+':00',(h)/24*W2+W2/48,H2-1));
+  ctx.textAlign='left';
+  ctx.fillStyle='#1a8c1a';ctx.font='6px Arial';ctx.fillText(formatTT(minT)+' best',2,H2-10);
+  ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE DATA  —  Cloudflare Worker hookup  (unchanged)
+═══════════════════════════════════════════════════════════════════════════ */
 const WORKER_URL='https://ma-traffic-twin.jsj-ai.workers.dev';
 const POLL_MS=30000;
 let liveActive=false,fetchErrs=0;
@@ -1671,21 +1767,15 @@ function startLiveData(){
   setInterval(()=>{if(activeRoute)recalcRoute();},POLL_MS);
 }
 
+
+/* ── addAlert shim (used by calcRoute) ── */
+function addAlert(sev,msg){logEvent(sev,msg);}
+
 /* ── INIT ── */
-buildSegments();
-logEvent('clear','MA Traffic Twin initialized');
 populateSelects();
-logEvent('clear',`${ROUTES.length} routes • ${SEGMENTS.length} segments • ${SENSORS.length} sensors`);
-logEvent('info','Click segments to inspect • Road geometry loading from OSRM…');
-
-initSegmentPolylines();
-updateExitMarkers();
-updateSensorMarkers();
-startLiveData();
-startSim();
-
-// Snap segment geometry from route pts (immediate, no external API)
-snapSegmentGeometries();
+updateClock();
+updateFooter();
+// Map 'load' event above handles: buildSegments, startSim, startLiveData, loadOSMGeometry
 
 </script>
 </body>
