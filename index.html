@@ -32,8 +32,8 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .hbtn.danger:hover{border-color:#ff8866;color:#ff8866;}
 .hbtn.danger.on{background:#cc2200;border-color:#ff4422;color:#fff;}
 .hdr-clock{font-size:10px;color:#ffe0a0;letter-spacing:.1em;white-space:nowrap;}
-.content{display:grid;grid-template-columns:1fr 280px;overflow:hidden;flex:1;min-height:0;}
-.map-area{position:relative;overflow:hidden;background:var(--bg);min-height:0;}
+.content{display:grid;grid-template-columns:1fr 280px;grid-template-rows:1fr;overflow:hidden;flex:1;min-height:0;}
+.map-area{position:relative;overflow:hidden;background:var(--bg);min-height:0;height:100%;}
 #leaflet-map{position:absolute;inset:0;z-index:1;}
 
 /* Override Leaflet attribution for our style */
@@ -51,7 +51,7 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .tip-title{color:#2a1808;font-size:10px;margin-bottom:5px;font-family:Georgia,serif;font-weight:bold;border-bottom:1px solid #c8b890;padding-bottom:3px;}
 .tip-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;color:#3a2818;}
 .tip-val{color:#883300;font-weight:700;}
-.right-panel{background:var(--surface);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.right-panel{background:var(--surface);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
 .psec{border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;}
 .psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;}
 .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
@@ -603,7 +603,8 @@ const ROUTES=[
   {id:'RT1A-BOSTON',label:'Route 1A',type:'local',pts:[
     [42.360,-71.058],[42.378,-71.042],[42.398,-71.028],[42.418,-71.018],
     [42.438,-71.008],[42.458,-70.998],[42.478,-70.988]]},
-];\n
+];
+
 /* ── EXIT DATABASE ── */
 const EXITS=[
   {id:'I90-9', route:'I-90',exit:'9', name:'Mass Ave Boston',       lat:42.343,lon:-71.073,mi:1},
