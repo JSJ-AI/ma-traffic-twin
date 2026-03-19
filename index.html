@@ -784,6 +784,11 @@ function drawMapGrid(){
   mc.setLineDash([]);
 }
 
+function speedColor(spd,type){
+  if(type==='local') return spd<20?'#cc1100':spd<30?'#cc8800':'#8a7050';
+  return spd>50?'#1a8c1a':spd>30?'#cc8800':spd>15?'#cc5500':'#cc1100';
+}
+
 function drawRoute(r){
   if(r.pts.length<2)return;
   const trafficCol=speedColor(r.speed,r.type);
