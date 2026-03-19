@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MA Traffic Twin · Massachusetts Road Network Digital Twin</title>
+<title>MA Traffic Twin - Massachusetts Road Network Digital Twin</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -15,15 +15,9 @@
 }
 html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden;}
 .app{display:grid;grid-template-rows:48px 1fr 36px;height:100vh;}
-.hdr{background:linear-gradient(90deg,#2a1808,#3a2010,#2a1808);border-bottom:2px solid #6a4828;display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:12px;flex-wrap:wrap;}
-.logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;letter-spacing:.2em;color:#ffe0a0;white-space:nowrap;}
-.hdr-mid{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.sys-status{display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:.2em;color:#ffe0a0;}
-.dot{width:7px;height:7px;border-radius:50%;animation:blink 1.4s ease-in-out infinite;}
-.dot.ok{background:#00cc44;box-shadow:0 0 6px #00cc44;}
-.dot.warn{background:#ffaa00;box-shadow:0 0 6px #ffaa00;}
-.dot.crit{background:#ff2244;box-shadow:0 0 6px #ff2244;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr{background:#3a2010;border-bottom:3px solid #c8a060;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:8px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+.logo{font-family:Georgia,serif;font-size:16px;font-weight:bold;letter-spacing:.1em;color:#ffe8b0;white-space:nowrap;}
+.sys-status{display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:.15em;color:#ffe8b0;}
 .hdr-btns{display:flex;gap:5px;flex-wrap:wrap;}
 .hbtn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.12em;padding:4px 10px;border:1px solid rgba(255,220,160,0.3);background:rgba(255,220,160,0.1);color:#c8a060;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase;}
 .hbtn:hover{border-color:#ffe0a0;color:#ffe0a0;}
@@ -85,6 +79,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .api-note a{color:#003399;text-decoration:none;}
 .api-note a:hover{text-decoration:underline;}
 @media(max-width:768px){.content{grid-template-columns:1fr;}.right-panel{display:none;}}
+</style>
 
 </head>
 <body>
@@ -101,13 +96,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
   </div>
   <div class="hdr-mid">
     <div class="hdr-btns">
-      <button class="hbtn on" id="btn-run" onclick="toggleSim()">⏸ LIVE</button>
-      <button class="hbtn" onclick="resetSim()">↺ RESET</button>
-      <button class="hbtn" id="btn-rush" onclick="toggleRush()">🚗 RUSH HOUR</button>
-      <button class="hbtn danger" id="btn-accident" onclick="triggerAccident()">💥 ACCIDENT</button>
-      <button class="hbtn danger" id="btn-weather" onclick="triggerWeather()">🌨 STORM</button>
-      <button class="hbtn" id="btn-sensors" onclick="toggleSensors()">📡 SENSORS</button>
-      <button class="hbtn" id="btn-labels" onclick="toggleLabels()">🏷 LABELS</button>
+      <button class="hbtn on" id="btn-run" onclick="toggleSim()">|| LIVE</button>
+      <button class="hbtn" onclick="resetSim()">Reset RESET</button>
+      <button class="hbtn" id="btn-rush" onclick="toggleRush()"> RUSH HOUR</button>
+      <button class="hbtn danger" id="btn-accident" onclick="triggerAccident()">! ACCIDENT</button>
+      <button class="hbtn danger" id="btn-weather" onclick="triggerWeather()"> STORM</button>
+      <button class="hbtn" id="btn-sensors" onclick="toggleSensors()"> SENSORS</button>
+      <button class="hbtn" id="btn-labels" onclick="toggleLabels()"> LABELS</button>
     </div>
   </div>
   <div class="hdr-clock" id="sim-clock">Loading...</div>
@@ -122,28 +117,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     <!-- Zoom -->
     <div class="zoom-ctrl">
       <button class="zbtn" onclick="zoom(1.2)">+</button>
-      <button class="zbtn" onclick="zoom(0.83)">−</button>
-      <button class="zbtn" onclick="resetView()" title="Reset view" style="font-size:11px">⊡</button>
+      <button class="zbtn" onclick="zoom(0.83)">-</button>
+      <button class="zbtn" onclick="resetView()" title="Reset view" style="font-size:11px">[]</button>
     </div>
 
     <!-- API Note -->
     <div class="api-note">
       <strong>Data Sources:</strong><br>
-      Simulated twin — ready for live data.<br>
+      Simulated twin - ready for live data.<br>
       <strong>MassDOT APIs available:</strong><br>
-      • <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">GoTime Travel Times</a> (requires key)<br>
-      • <a href="https://geo-massdot.opendata.arcgis.com/" target="_blank">GeoDOT Open Data</a><br>
-      • Traffic cameras via TrafficLand<br>
-      • <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">Highway event feed</a>
+      * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">GoTime Travel Times</a> (requires key)<br>
+      * <a href="https://geo-massdot.opendata.arcgis.com/" target="_blank">GeoDOT Open Data</a><br>
+      * Traffic cameras via TrafficLand<br>
+      * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">Highway event feed</a>
     </div>
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip">
       <div class="tip-title" id="tip-title">Route</div>
-      <div class="tip-row"><span>Speed</span><span class="tip-val" id="tip-speed">—</span></div>
-      <div class="tip-row"><span>Volume</span><span class="tip-val" id="tip-vol">—</span></div>
-      <div class="tip-row"><span>Travel Time</span><span class="tip-val" id="tip-time">—</span></div>
-      <div class="tip-row"><span>Status</span><span class="tip-val" id="tip-status">—</span></div>
+      <div class="tip-row"><span>Speed</span><span class="tip-val" id="tip-speed">-</span></div>
+      <div class="tip-row"><span>Volume</span><span class="tip-val" id="tip-vol">-</span></div>
+      <div class="tip-row"><span>Travel Time</span><span class="tip-val" id="tip-time">-</span></div>
+      <div class="tip-row"><span>Status</span><span class="tip-val" id="tip-status">-</span></div>
     </div>
 
     <!-- Legend -->
@@ -191,7 +186,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 
     <!-- Route Planner -->
     <div class="psec" style="flex-shrink:0">
-      <div class="psec-title">🗺 Route Planner</div>
+      <div class="psec-title"> Route Planner</div>
       <div style="font-size:7px;color:var(--muted);margin-bottom:2px">FROM EXIT</div>
       <select id="sel-from" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:7px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
       <div style="font-size:7px;color:var(--muted);margin-bottom:2px">TO EXIT</div>
@@ -199,17 +194,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
       <div style="font-size:7px;color:var(--muted);margin-bottom:2px">DEPART TIME</div>
       <input type="time" id="depart-time" value="08:00" onchange="recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:8px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:5px;">
       <div style="display:flex;gap:4px;margin-bottom:6px">
-        <button onclick="calcRoute()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:#2a1808;color:#ffe0a0;border:1px solid #6a4828;border-radius:2px;cursor:pointer;letter-spacing:.1em">🔍 FIND ROUTE</button>
-        <button onclick="calcAltRoutes()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:rgba(0,50,150,0.1);color:#003399;border:1px solid rgba(0,50,150,0.3);border-radius:2px;cursor:pointer">⇄ ALTS</button>
-        <button onclick="clearRoute()" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:var(--dim);color:var(--muted);border:1px solid var(--border);border-radius:2px;cursor:pointer">✕</button>
+        <button onclick="calcRoute()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:#2a1808;color:#ffe0a0;border:1px solid #6a4828;border-radius:2px;cursor:pointer;letter-spacing:.1em"> FIND ROUTE</button>
+        <button onclick="calcAltRoutes()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:rgba(0,50,150,0.1);color:#003399;border:1px solid rgba(0,50,150,0.3);border-radius:2px;cursor:pointer"><> ALTS</button>
+        <button onclick="clearRoute()" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:var(--dim);color:var(--muted);border:1px solid var(--border);border-radius:2px;cursor:pointer">X</button>
       </div>
       <!-- Result -->
       <div id="route-result" style="display:none;background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:7px 8px;font-size:8px;">
         <div id="rr-head" style="font-family:Georgia,serif;font-size:9px;font-weight:bold;color:#1a1008;margin-bottom:5px;"></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Distance</span><span id="rr-dist" style="color:#883300;font-weight:700">—</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Travel Time</span><span id="rr-time" style="color:#883300;font-weight:700">—</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Avg Speed</span><span id="rr-spd" style="color:#883300;font-weight:700">—</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted)">Arrive</span><span id="rr-arrive" style="color:#883300;font-weight:700">—</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Distance</span><span id="rr-dist" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Travel Time</span><span id="rr-time" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Avg Speed</span><span id="rr-spd" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted)">Arrive</span><span id="rr-arrive" style="color:#883300;font-weight:700">-</span></div>
         <div id="rr-path" style="font-size:7px;color:#5a4030;padding-top:4px;border-top:1px solid var(--border);line-height:1.7;margin-bottom:4px;"></div>
         <div id="alt-routes"></div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:5px;margin-top:4px;">
@@ -243,20 +238,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     <div class="psec">
       <div class="psec-title">Inject Event</div>
       <div class="inj-grid">
-        <button class="inj-btn" onclick="injectEvent('accident')">💥 Accident<br>I-93</button>
-        <button class="inj-btn" onclick="injectEvent('breakdown')">🚗 Breakdown<br>Route 128</button>
-        <button class="inj-btn" onclick="injectEvent('construction')">🚧 Lane Closure<br>Mass Pike</button>
-        <button class="inj-btn" onclick="injectEvent('flood')">🌊 Flooding<br>Southeast Exp</button>
-        <button class="inj-btn" onclick="injectEvent('event')">🏟 Stadium<br>Event</button>
-        <button class="inj-btn" onclick="injectEvent('clearall')">✅ Clear<br>All Events</button>
+        <button class="inj-btn" onclick="injectEvent('accident')">! Accident<br>I-93</button>
+        <button class="inj-btn" onclick="injectEvent('breakdown')"> Breakdown<br>Route 128</button>
+        <button class="inj-btn" onclick="injectEvent('construction')">[WZ] Lane Closure<br>Mass Pike</button>
+        <button class="inj-btn" onclick="injectEvent('flood')"> Flooding<br>Southeast Exp</button>
+        <button class="inj-btn" onclick="injectEvent('event')"> Stadium<br>Event</button>
+        <button class="inj-btn" onclick="injectEvent('clearall')">[OK] Clear<br>All Events</button>
       </div>
     </div>
 
     <!-- LIVE DATA PANEL -->
     <div class="psec" style="flex-shrink:0">
       <div class="psec-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>📡 Live Feeds</span>
-        <span id="live-badge" style="font-size:7px;color:#886600;letter-spacing:.1em;font-family:'Share Tech Mono',monospace">◌ SIM</span>
+        <span> Live Feeds</span>
+        <span id="live-badge" style="font-size:7px;color:#886600;letter-spacing:.1em;font-family:'Share Tech Mono',monospace">o SIM</span>
       </div>
       <div id="live-data-panel" style="font-size:7px;color:var(--muted);line-height:1.8">
         Connecting to live feeds...
@@ -278,21 +273,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     <div class="ft-stat">ROUTES <span id="ft-routes">0</span></div>
     <div class="ft-stat">SENSORS <span id="ft-sensors">0</span></div>
     <div class="ft-stat">SIM TIME <span id="ft-time">0s</span></div>
-    <div class="ft-stat">TICK <span id="ft-tick">1×</span></div>
+    <div class="ft-stat">TICK <span id="ft-tick">1&#215;</span></div>
   </div>
-  <div>MA TRAFFIC TWIN · MassDOT Digital Twin · J2AI · Data: Simulated (hook to GoTime API for live)</div>
+  <div>MA TRAFFIC TWIN - MassDOT Digital Twin - J2AI - Data: Simulated (hook to GoTime API for live)</div>
 </div>
 
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════════
+/* &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
    MASSACHUSETTS ROAD NETWORK DIGITAL TWIN
    Coordinate system: lat/lon mapped to canvas pixels
-   MA approx bounds: lat 41.2–42.9, lon -73.5 to -69.9
-══════════════════════════════════════════════════════ */
+   MA approx bounds: lat 41.2&#8211;42.9, lon -73.5 to -69.9
+&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; */
 
-/* ── GEO PROJECTION ── */
+/* &#9472;&#9472; GEO PROJECTION &#9472;&#9472; */
 const MA_BOUNDS={latMin:41.2,latMax:42.9,lonMin:-73.55,lonMax:-69.85};
 
 function geo(lat,lon){
@@ -302,7 +297,7 @@ function geo(lat,lon){
   return{x,y};
 }
 
-/* ── MA ROAD NETWORK DATA ── */
+/* &#9472;&#9472; MA ROAD NETWORK DATA &#9472;&#9472; */
 // Each route is array of [lat, lon] waypoints tracing actual road paths
 const ROUTES=[
   // INTERSTATES
@@ -389,7 +384,7 @@ const ROUTES=[
    pts:[[42.360,-71.058],[42.350,-71.030],[42.340,-71.000],[42.328,-70.960],[42.320,-70.930]]},
 ];
 
-/* ── MAJOR CITIES / NODES ── */
+/* &#9472;&#9472; MAJOR CITIES / NODES &#9472;&#9472; */
 const CITIES=[
   {name:'Boston',lat:42.360,lon:-71.058,pop:'large',type:'hub'},
   {name:'Worcester',lat:42.262,lon:-71.802,pop:'large',type:'city'},
@@ -417,7 +412,7 @@ const CITIES=[
   {name:'Brookline',lat:42.332,lon:-71.121,pop:'small',type:'city'},
 ];
 
-/* ── TRAFFIC SENSORS ── */
+/* &#9472;&#9472; TRAFFIC SENSORS &#9472;&#9472; */
 const SENSORS=[];
 ROUTES.forEach(r=>{
   const step=Math.max(1,Math.floor(r.pts.length/4));
@@ -431,14 +426,14 @@ ROUTES.forEach(r=>{
   }
 });
 
-/* ── STATE ── */
+/* &#9472;&#9472; STATE &#9472;&#9472; */
 let simRunning=true,simTime=0,tickRate=1,simInterval=null;
 let showSensors=true,showLabels=true;
 let rushHour=false,weatherActive=false;
 let incidents=[],eventCount=0;
 let sliders={traffic:50,weather:0,const:20};
 
-/* ── ROUTE STATE ── */
+/* &#9472;&#9472; ROUTE STATE &#9472;&#9472; */
 ROUTES.forEach(r=>{
   r.speed=r.type==='local'?30:65;
   r.volume=r.type==='local'?400:1200;
@@ -447,7 +442,7 @@ ROUTES.forEach(r=>{
   r.history=new Array(60).fill(65);
 });
 
-/* ── CANVAS SETUP ── */
+/* &#9472;&#9472; CANVAS SETUP &#9472;&#9472; */
 const mapCanvas=document.getElementById('map-canvas');
 const ovCanvas=document.getElementById('overlay-canvas');
 const mc=mapCanvas.getContext('2d');
@@ -466,7 +461,7 @@ function resize(){
 window.addEventListener('resize',resize);
 resize();
 
-/* ── PROJECT GEO TO CANVAS ── */
+/* &#9472;&#9472; PROJECT GEO TO CANVAS &#9472;&#9472; */
 function project(lat,lon){
   const g=geo(lat,lon);
   return{
@@ -475,7 +470,7 @@ function project(lat,lon){
   };
 }
 
-/* ── PAN & ZOOM ── */
+/* &#9472;&#9472; PAN & ZOOM &#9472;&#9472; */
 mapCanvas.addEventListener('mousedown',e=>{dragging=true;lastMouse={x:e.clientX,y:e.clientY};});
 window.addEventListener('mouseup',()=>{dragging=false;});
 window.addEventListener('mousemove',e=>{
@@ -499,7 +494,7 @@ function zoom(f){
 }
 function resetView(){pan={x:0,y:0};scale=1;}
 
-/* ── PAPER MAP THEME COLORS ── */
+/* &#9472;&#9472; PAPER MAP THEME COLORS &#9472;&#9472; */
 const MAP_THEME={
   bg:'#f4efe0',          // warm cream paper
   water:'#a8cfe0',       // muted blue water
@@ -529,7 +524,7 @@ const MAP_THEME={
   shield_state:'#1a6a20',
 };
 
-/* ── EXIT DATA (major MA highway exits) ── */
+/* &#9472;&#9472; EXIT DATA (major MA highway exits) &#9472;&#9472; */
 const EXITS=[
   // I-90 Mass Pike (full exit list with mileage for routing)
   {id:'I90-9', route:'I-90',exit:'9', name:'Mass Ave Boston',       lat:42.343,lon:-71.073,mi:1},
@@ -623,7 +618,7 @@ const EXITS=[
 EXITS.forEach((e,i)=>{if(!e.id)e.id=`exit_${i}`;if(e.mi===undefined)e.mi=i*2;});
 const EXITS_DB=EXITS;
 
-/* ── WATER BODIES ── */
+/* &#9472;&#9472; WATER BODIES &#9472;&#9472; */
 const WATERS=[
   // Boston Harbor (simplified)
   {name:'Boston Harbor',type:'harbor',
@@ -656,7 +651,7 @@ const WATERS=[
         [42.398,-71.670],[42.388,-71.685],[42.384,-71.705],[42.392,-71.722]]},
 ];
 
-/* ── COUNTY BOUNDS (simplified polygons) ── */
+/* &#9472;&#9472; COUNTY BOUNDS (simplified polygons) &#9472;&#9472; */
 const COUNTIES=[
   {name:'Suffolk',color:'#ede8d8',
    pts:[[42.400,-71.020],[42.400,-71.090],[42.360,-71.095],[42.320,-71.060],[42.330,-71.010],[42.370,-71.000]]},
@@ -668,7 +663,7 @@ const COUNTIES=[
    pts:[[42.726,-72.000],[42.760,-71.980],[42.880,-71.900],[42.880,-72.300],[42.850,-72.500],[42.730,-72.200],[42.640,-71.980],[42.580,-71.900],[42.520,-71.900],[42.450,-71.900],[42.335,-71.940],[42.295,-72.040],[42.186,-72.100],[42.100,-71.530],[42.000,-71.540],[42.050,-71.535],[42.240,-71.415],[42.305,-71.408],[42.375,-71.448],[42.465,-71.490],[42.510,-71.530],[42.550,-71.580],[42.620,-71.710],[42.700,-71.900]]},
 ];
 
-/* ── IMPROVED DRAW ── */
+/* &#9472;&#9472; IMPROVED DRAW &#9472;&#9472; */
 function draw(){
   mc.fillStyle=MAP_THEME.bg;
   mc.fillRect(0,0,W,H);
@@ -902,7 +897,7 @@ function drawCities(){
     const r=isHub?7:c.pop==='large'?5:c.pop==='medium'?3.5:2.5;
     const scaledR=r*Math.min(scale,1.5);
 
-    // City dot — classic map style
+    // City dot - classic map style
     mc.beginPath();mc.arc(p.x,p.y,scaledR,0,Math.PI*2);
     mc.fillStyle=isHub?'#1a0808':'#2a1808';mc.fill();
     mc.strokeStyle=MAP_THEME.bg;mc.lineWidth=1.5;mc.stroke();
@@ -1010,7 +1005,7 @@ function drawScaleBar(){
 }
 
 
-/* ── HOVER TOOLTIP ── */
+/* &#9472;&#9472; HOVER TOOLTIP &#9472;&#9472; */
 let hoverRoute=null;
 function handleHover(e){
   const rect=mapCanvas.getBoundingClientRect();
@@ -1035,7 +1030,7 @@ function handleHover(e){
     document.getElementById('tip-vol').textContent=Math.round(found.volume)+' veh/hr';
     const est=found.pts.length*0.8/(found.speed/60);
     document.getElementById('tip-time').textContent=est.toFixed(1)+' min';
-    const st=found.speed>55?'✅ Free Flow':found.speed>35?'🟡 Slow':'🔴 Congested';
+    const st=found.speed>55?'[OK] Free Flow':found.speed>35?'[Y] Slow':'[R] Congested';
     document.getElementById('tip-status').textContent=st;
   } else {
     tip.style.display='none';
@@ -1048,7 +1043,7 @@ function distToSegment(px,py,x1,y1,x2,y2){
   return Math.hypot(px-(x1+t*dx),py-(y1+t*dy));
 }
 
-/* ── SIMULATION TICK ── */
+/* &#9472;&#9472; SIMULATION TICK &#9472;&#9472; */
 function tick(){
   simTime++;
   const t=simTime*0.03;
@@ -1119,20 +1114,20 @@ function setGauge(id,val,pct,color){
   const fill=document.getElementById('gf-'+id);if(fill){fill.style.width=Math.max(0,Math.min(100,pct))+'%';fill.style.background=color;}
 }
 
-/* ── INCIDENT MANAGEMENT ── */
+/* &#9472;&#9472; INCIDENT MANAGEMENT &#9472;&#9472; */
 function addIncident(type,route,lat,lon,icon,msg,severity){
   const inc={id:Date.now(),type,route,lat,lon,icon,msg,severity,time:simTime};
   incidents.push(inc);
   // Mark route
   const r=ROUTES.find(r=>r.id===route);
   if(r&&r.incidents)r.incidents.push(inc.id);
-  logEvent(severity,`${icon} <span class="inc-route">${route}</span> — ${msg}`);
+  logEvent(severity,`${icon} <span class="inc-route">${route}</span> - ${msg}`);
   eventCount++;
 }
 function clearIncidents(){
   incidents=[];
   ROUTES.forEach(r=>{r.incidents=[];});
-  logEvent('clear','✅ All incidents cleared — traffic normalizing');
+  logEvent('clear','[OK] All incidents cleared - traffic normalizing');
 }
 
 function logEvent(sev,msg){
@@ -1145,24 +1140,24 @@ function logEvent(sev,msg){
   if(log.children.length>40)log.removeChild(log.lastChild);
 }
 
-/* ── INJECT EVENTS ── */
+/* &#9472;&#9472; INJECT EVENTS &#9472;&#9472; */
 function injectEvent(type){
   switch(type){
     case 'accident':
-      addIncident('accident','I-93S',42.310,-71.073,'💥','Multi-vehicle accident - 2 lanes blocked','crit');
+      addIncident('accident','I-93S',42.310,-71.073,'!','Multi-vehicle accident - 2 lanes blocked','crit');
       break;
     case 'breakdown':
-      addIncident('breakdown','I-95N',42.340,-71.058,'🚗','Vehicle breakdown - right lane closed','warn');
+      addIncident('breakdown','I-95N',42.340,-71.058,'','Vehicle breakdown - right lane closed','warn');
       break;
     case 'construction':
-      addIncident('construction','I-90',42.279,-71.416,'🚧','Lane closure - construction through 6pm','warn');
+      addIncident('construction','I-90',42.279,-71.416,'[WZ]','Lane closure - construction through 6pm','warn');
       break;
     case 'flood':
-      addIncident('flood','SE-EXP',42.250,-71.060,'🌊','Flooding reported - use alternate routes','crit');
+      addIncident('flood','SE-EXP',42.250,-71.060,'','Flooding reported - use alternate routes','crit');
       break;
     case 'event':
-      addIncident('event','I-90',42.360,-71.058,'🏟','TD Garden event - heavy traffic downtown','warn');
-      addIncident('event','I-93N',42.380,-71.058,'🚦','Fenway area congestion - Red Sox game','warn');
+      addIncident('event','I-90',42.360,-71.058,'','TD Garden event - heavy traffic downtown','warn');
+      addIncident('event','I-93N',42.380,-71.058,'','Fenway area congestion - Red Sox game','warn');
       break;
     case 'clearall':
       clearIncidents();break;
@@ -1170,9 +1165,9 @@ function injectEvent(type){
 }
 
 function triggerAccident(){
-  addIncident('accident','I-93N',42.400,-71.058,'💥','Major accident - all lanes stopped','crit');
-  addIncident('accident','RT128S',42.340,-71.058,'💥','Secondary incident - rubbernecking delay','warn');
-  logEvent('crit','🚨 Emergency response dispatched');
+  addIncident('accident','I-93N',42.400,-71.058,'!','Major accident - all lanes stopped','crit');
+  addIncident('accident','RT128S',42.340,-71.058,'!','Secondary incident - rubbernecking delay','warn');
+  logEvent('crit','&#128680; Emergency response dispatched');
 }
 function triggerWeather(){
   sliders.weather=75;
@@ -1180,15 +1175,15 @@ function triggerWeather(){
   document.getElementById('sv-weather').textContent='75%';
   weatherActive=true;
   document.getElementById('btn-weather').classList.add('on');
-  logEvent('warn','🌨 Winter storm warning — reduced visibility and road conditions');
-  logEvent('warn','Speed limits reduced statewide — use caution');
+  logEvent('warn',' Winter storm warning - reduced visibility and road conditions');
+  logEvent('warn','Speed limits reduced statewide - use caution');
   setTimeout(()=>{
     weatherActive=false;
     document.getElementById('btn-weather').classList.remove('on');
     sliders.weather=10;
     document.getElementById('sl-weather').value=10;
     document.getElementById('sv-weather').textContent='10%';
-    logEvent('clear','🌤 Storm passing — conditions improving');
+    logEvent('clear','&#127780; Storm passing - conditions improving');
   },30000);
 }
 function toggleRush(){
@@ -1198,13 +1193,13 @@ function toggleRush(){
     sliders.traffic=90;
     document.getElementById('sl-traffic').value=90;
     document.getElementById('sv-traffic').textContent='90%';
-    logEvent('warn','🚗 Rush hour activated — peak traffic period');
-    logEvent('warn','I-93 inbound — 45 min delay | I-90 — 30 min delay');
+    logEvent('warn',' Rush hour activated - peak traffic period');
+    logEvent('warn','I-93 inbound - 45 min delay | I-90 - 30 min delay');
   } else {
     sliders.traffic=50;
     document.getElementById('sl-traffic').value=50;
     document.getElementById('sv-traffic').textContent='50%';
-    logEvent('clear','Rush hour ended — traffic returning to normal');
+    logEvent('clear','Rush hour ended - traffic returning to normal');
   }
 }
 function toggleSensors(){showSensors=!showSensors;document.getElementById('btn-sensors').classList.toggle('on',showSensors);}
@@ -1212,14 +1207,14 @@ function toggleLabels(){showLabels=!showLabels;document.getElementById('btn-labe
 function toggleSim(){
   simRunning=!simRunning;
   const btn=document.getElementById('btn-run');
-  if(simRunning){startSim();btn.textContent='⏸ LIVE';btn.classList.add('on');}
-  else{clearInterval(simInterval);btn.textContent='▶ RUN';btn.classList.remove('on');}
+  if(simRunning){startSim();btn.textContent='|| LIVE';btn.classList.add('on');}
+  else{clearInterval(simInterval);btn.textContent='&#9654; RUN';btn.classList.remove('on');}
 }
 function resetSim(){
   clearInterval(simInterval);simTime=0;incidents=[];eventCount=0;
   ROUTES.forEach(r=>{r.incidents=[];r.speed=r.type==='local'?30:65;r.history.fill(65);});
   document.getElementById('incident-log').innerHTML='';
-  logEvent('clear','System reset — all routes nominal');
+  logEvent('clear','System reset - all routes nominal');
   if(simRunning)startSim();
 }
 function updateSl(k,v){sliders[k]=parseInt(v);document.getElementById('sv-'+k).textContent=v+'%';}
@@ -1227,7 +1222,7 @@ function updateClock(){
   const now=new Date();
   document.getElementById('sim-clock').textContent=
     now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+
-    ' · SIM+'+simTime+'s';
+    ' - SIM+'+simTime+'s';
 }
 function updateFooter(){
   document.getElementById('ft-routes').textContent=ROUTES.length;
@@ -1237,10 +1232,10 @@ function updateFooter(){
 function startSim(){clearInterval(simInterval);simInterval=setInterval(tick,500);}
 
 
-/* ─────────────────────────────────────────────────────────────
+/* &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
    TIME-OF-DAY TRAFFIC MODEL
-   Speed multiplier by hour (0-23) — MA commute patterns
-───────────────────────────────────────────────────────────── */
+   Speed multiplier by hour (0-23) - MA commute patterns
+&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; */
 const TOD_PAT={
   interstate:[0.95,0.95,0.95,0.95,0.92,0.85,0.72,0.58,0.65,0.82,0.88,0.87,0.85,0.84,0.83,0.80,0.68,0.60,0.70,0.82,0.88,0.92,0.94,0.95],
   expressway: [0.95,0.95,0.95,0.92,0.88,0.80,0.65,0.52,0.60,0.78,0.86,0.85,0.83,0.82,0.80,0.76,0.62,0.55,0.67,0.80,0.86,0.90,0.93,0.95],
@@ -1257,10 +1252,10 @@ function todMult(type,hour){
 function todSpeed(route,hour){return route.baseSpd*todMult(route.type,hour);}
 function formatTT(min){if(min<60)return Math.round(min)+'min';const h=Math.floor(min/60),m=Math.round(min%60);return h+'h '+m+'min';}
 
-/* ─────────────────────────────────────────────────────────────
-   ROUTING ENGINE — Dijkstra shortest path
+/* &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+   ROUTING ENGINE - Dijkstra shortest path
    Supports: interchange detection, incident penalties, TOD
-───────────────────────────────────────────────────────────── */
+&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; */
 function buildGraph(deptHr){
   const graph={};
   const byRoute={};
@@ -1334,14 +1329,14 @@ function findAlternates(fromId,toId,mainPath,deptHr){
   return alts;
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
    ROUTE PLANNER UI
-───────────────────────────────────────────────────────────── */
+&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; */
 let activeRoute=null,activeAlt=null,departHour=8;
 let _alts=[];
 
 function populateSelects(){
-  const opts=EXITS_DB.map(e=>`<option value="${e.id}">${e.route} Exit ${e.exit} — ${e.name}</option>`).join('');
+  const opts=EXITS_DB.map(e=>`<option value="${e.id}">${e.route} Exit ${e.exit} - ${e.name}</option>`).join('');
   const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to');
   if(sf){sf.innerHTML=opts;sf.value='I93N-7';}
   if(st){st.innerHTML=opts;st.value='I93N-20';}
@@ -1363,7 +1358,7 @@ function calcRoute(){
   if(result.totalTime===Infinity){addAlert('warn','No route found. Exits may not be connected. Try different endpoints.');return;}
   activeRoute=result;activeAlt=null;
   showRouteResult(result,fromId,toId);
-  addAlert('info',`Route: ${formatTT(result.totalTime)} · ${result.path.length} segments`);
+  addAlert('info',`Route: ${formatTT(result.totalTime)} - ${result.path.length} segments`);
 }
 
 function calcAltRoutes(){
@@ -1396,14 +1391,14 @@ function showRouteResult(result,fromId,toId,alts){
   const arrStr=arr.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 
   const el=id=>document.getElementById(id);
-  if(el('rr-head'))el('rr-head').textContent=(fromEx?.name||fromId)+' → '+(toEx?.name||toId);
+  if(el('rr-head'))el('rr-head').textContent=(fromEx?.name||fromId)+' > '+(toEx?.name||toId);
   if(el('rr-dist'))el('rr-dist').textContent=totalDist.toFixed(1)+' mi';
   if(el('rr-time'))el('rr-time').textContent=formatTT(result.totalTime);
   if(el('rr-spd'))el('rr-spd').textContent=avgSpd.toFixed(0)+' mph';
   if(el('rr-arrive'))el('rr-arrive').textContent=arrStr;
 
   const segs=[...new Set(result.path.map(p=>p.routeLabel).filter(Boolean))];
-  if(el('rr-path'))el('rr-path').innerHTML='<strong>Via:</strong> '+segs.join(' → ');
+  if(el('rr-path'))el('rr-path').innerHTML='<strong>Via:</strong> '+segs.join(' > ');
 
   // Alternates
   if(el('alt-routes')&&alts&&alts.length){
@@ -1412,11 +1407,11 @@ function showRouteResult(result,fromId,toId,alts){
         const aDist=alt.path.reduce((s,p)=>s+(p.dist||0),0);
         const diff=alt.totalTime-result.totalTime;
         const diffStr=diff>0?'+'+formatTT(diff)+' slower':formatTT(-diff)+' faster';
-        const aSegs=[...new Set(alt.path.map(p=>p.routeLabel).filter(Boolean))].slice(0,3).join(' → ');
+        const aSegs=[...new Set(alt.path.map(p=>p.routeLabel).filter(Boolean))].slice(0,3).join(' > ');
         return `<div class="alt-route-item" onclick="selectAlt(${i})">
           <div class="alt-head"><span>Alt Route ${i+2}</span><span style="color:${diff>0?'#cc8800':'#1a8c1a'}">${diffStr}</span></div>
           <div style="font-size:7px;color:#3a2818">${aSegs}</div>
-          <div style="font-size:6px;color:#6a5840;margin-top:2px">Avoids: ${alt.avoids||'—'} · ${aDist.toFixed(1)}mi</div>
+          <div style="font-size:6px;color:#6a5840;margin-top:2px">Avoids: ${alt.avoids||'-'} - ${aDist.toFixed(1)}mi</div>
         </div>`;
       }).join('');
   } else if(el('alt-routes')){el('alt-routes').innerHTML='';}
@@ -1506,10 +1501,10 @@ function drawTODChart(fromId,toId){
   ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);
 }
 
-/* ═══════════════════════════════════════════════════
+/* &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
    LIVE DATA HOOKUP
    Cloudflare Worker: ma-traffic-twin.jsj-ai.workers.dev
-═══════════════════════════════════════════════════ */
+&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552; */
 const WORKER_URL='https://ma-traffic-twin.jsj-ai.workers.dev';
 const POLL_MS=30000;
 let liveActive=false,fetchErrs=0;
@@ -1562,7 +1557,7 @@ function applyLiveState(state){
     });
     // Log transit alerts without map position
     state.activeIncidents.filter(i=>!i.lat||!i.lon).slice(0,2).forEach(i=>{
-      logEvent(i.severity,`${i.icon} <span class="inc-route">${i.route||i.source}</span> — ${i.msg}`);
+      logEvent(i.severity,`${i.icon} <span class="inc-route">${i.route||i.source}</span> - ${i.msg}`);
     });
   }
   // 4. Status indicator
@@ -1580,7 +1575,7 @@ function applyLiveState(state){
 function setLiveBadge(live){
   const b=document.getElementById('live-badge');
   if(!b)return;
-  b.textContent=live?'● LIVE':'◌ SIM';
+  b.textContent=live?'* LIVE':'o SIM';
   b.style.color=live?'#1a8c1a':'#886600';
 }
 
@@ -1590,45 +1585,45 @@ function updateLivePanel(state){
   const wx=state.weatherSummary||{};
   const mb=state.mbtaSummary||{};
   const meta=state.meta||{};
-  const updated=meta.generatedAt?new Date(meta.generatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'—';
+  const updated=meta.generatedAt?new Date(meta.generatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'-';
   const srcOk=Object.values(meta.sources||{}).filter(v=>v==='ok'||v==='simulated').length;
   const srcTotal=Object.keys(meta.sources||{}).length;
   panel.innerHTML=`
-    <div style="color:var(--muted);font-size:6px;margin-bottom:6px">Updated ${updated} · ${meta.processingMs||0}ms · ${srcOk}/${srcTotal} sources</div>
+    <div style="color:var(--muted);font-size:6px;margin-bottom:6px">Updated ${updated} - ${meta.processingMs||0}ms - ${srcOk}/${srcTotal} sources</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
       <div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:5px 6px">
         <div style="font-size:6px;color:var(--muted);margin-bottom:2px">WEATHER</div>
-        <div style="font-weight:700;color:${wx.impact==='none'?'#1a8c1a':wx.impact==='moderate'?'#886600':'#cc1100'}">${wx.label||'—'}</div>
-        <div style="font-size:6px;color:var(--muted)">${wx.temp!==undefined?wx.temp+'°F':''}</div>
+        <div style="font-weight:700;color:${wx.impact==='none'?'#1a8c1a':wx.impact==='moderate'?'#886600':'#cc1100'}">${wx.label||'-'}</div>
+        <div style="font-size:6px;color:var(--muted)">${wx.temp!==undefined?wx.temp+'&#176;F':''}</div>
       </div>
       <div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:5px 6px">
         <div style="font-size:6px;color:var(--muted);margin-bottom:2px">MBTA</div>
-        <div style="font-weight:700;color:${(mb.health||100)>80?'#1a8c1a':(mb.health||100)>60?'#886600':'#cc1100'}">${mb.health??'—'}% health</div>
+        <div style="font-weight:700;color:${(mb.health||100)>80?'#1a8c1a':(mb.health||100)>60?'#886600':'#cc1100'}">${mb.health??'-'}% health</div>
         <div style="font-size:6px;color:var(--muted)">${mb.activeAlerts||0} alerts</div>
       </div>
     </div>
     ${mb.topAlert?`<div style="font-size:6px;color:var(--muted);margin-top:5px;padding:3px 5px;background:var(--dim);border-left:2px solid #886600;line-height:1.5">${mb.topAlert.slice(0,90)}</div>`:''}
     <div style="font-size:6px;color:var(--muted);margin-top:5px">
-      ${Object.entries(meta.sources||{}).map(([k,v])=>`${k}:${v==='ok'?'✓':v==='simulated'?'~':'✗'}`).join(' · ')}
+      ${Object.entries(meta.sources||{}).map(([k,v])=>`${k}:${v==='ok'?'&#10003;':v==='simulated'?'~':'&#10007;'}`).join(' - ')}
     </div>`;
 }
 
 function startLiveData(){
   // First fetch
   fetchLiveState().then(state=>{
-    if(state) logEvent('info','📡 Live data connected · <span class="inc-route">'+WORKER_URL+'</span>');
-    else logEvent('info','📡 Worker unreachable · running simulation · retrying every 30s');
+    if(state) logEvent('info',' Live data connected - <span class="inc-route">'+WORKER_URL+'</span>');
+    else logEvent('info',' Worker unreachable - running simulation - retrying every 30s');
   });
   setInterval(fetchLiveState,POLL_MS);
   // Recalc route if active every 30s
   setInterval(()=>{if(activeRoute)recalcRoute();},POLL_MS);
 }
 
-/* ── INIT ── */
+/* &#9472;&#9472; INIT &#9472;&#9472; */
 logEvent('clear','MA Traffic Twin initialized');
 populateSelects();
-logEvent('clear',`${ROUTES.length} routes loaded · ${SENSORS.length} sensors active`);
-logEvent('info','Click routes to inspect · Drag to pan · Scroll to zoom');
+logEvent('clear',`${ROUTES.length} routes loaded - ${SENSORS.length} sensors active`);
+logEvent('info','Click routes to inspect - Drag to pan - Scroll to zoom');
 startLiveData();
 startSim();
 </script>
