@@ -785,8 +785,9 @@ function drawMapGrid(){
 }
 
 function speedColor(spd,type){
-  if(type==='local') return spd<20?'#cc1100':spd<30?'#cc8800':'#8a7050';
-  return spd>50?'#1a8c1a':spd>30?'#cc8800':spd>15?'#cc5500':'#cc1100';
+  if(type==='local') return spd<15?'#cc1100':spd<25?'#cc8800':'#8a7050';
+  if(type==='arterial') return spd<20?'#cc1100':spd<35?'#cc8800':'#1a8c1a';
+  return spd>45?'#1a8c1a':spd>25?'#cc8800':spd>12?'#cc5500':'#cc1100';
 }
 
 function drawRoute(r){
@@ -1078,7 +1079,7 @@ function tick(){
     // Time of day wave
     const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3);
     // trafficLoad: 0%=full speed, 50%=slight slowdown, 100%=heavy congestion
-    const loadFactor=1.0-(trafficLoad*0.35);
+    const loadFactor=0.88+(1.0-trafficLoad)*0.12;
     // Apply all factors
     let speed=baseSpeed*wave*loadFactor*weatherFactor*constFactor*rushFactor;
     // Incident penalty
