@@ -219,8 +219,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
       <div class="psec-title">Conditions</div>
       <div class="sl-row">
         <div class="sl-lbl">Traffic Load</div>
-        <input type="range" id="sl-traffic" min="10" max="100" value="50" oninput="updateSl('traffic',this.value)">
-        <div class="sl-val" id="sv-traffic">50%</div>
+        <input type="range" id="sl-traffic" min="10" max="100" value="85" oninput="updateSl('traffic',this.value)">
+        <div class="sl-val" id="sv-traffic">85%</div>
       </div>
       <div class="sl-row">
         <div class="sl-lbl">Weather Impact</div>
@@ -431,7 +431,7 @@ let simRunning=true,simTime=0,tickRate=1,simInterval=null;
 let showSensors=true,showLabels=true;
 let rushHour=false,weatherActive=false;
 let incidents=[],eventCount=0;
-let sliders={traffic:50,weather:0,const:20};
+let sliders={traffic:85,weather:0,const:5};
 
 /* &#9472;&#9472; ROUTE STATE &#9472;&#9472; */
 ROUTES.forEach(r=>{
@@ -1077,8 +1077,10 @@ function tick(){
     let baseSpeed=r.type==='local'?35:r.type==='arterial'?45:65;
     // Time of day wave
     const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3);
+    // trafficLoad: 0%=full speed, 50%=slight slowdown, 100%=heavy congestion
+    const loadFactor=1.0-(trafficLoad*0.35);
     // Apply all factors
-    let speed=baseSpeed*wave*trafficLoad*weatherFactor*constFactor*rushFactor;
+    let speed=baseSpeed*wave*loadFactor*weatherFactor*constFactor*rushFactor;
     // Incident penalty
     if(r.incidents&&r.incidents.length>0) speed*=0.4;
     // Add noise
