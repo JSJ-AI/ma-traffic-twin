@@ -25,8 +25,8 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'S
 .hbtn.danger:hover{border-color:#ff8866;color:#ff8866;}
 .hbtn.danger.on{background:#cc2200;border-color:#ff4422;color:#fff;}
 .hdr-clock{font-size:10px;color:#ffe0a0;letter-spacing:.1em;white-space:nowrap;}
-.content{display:grid;grid-template-columns:1fr 280px;overflow:hidden;}
-.map-area{position:relative;overflow:hidden;background:var(--bg);}
+.content{display:grid;grid-template-columns:1fr 280px;overflow:hidden;height:100%;}
+.map-area{position:relative;overflow:hidden;background:var(--bg);height:100%;min-height:400px;}
 #map-canvas{position:absolute;inset:0;cursor:grab;}
 #map-canvas:active{cursor:grabbing;}
 #overlay-canvas{position:absolute;inset:0;pointer-events:none;}
@@ -454,8 +454,9 @@ let particles=[];
 
 function resize(){
   const area=document.getElementById('map-area');
-  W=mapCanvas.width=ovCanvas.width=area.clientWidth;
-  H=mapCanvas.height=ovCanvas.height=area.clientHeight;
+  W=mapCanvas.width=ovCanvas.width=area.clientWidth||window.innerWidth;
+  const aH=area.clientHeight;
+  H=mapCanvas.height=ovCanvas.height=(aH>100?aH:window.innerHeight-84);
   draw();
 }
 window.addEventListener('resize',resize);
