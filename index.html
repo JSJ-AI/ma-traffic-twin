@@ -116,9 +116,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 #route-result.visible{display:block;}
 /* MapLibre exit marker */
 .exit-dot{width:7px;height:7px;background:#1a5c1a;border:1.5px solid #fff;
-  border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);}
+  border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  transform:translate(-50%,-50%);}
 .sensor-dot{width:5px;height:5px;background:#0044aa;border:1px solid #fff;
-  border-radius:50%;pointer-events:none;}
+  border-radius:50%;pointer-events:none;
+  transform:translate(-50%,-50%);}
 /* Incident pulse marker */
 @keyframes pulse-ring{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
 .inc-marker-wrap{position:relative;width:24px;height:24px;
@@ -1256,7 +1258,7 @@ function updateExitMarkers(){
     el.className='exit-dot';
     const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false})
       .setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);
-    const m=new maplibregl.Marker({element:el})
+    const m=new maplibregl.Marker({element:el,anchor:'top-left'})
       .setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);
     exitMarkerMap[ex.id]=m;
   });
@@ -1272,7 +1274,7 @@ function updateSensorMarkers(){
     if(sensorMarkerMap[s.id])return;
     const el=document.createElement('div');
     el.className='sensor-dot';
-    const m=new maplibregl.Marker({element:el}).setLngLat([s.lon,s.lat]).addTo(map);
+    const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([s.lon,s.lat]).addTo(map);
     sensorMarkerMap[s.id]=m;
   });
 }
