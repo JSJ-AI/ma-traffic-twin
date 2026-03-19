@@ -454,13 +454,23 @@ let particles=[];
 
 function resize(){
   const area=document.getElementById('map-area');
-  // Force area to fill available space if it reports zero
-  if(area.clientHeight<100){
-    area.style.height=(window.innerHeight-88)+'px';
+  const ww=window.innerWidth||screen.width||1400;
+  const wh=window.innerHeight||screen.height||900;
+  const panelW=300;
+  const hdrH=52;
+  const ftrH=36;
+  // Always compute from window dimensions directly
+  W=Math.max(600,ww-panelW);
+  H=Math.max(500,wh-hdrH-ftrH);
+  // Force the area and canvas to the right size
+  area.style.width=W+'px';
+  area.style.height=H+'px';
+  mapCanvas.width=W; mapCanvas.height=H;
+  mapCanvas.style.width=W+'px'; mapCanvas.style.height=H+'px';
+  if(ovCanvas){
+    ovCanvas.width=W; ovCanvas.height=H;
+    ovCanvas.style.width=W+'px'; ovCanvas.style.height=H+'px';
   }
-  W=mapCanvas.width=ovCanvas.width=Math.max(400,area.clientWidth||window.innerWidth-300);
-  H=mapCanvas.height=ovCanvas.height=Math.max(400,area.clientHeight||window.innerHeight-88);
-  if(ovCanvas){ovCanvas.width=W;ovCanvas.height=H;}
   draw();
 }
 window.addEventListener('resize',resize);
