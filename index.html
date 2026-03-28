@@ -943,7 +943,7 @@ function updateRoutePathSource(){
 }
 
 /* ── Map load: add sources, layers, interactivity ── */
-map.on('load',()=>{
+map.on('load',()=>{   map.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
   // ── Boost secondary/tertiary road visibility in the base style ────────────
   // Iterate style layers; find road-line layers by ID pattern and beef them up
   map.getStyle().layers.forEach(layer=>{
@@ -1175,7 +1175,7 @@ out geom qt;`;
 
   let elements;
   try{
-    const r=await fetch('https://overpass-api.de/api/interpreter',{
+    const r=await fetch('https://overpass.kumi.systems/api/interpreter',{
       method:'POST',
       headers:{'Content-Type':'application/x-www-form-urlencoded'},
       body:'data='+encodeURIComponent(query),
