@@ -81,23 +81,23 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .tip-val{color:#883300;font-weight:700;}
 .right-panel{background:var(--surface);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
 .psec{border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;}
-.psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;}
+.psec-title{font-family:Georgia,serif;font-size:11px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;}
 .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .gauge{background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:6px 8px;text-align:center;}
-.gauge-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;line-height:1.1;}
-.gauge-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;margin-top:2px;}
+.gauge-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;line-height:1.1;}
+.gauge-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-top:2px;}
 .gauge-bar{height:2px;background:var(--border);border-radius:1px;margin-top:5px;overflow:hidden;}
 .gauge-fill{height:100%;border-radius:1px;transition:width .4s,background .4s;}
 .incidents{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;background:var(--panel);}
-.inc-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;}
-.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;border-left:2px solid;font-size:8px;animation:slideIn .3s ease;cursor:pointer;transition:background .15s;color:#2a1808;}
+.inc-title{font-family:Georgia,serif;font-size:11px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;}
+.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;border-left:2px solid;font-size:10px;animation:slideIn .3s ease;cursor:pointer;transition:background .15s;color:#2a1808;}
 .inc-item:hover{background:var(--dim);}
 @keyframes slideIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 .inc-crit{border-color:#cc1100;background:rgba(200,30,0,0.07);}
 .inc-warn{border-color:#886600;background:rgba(150,120,0,0.05);}
 .inc-info{border-color:#003399;background:rgba(0,50,150,0.04);}
 .inc-clear{border-color:#1a6a1a;background:rgba(0,100,0,0.04);}
-.inc-time{color:var(--muted);white-space:nowrap;font-size:7px;}
+.inc-time{color:var(--muted);white-space:nowrap;font-size:9px;}
 .inc-body{flex:1;line-height:1.5;}
 .inc-route{color:#883300;font-weight:700;}
 .inj-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
@@ -188,11 +188,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     </div>
     <div class="psec">
       <div class="psec-title">⊕ Route Planner</div>
-      <div style="font-size:7px;color:var(--muted);margin-bottom:2px">FROM EXIT</div>
-      <select id="sel-from" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:7px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
-      <div style="font-size:7px;color:var(--muted);margin-bottom:2px">TO EXIT</div>
-      <select id="sel-to" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:7px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
-      <div style="font-size:7px;color:var(--muted);margin-bottom:2px">DEPART TIME</div>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:2px">FROM EXIT</div>
+      <select id="sel-from" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:2px">TO EXIT</div>
+      <select id="sel-to" onchange="if(activeRoute)recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:4px;"></select>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:2px">DEPART TIME</div>
       <input type="time" id="depart-time" value="08:00" onchange="recalcRoute()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:8px;padding:4px 5px;border:1px solid var(--border);background:var(--dim);color:var(--text);border-radius:2px;margin-bottom:5px;">
       <div style="display:flex;gap:4px;margin-bottom:6px">
         <button onclick="calcRoute()" style="flex:2;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:#2a1808;color:#ffe0a0;border:1px solid #6a4828;border-radius:2px;cursor:pointer;letter-spacing:.1em">⊕ FIND ROUTE</button>
@@ -200,11 +200,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
         <button onclick="clearRoute()" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 3px;background:var(--dim);color:var(--muted);border:1px solid var(--border);border-radius:2px;cursor:pointer">X</button>
       </div>
       <div id="route-result" style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:7px 8px;font-size:8px;">
-        <div id="rr-head" style="font-family:Georgia,serif;font-size:9px;font-weight:bold;color:#1a1008;margin-bottom:5px;"></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Distance</span><span id="rr-dist" style="color:#883300;font-weight:700">-</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Travel Time</span><span id="rr-time" style="color:#883300;font-weight:700">-</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--muted)">Avg Speed</span><span id="rr-spd" style="color:#883300;font-weight:700">-</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--muted)">Arrive</span><span id="rr-arrive" style="color:#883300;font-weight:700">-</span></div>
+        <div id="rr-head" style="font-family:Georgia,serif;font-size:11px;font-weight:bold;color:#1a1008;margin-bottom:5px;"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;font-size:9px"><span style="color:var(--muted)">Distance</span><span id="rr-dist" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;font-size:9px"><span style="color:var(--muted)">Travel Time</span><span id="rr-time" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;font-size:9px"><span style="color:var(--muted)">Avg Speed</span><span id="rr-spd" style="color:#883300;font-weight:700">-</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:9px"><span style="color:var(--muted)">Arrive</span><span id="rr-arrive" style="color:#883300;font-weight:700">-</span></div>
         <div id="rr-path" style="font-size:7px;color:#5a4030;padding-top:4px;border-top:1px solid var(--border);line-height:1.7;margin-bottom:4px;"></div>
         <div id="alt-routes"></div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:5px;margin-top:4px;">
@@ -235,7 +235,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
         <span>⚡ Live Feeds</span>
         <span id="live-badge" style="font-size:7px;color:#886600;letter-spacing:.1em;font-family:'Share Tech Mono',monospace">○ SIM</span>
       </div>
-      <div id="live-data-panel" style="font-size:7px;color:var(--muted);line-height:1.8">Connecting…</div>
+      <div id="live-data-panel" style="font-size:9px;color:var(--muted);line-height:1.8">Connecting…</div>
     </div>
     <div class="incidents">
       <div class="inc-title">Event Log</div>
