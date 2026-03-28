@@ -26,7 +26,7 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .dot{width:7px;height:7px;border-radius:50%;background:#888;}
 .dot.ok{background:#1a8c1a;}.dot.warn{background:#cc8800;}.dot.crit{background:#cc1100;animation:blink .6s infinite;}
 @keyframes blink{50%{opacity:.3}}
-.hdr-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.hdr-btns{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .hbtn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.12em;padding:4px 10px;
   border:1px solid rgba(255,220,160,0.3);background:rgba(255,220,160,0.1);color:#c8a060;
   cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase;}
@@ -35,12 +35,29 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .hbtn.danger:hover{border-color:#ff8866;color:#ff8866;}
 .hbtn.danger.on{background:#cc2200;border-color:#ff4422;color:#fff;}
 .hdr-clock{font-size:10px;color:#ffe0a0;letter-spacing:.1em;white-space:nowrap;}
+/* ── MODE TOGGLE ── */
+.mode-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.12em;
+  padding:5px 14px;border:2px solid rgba(255,220,160,0.5);background:rgba(255,220,160,0.08);
+  color:#c8a060;cursor:pointer;border-radius:2px;transition:all .2s;text-transform:uppercase;font-weight:700;margin-right:6px;}
+.mode-btn:hover{border-color:#ffe0a0;color:#ffe0a0;}
+.mode-btn.twin-active{background:linear-gradient(135deg,#1a3a6a,#2a5a9a);border-color:#4a9ade;
+  color:#aee0ff;box-shadow:0 0 12px rgba(74,154,222,0.5);}
+/* ── RADAR BUTTON ── */
+.radar-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.12em;
+  padding:4px 10px;border:1px solid rgba(100,180,255,0.35);background:rgba(100,180,255,0.07);
+  color:#88bbdd;cursor:pointer;border-radius:2px;transition:all .15s;text-transform:uppercase;}
+.radar-btn:hover{border-color:#4a9ade;color:#aee0ff;}
+.radar-btn.on{background:#1a4a7a;border-color:#4a9ade;color:#aee0ff;}
+/* ── TWIN-ONLY VISIBILITY ── */
+.twin-only{display:none!important;}
+.app.twin-mode .twin-only{display:inline-flex!important;}
+.twin-only-block{display:none!important;}
+.app.twin-mode .twin-only-block{display:block!important;}
 .content{display:grid;grid-template-columns:1fr 280px;grid-template-rows:1fr;overflow:hidden;flex:1;min-height:0;}
 .map-area{position:relative;overflow:hidden;background:#e8e4d8;min-height:0;height:100%;}
 #map{position:absolute;inset:0;}
 .maplibregl-ctrl-attrib{font-size:7px!important;}
 .maplibregl-ctrl-group{border:1px solid #a09070!important;border-radius:2px!important;}
-.maplibregl-ctrl-group button{font-family:'Share Tech Mono',monospace;}
 .legend{position:absolute;bottom:50px;left:12px;background:rgba(244,239,224,0.97);
   border:1px solid #a09070;border-radius:3px;padding:8px 10px;font-size:8px;
   letter-spacing:.08em;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:10;pointer-events:none;}
@@ -50,8 +67,7 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .leg-line{width:24px;height:4px;border-radius:1px;}
 .leg-dot{width:8px;height:8px;border-radius:50%;border:1px solid rgba(0,0,0,0.3);}
 .osm-badge{position:absolute;bottom:10px;left:12px;background:rgba(244,239,224,0.95);
-  border:1px solid #a09070;border-radius:2px;padding:3px 7px;font-size:7px;
-  color:#6a5840;z-index:10;pointer-events:none;}
+  border:1px solid #a09070;border-radius:2px;padding:3px 7px;font-size:7px;color:#6a5840;z-index:10;pointer-events:none;}
 .api-note{position:absolute;top:12px;right:12px;background:rgba(244,239,224,0.97);
   border:1px solid #a09070;border-radius:3px;padding:7px 10px;font-size:7px;
   color:#4a3828;max-width:200px;line-height:1.7;box-shadow:2px 2px 6px rgba(0,0,0,0.2);z-index:10;}
@@ -60,28 +76,21 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .tooltip-panel{position:absolute;background:rgba(244,239,224,0.98);border:1px solid #8a7050;
   border-radius:3px;padding:8px 10px;font-size:8px;pointer-events:none;
   display:none;z-index:20;min-width:160px;box-shadow:2px 2px 8px rgba(0,0,0,0.25);}
-.tip-title{color:#2a1808;font-size:10px;margin-bottom:5px;font-family:Georgia,serif;
-  font-weight:bold;border-bottom:1px solid #c8b890;padding-bottom:3px;}
+.tip-title{color:#2a1808;font-size:10px;margin-bottom:5px;font-family:Georgia,serif;font-weight:bold;border-bottom:1px solid #c8b890;padding-bottom:3px;}
 .tip-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;color:#3a2818;}
 .tip-val{color:#883300;font-weight:700;}
-.right-panel{background:var(--surface);border-left:2px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
+.right-panel{background:var(--surface);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;}
 .psec{border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;}
-.psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;
-  color:#2a1008;margin-bottom:8px;text-transform:uppercase;
-  border-bottom:1px solid var(--border);padding-bottom:4px;}
+.psec-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;}
 .gauge-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .gauge{background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:6px 8px;text-align:center;}
 .gauge-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;line-height:1.1;}
 .gauge-lbl{font-size:7px;color:var(--muted);letter-spacing:.1em;margin-top:2px;}
 .gauge-bar{height:2px;background:var(--border);border-radius:1px;margin-top:5px;overflow:hidden;}
 .gauge-fill{height:100%;border-radius:1px;transition:width .4s,background .4s;}
-.incidents{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;
-  scrollbar-color:var(--border) transparent;background:var(--panel);}
+.incidents{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;background:var(--panel);}
 .inc-title{font-family:Georgia,serif;font-size:9px;font-weight:bold;letter-spacing:.15em;color:#2a1008;margin-bottom:8px;text-transform:uppercase;}
-.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;
-  border-left:2px solid;font-size:8px;animation:slideIn .3s ease;cursor:pointer;
-  transition:background .15s;color:#2a1808;}
+.inc-item{display:flex;gap:8px;padding:5px 7px;border-radius:2px;margin-bottom:3px;border-left:2px solid;font-size:8px;animation:slideIn .3s ease;cursor:pointer;transition:background .15s;color:#2a1808;}
 .inc-item:hover{background:var(--dim);}
 @keyframes slideIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 .inc-crit{border-color:#cc1100;background:rgba(200,30,0,0.07);}
@@ -92,74 +101,52 @@ html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);
 .inc-body{flex:1;line-height:1.5;}
 .inc-route{color:#883300;font-weight:700;}
 .inj-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-.inj-btn{font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 4px;
-  border:1px solid var(--border);background:var(--dim);cursor:pointer;
-  border-radius:2px;text-align:center;line-height:1.4;transition:all .15s;color:#3a2818;}
+.inj-btn{font-family:'Share Tech Mono',monospace;font-size:7px;padding:5px 4px;border:1px solid var(--border);background:var(--dim);cursor:pointer;border-radius:2px;text-align:center;line-height:1.4;transition:all .15s;color:#3a2818;}
 .inj-btn:hover{border-color:#883300;color:#883300;background:#f0e8d0;}
 .sl-row{display:flex;align-items:center;gap:6px;font-size:7px;margin-bottom:5px;}
 .sl-lbl{width:70px;color:var(--muted);}
 .sl-val{width:30px;text-align:right;color:#883300;font-weight:700;}
 input[type=range]{flex:1;-webkit-appearance:none;height:2px;background:var(--border);border-radius:1px;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#883300;cursor:pointer;}
-.footer{border-top:2px solid #6a4828;display:flex;align-items:center;
-  justify-content:space-between;padding:0 16px;font-size:8px;color:#c8a060;
-  letter-spacing:.1em;background:linear-gradient(90deg,#2a1808,#3a2010,#2a1808);
-  flex-shrink:0;min-height:30px;}
+.footer{border-top:2px solid #6a4828;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:8px;color:#c8a060;letter-spacing:.1em;background:linear-gradient(90deg,#2a1808,#3a2010,#2a1808);flex-shrink:0;min-height:30px;}
 .ft-stats{display:flex;gap:16px;}
 .ft-stat span{color:#ffe0a0;font-weight:700;}
-.alt-route-item{border:1px solid var(--border);border-radius:2px;padding:5px 6px;
-  margin-bottom:3px;cursor:pointer;font-size:7px;background:var(--dim);transition:background .15s;}
+.alt-route-item{border:1px solid var(--border);border-radius:2px;padding:5px 6px;margin-bottom:3px;cursor:pointer;font-size:7px;background:var(--dim);transition:background .15s;}
 .alt-route-item:hover{background:#e8d8c0;}
 .alt-route-item.selected-alt{border-color:#003399;background:rgba(0,50,150,0.08);}
 .alt-head{display:flex;justify-content:space-between;margin-bottom:2px;font-size:8px;font-weight:700;}
-#route-result{display:none;}
-#route-result.visible{display:block;}
-/* MapLibre exit marker */
-.exit-dot{width:7px;height:7px;background:#1a5c1a;border:1.5px solid #fff;
-  border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);
-  transform:translate(-50%,-50%);}
-.sensor-dot{width:5px;height:5px;background:#0044aa;border:1px solid #fff;
-  border-radius:50%;pointer-events:none;
-  transform:translate(-50%,-50%);}
-/* Incident pulse marker */
+#route-result{display:none;}#route-result.visible{display:block;}
+.exit-dot{width:7px;height:7px;background:#1a5c1a;border:1.5px solid #fff;border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);transform:translate(-50%,-50%);}
+.sensor-dot{width:5px;height:5px;background:#0044aa;border:1px solid #fff;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);}
 @keyframes pulse-ring{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
-.inc-marker-wrap{position:relative;width:24px;height:24px;
-  transform:translate(-50%,-50%); /* true center anchor at the geo point */
-  pointer-events:auto;}
-.inc-ring{position:absolute;inset:-4px;border-radius:50%;
-  border:2px solid rgba(204,0,0,.65);animation:pulse-ring 1.4s ease-out infinite;
-  pointer-events:none;}
-.inc-dot{position:absolute;inset:0;border-radius:50%;
-  background:#cc1100;border:2px solid #fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;cursor:pointer;}
-/* MapLibre popup */
-.maplibregl-popup-content{font-family:'Share Tech Mono',monospace;font-size:8px;
-  background:rgba(244,239,224,0.98)!important;border:1px solid #8a7050;padding:6px 8px;}
+.inc-marker-wrap{position:relative;width:24px;height:24px;transform:translate(-50%,-50%);pointer-events:auto;}
+.inc-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(204,0,0,.65);animation:pulse-ring 1.4s ease-out infinite;pointer-events:none;}
+.inc-dot{position:absolute;inset:0;border-radius:50%;background:#cc1100;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;}
+.maplibregl-popup-content{font-family:'Share Tech Mono',monospace;font-size:8px;background:rgba(244,239,224,0.98)!important;border:1px solid #8a7050;padding:6px 8px;}
 @media(max-width:768px){.content{grid-template-columns:1fr;}.right-panel{display:none;}}
 </style>
 </head>
 <body>
 <div class="app">
-<!-- HEADER -->
 <div class="hdr">
   <div style="display:flex;align-items:center;gap:12px">
     <div class="logo">MA TRAFFIC TWIN</div>
     <div class="sys-status"><div class="dot ok" id="sys-dot"></div><span id="sys-label">NOMINAL</span></div>
   </div>
   <div class="hdr-btns">
+    <button class="mode-btn" id="btn-mode" onclick="toggleTwinMode()" title="Toggle Digital Twin controls">🗺 STATUS</button>
     <button class="hbtn on" id="btn-run" onclick="toggleSim()">|| LIVE</button>
     <button class="hbtn" onclick="resetSim()">⟳ RESET</button>
-    <button class="hbtn" id="btn-rush" onclick="toggleRush()">⚡ RUSH HOUR</button>
-    <button class="hbtn danger" id="btn-accident" onclick="triggerAccident()">! ACCIDENT</button>
-    <button class="hbtn danger" id="btn-weather" onclick="triggerWeather()">❄ STORM</button>
+    <button class="hbtn twin-only" id="btn-rush" onclick="toggleRush()">⚡ RUSH HOUR</button>
+    <button class="hbtn danger twin-only" id="btn-accident" onclick="triggerAccident()">! ACCIDENT</button>
+    <button class="hbtn danger twin-only" id="btn-weather" onclick="triggerWeather()">❄ STORM</button>
     <button class="hbtn on" id="btn-sensors" onclick="toggleSensors()">◉ SENSORS</button>
     <button class="hbtn on" id="btn-labels" onclick="toggleLabels()">⊞ EXITS</button>
     <button class="hbtn on" id="btn-incidents" onclick="toggleIncidents()">⚠ INCIDENTS</button>
+    <button class="radar-btn" id="btn-radar" onclick="toggleRadarLayer()">🌧 RADAR</button>
   </div>
   <div class="hdr-clock" id="sim-clock">Loading...</div>
 </div>
-<!-- CONTENT -->
 <div class="content">
   <div class="map-area" id="map-area">
     <div id="map"></div>
@@ -176,6 +163,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
       <strong>Data Sources:</strong><br>
       <strong>Map:</strong> MapLibre GL + OpenFreeMap<br>
       <strong>Roads:</strong> OpenStreetMap via Overpass<br>
+      <strong>Weather:</strong> NOAA/NWS NEXRAD<br>
       <strong>MassDOT APIs:</strong><br>
       * <a href="https://www.mass.gov/info-details/highway-data-for-developers" target="_blank">GoTime Travel Times</a><br>
       * <a href="https://geo-massdot.opendata.arcgis.com/" target="_blank">GeoDOT Open Data</a>
@@ -188,7 +176,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
       <div class="tip-row"><span>Status</span><span class="tip-val" id="tip-status">-</span></div>
     </div>
   </div>
-  <!-- RIGHT PANEL -->
   <div class="right-panel">
     <div class="psec">
       <div class="psec-title">Network Status</div>
@@ -226,13 +213,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
         </div>
       </div>
     </div>
-    <div class="psec">
+    <div class="psec twin-only-block">
       <div class="psec-title">Conditions</div>
       <div class="sl-row"><div class="sl-lbl">Traffic Load</div><input type="range" id="sl-traffic" min="10" max="100" value="85" oninput="updateSl('traffic',this.value)"><div class="sl-val" id="sv-traffic">85%</div></div>
       <div class="sl-row"><div class="sl-lbl">Weather Impact</div><input type="range" id="sl-weather" min="0" max="100" value="0" oninput="updateSl('weather',this.value)"><div class="sl-val" id="sv-weather">0%</div></div>
       <div class="sl-row"><div class="sl-lbl">Construction</div><input type="range" id="sl-const" min="0" max="100" value="20" oninput="updateSl('const',this.value)"><div class="sl-val" id="sv-const">20%</div></div>
     </div>
-    <div class="psec">
+    <div class="psec twin-only-block">
       <div class="psec-title">Inject Event</div>
       <div class="inj-grid">
         <button class="inj-btn" onclick="injectEvent('accident')">! Accident<br>I-93</button>
@@ -256,7 +243,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     </div>
   </div>
 </div>
-<!-- FOOTER -->
 <div class="footer">
   <div class="ft-stats">
     <div class="ft-stat">ROUTES <span id="ft-routes">0</span></div>
@@ -268,1702 +254,252 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 </div>
 </div>
 <script>
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   DATA  —  ROUTES, EXITS, TOD
-═══════════════════════════════════════════════════════════════════════════ */
 const ROUTES=[
-  {id:'I-90',label:'Mass Pike (I-90)',type:'interstate',pts:[
-    [42.348,-71.059],[42.346,-71.073],[42.348,-71.083],[42.350,-71.100],
-    [42.352,-71.120],[42.344,-71.139],[42.330,-71.156],[42.320,-71.170],
-    [42.313,-71.185],[42.302,-71.220],[42.295,-71.268],[42.290,-71.310],
-    [42.284,-71.346],[42.282,-71.370],[42.280,-71.395],[42.272,-71.446],
-    [42.262,-71.497],[42.252,-71.549],[42.244,-71.600],[42.229,-71.680],
-    [42.212,-71.762],[42.200,-71.830],[42.190,-71.908],[42.182,-71.982],
-    [42.165,-72.056],[42.150,-72.120],[42.128,-72.212],[42.115,-72.340],
-    [42.100,-72.440],[42.100,-72.520],[42.104,-72.622],[42.100,-72.700],
-    [42.098,-72.790],[42.088,-72.900],[42.072,-73.018],[42.051,-73.100],
-    [42.035,-73.190],[42.023,-73.292],[42.023,-73.362]]},
-
-  {id:'I-93N',label:'I-93 North',type:'interstate',pts:[
-    [42.358,-71.058],[42.370,-71.058],[42.385,-71.057],[42.398,-71.057],
-    [42.415,-71.057],[42.432,-71.058],[42.448,-71.060],[42.462,-71.062],
-    [42.478,-71.065],[42.494,-71.068],[42.510,-71.072],[42.525,-71.076],
-    [42.540,-71.080],[42.555,-71.086],[42.570,-71.092],[42.584,-71.098],
-    [42.600,-71.105],[42.616,-71.113],[42.634,-71.122],[42.652,-71.132],
-    [42.670,-71.143],[42.690,-71.154],[42.710,-71.163],[42.730,-71.174],
-    [42.750,-71.190],[42.770,-71.210],[42.790,-71.232],[42.810,-71.254],
-    [42.832,-71.278],[42.854,-71.298],[42.862,-71.310]]},
-
-  {id:'I-93S',label:'I-93 South / SE Expressway',type:'interstate',pts:[
-    [42.358,-71.058],[42.340,-71.060],[42.320,-71.062],[42.300,-71.065],
-    [42.280,-71.068],[42.260,-71.072],[42.240,-71.074],[42.220,-71.068],
-    [42.200,-71.048],[42.182,-71.025],[42.165,-71.000],[42.150,-70.982],
-    [42.132,-70.968],[42.114,-70.955],[42.096,-70.948]]},
-
-  {id:'SE-EXP',label:'Southeast Expressway',type:'interstate',pts:[
-    [42.358,-71.058],[42.340,-71.060],[42.320,-71.062],[42.300,-71.064],
-    [42.278,-71.062],[42.258,-71.052],[42.238,-71.038],[42.218,-71.018],
-    [42.198,-70.998],[42.178,-70.985],[42.158,-70.975],[42.138,-70.965],
-    [42.116,-70.958]]},
-
-  // I-95 runs: RI border -> loops around Boston as Rt128 -> NH border
-  {id:'I-95N',label:'I-95 / Route 128',type:'interstate',pts:[
-    // RI border / Attleboro area up the western corridor
-    [41.877,-71.374],[41.905,-71.338],[41.938,-71.295],[41.972,-71.264],
-    [42.006,-71.248],[42.040,-71.244],[42.075,-71.250],[42.110,-71.260],
-    [42.133,-71.248],[42.150,-71.220],[42.164,-71.182],[42.168,-71.158],
-    // Route 128 – southwest of Boston (Canton → Dedham → Needham → Newton)
-    [42.185,-71.152],[42.208,-71.152],[42.230,-71.158],[42.252,-71.168],
-    [42.272,-71.190],[42.292,-71.210],[42.312,-71.210],[42.332,-71.198],
-    [42.352,-71.188],[42.370,-71.196],[42.388,-71.210],[42.402,-71.212],
-    // Northwest arc (Waltham → Burlington → Woburn)
-    [42.420,-71.200],[42.438,-71.185],[42.455,-71.172],[42.470,-71.162],
-    [42.485,-71.160],[42.500,-71.165],[42.515,-71.174],[42.526,-71.186],
-    // Northeast leg: Burlington → Peabody → Salem → Newburyport / NH border
-    [42.536,-71.168],[42.548,-71.145],[42.558,-71.108],[42.562,-71.062],
-    [42.556,-71.020],[42.544,-70.982],[42.530,-70.950],[42.515,-70.920],
-    [42.505,-70.890],[42.515,-70.858],[42.535,-70.836],[42.555,-70.818],
-    [42.580,-70.808],[42.608,-70.800],[42.638,-70.800],[42.668,-70.800],
-    [42.698,-70.812],[42.724,-70.830],[42.750,-70.845],[42.774,-70.848],
-    [42.802,-70.836],[42.832,-70.820],[42.860,-70.818]]},
-
-  {id:'RT128S',label:'Route 128 South',type:'interstate',pts:[
-    [42.540,-71.150],[42.522,-71.148],[42.502,-71.155],[42.480,-71.158],
-    [42.460,-71.162],[42.442,-71.172],[42.422,-71.188],[42.404,-71.210],
-    [42.385,-71.208],[42.364,-71.196],[42.346,-71.188],[42.330,-71.198],
-    [42.310,-71.210],[42.288,-71.210],[42.268,-71.190],[42.248,-71.168],
-    [42.228,-71.158],[42.206,-71.152],[42.184,-71.152],[42.164,-71.158]]},
-
-  // I-495: The outer beltway – NH coast border → wraps around Boston → RI border
-  // Starts NE near Salisbury coast, sweeps south & west through Merrimack Valley,
-  // arcs around Boston's western suburbs, back SE to Taunton/Fall River
-  {id:'I-495',label:'I-495',type:'interstate',pts:[
-    // Northern end – Salisbury/NH coast border
-    [42.856,-70.860],[42.832,-70.878],[42.808,-70.898],
-    [42.784,-70.920],[42.762,-70.942],[42.740,-70.958],
-    // South through Merrimack Valley (Amesbury → Haverhill → Lawrence)
-    [42.726,-70.972],[42.712,-70.994],[42.700,-71.022],
-    [42.690,-71.060],[42.678,-71.098],[42.664,-71.136],
-    [42.648,-71.152], // Andover – I-93 interchange
-    // Curve west/southwest (Chelmsford → Lowell area)
-    [42.632,-71.178],[42.618,-71.210],[42.605,-71.248],
-    [42.592,-71.288],[42.578,-71.330],[42.562,-71.368],
-    [42.545,-71.402],[42.526,-71.432],[42.506,-71.458],
-    // Southwest through Devens/Marlborough
-    [42.485,-71.478],[42.462,-71.496],[42.438,-71.510],
-    [42.412,-71.520],[42.386,-71.528],[42.360,-71.534],
-    [42.340,-71.538],[42.318,-71.540],[42.294,-71.545],
-    // I-290 interchange then I-90 (Mass Pike) interchange
-    [42.270,-71.565],[42.248,-71.572],[42.225,-71.572],
-    [42.204,-71.560],[42.184,-71.540],[42.165,-71.515],
-    // South through Milford → Millis
-    [42.146,-71.490],[42.128,-71.462],[42.110,-71.432],
-    [42.092,-71.400],[42.072,-71.366],[42.054,-71.330],
-    // Southeast sweep through Foxborough → Mansfield
-    [42.038,-71.295],[42.020,-71.258],[42.002,-71.218],
-    [41.985,-71.182],[41.966,-71.148],[41.948,-71.110],
-    // South to Taunton → Raynham → RI area
-    [41.930,-71.072],[41.912,-71.038],[41.894,-71.008],
-    [41.876,-70.982],[41.858,-70.962],[41.840,-70.948],
-    [41.820,-70.938],[41.800,-70.934],[41.780,-70.930]]},
-
-  {id:'I-290',label:'I-290',type:'interstate',pts:[
-    [42.264,-71.800],[42.272,-71.768],[42.282,-71.738],[42.292,-71.710],
-    [42.305,-71.688],[42.318,-71.662],[42.330,-71.638],[42.342,-71.615],
-    [42.352,-71.590],[42.360,-71.566],[42.366,-71.540],[42.368,-71.512],
-    [42.370,-71.484],[42.370,-71.456],[42.368,-71.428],[42.364,-71.402],
-    [42.358,-71.378]]},
-
-  {id:'I-291',label:'I-291 Springfield',type:'interstate',pts:[
-    [42.115,-72.340],[42.128,-72.366],[42.138,-72.394],[42.145,-72.422],
-    [42.148,-72.452],[42.148,-72.482],[42.145,-72.510],[42.138,-72.538],
-    [42.128,-72.560],[42.115,-72.580]]},
-
-  {id:'I-91',label:'I-91',type:'interstate',pts:[
-    [42.104,-72.622],[42.114,-72.598],[42.124,-72.575],[42.135,-72.554],
-    [42.148,-72.538],[42.162,-72.524],[42.180,-72.513],[42.200,-72.508],
-    [42.220,-72.506],[42.242,-72.503],[42.265,-72.498],[42.288,-72.490],
-    [42.310,-72.478],[42.332,-72.463],[42.352,-72.446],[42.372,-72.426],
-    [42.392,-72.402],[42.414,-72.375],[42.434,-72.346],[42.455,-72.316],
-    [42.475,-72.288],[42.498,-72.263],[42.522,-72.246],[42.547,-72.236],
-    [42.570,-72.226],[42.592,-72.220]]},
-
-  {id:'RT2',label:'Route 2',type:'expressway',pts:[
-    [42.360,-71.058],[42.372,-71.076],[42.382,-71.096],[42.392,-71.118],
-    [42.400,-71.142],[42.405,-71.168],[42.408,-71.196],[42.408,-71.224],
-    [42.406,-71.253],[42.402,-71.282],[42.400,-71.313],[42.398,-71.344],
-    [42.396,-71.376],[42.395,-71.410],[42.394,-71.444],[42.392,-71.480],
-    [42.390,-71.518],[42.388,-71.555],[42.386,-71.592],[42.384,-71.630],
-    [42.380,-71.672],[42.375,-71.714],[42.370,-71.756],[42.364,-71.798],
-    [42.358,-71.840],[42.352,-71.882],[42.346,-71.924],[42.340,-71.966],
-    [42.333,-72.008],[42.326,-72.050],[42.318,-72.094],[42.310,-72.138],
-    [42.302,-72.182],[42.294,-72.228],[42.287,-72.276],[42.280,-72.326],
-    [42.272,-72.378],[42.264,-72.430],[42.254,-72.485],[42.244,-72.540],
-    [42.232,-72.598],[42.219,-72.658],[42.206,-72.718],[42.192,-72.780],
-    [42.178,-72.844],[42.165,-72.908],[42.152,-72.972],[42.140,-73.038],
-    [42.128,-73.106],[42.120,-73.168],[42.114,-73.226]]},
-
-  {id:'RT3',label:'Route 3',type:'expressway',pts:[
-    [42.358,-71.058],[42.338,-71.054],[42.318,-71.050],[42.298,-71.046],
-    [42.278,-71.040],[42.258,-71.035],[42.238,-71.030],[42.218,-71.024],
-    [42.198,-71.018],[42.178,-71.012],[42.158,-71.008],[42.138,-71.004],
-    [42.118,-71.000],[42.098,-70.995],[42.078,-70.990],[42.058,-70.984],
-    [42.038,-70.978],[42.018,-70.972],[41.998,-70.966],[41.978,-70.960],
-    [41.958,-70.954],[41.938,-70.948],[41.918,-70.940],[41.898,-70.932],
-    [41.878,-70.922],[41.858,-70.912],[41.838,-70.900],[41.818,-70.888],
-    [41.798,-70.875],[41.778,-70.860],[41.758,-70.845],[41.738,-70.828],
-    [41.718,-70.810],[41.698,-70.790],[41.678,-70.768],[41.660,-70.744]]},
-
-  {id:'RT6',label:'Route 6 (Cape)',type:'expressway',pts:[
-    [41.762,-71.238],[41.752,-71.185],[41.742,-71.132],[41.732,-71.078],
-    [41.722,-71.024],[41.718,-70.968],[41.716,-70.912],[41.715,-70.856],
-    [41.716,-70.800],[41.718,-70.744],[41.722,-70.688],[41.726,-70.632],
-    [41.730,-70.576],[41.736,-70.520],[41.742,-70.464],[41.748,-70.408],
-    [41.754,-70.354],[41.760,-70.300],[41.767,-70.248],[41.774,-70.196],
-    [41.780,-70.144],[41.782,-70.082]]},
-
-  {id:'RT24',label:'Route 24',type:'expressway',pts:[
-    [42.088,-70.950],[42.070,-70.940],[42.052,-70.930],[42.034,-70.920],
-    [42.015,-70.912],[41.995,-70.904],[41.975,-70.897],[41.955,-70.889],
-    [41.935,-70.881],[41.915,-70.872],[41.895,-70.861],[41.875,-70.848],
-    [41.855,-70.836],[41.835,-70.826],[41.815,-70.816],[41.795,-70.806],
-    [41.775,-70.798],[41.758,-70.790]]},
-
-  {id:'RT18',label:'Route 18',type:'expressway',pts:[
-    [42.088,-70.950],[42.068,-70.940],[42.048,-70.932],[42.028,-70.925],
-    [42.008,-70.918],[41.988,-70.912],[41.968,-70.908],[41.948,-70.904],
-    [41.928,-70.899],[41.908,-70.893],[41.888,-70.885],[41.868,-70.875],
-    [41.848,-70.862]]},
-
-  {id:'RT128N-EXT',label:'Route 128 North Shore',type:'expressway',pts:[
-    [42.540,-71.148],[42.548,-71.108],[42.555,-71.068],[42.558,-71.022],
-    [42.552,-70.984],[42.540,-70.952],[42.525,-70.922],[42.508,-70.894],
-    [42.492,-70.870],[42.476,-70.848],[42.460,-70.828],[42.445,-70.810],
-    [42.430,-70.795],[42.415,-70.780],[42.400,-70.766],[42.385,-70.755],
-    [42.370,-70.745],[42.355,-70.735],[42.340,-70.723],[42.326,-70.712],
-    [42.314,-70.699],[42.303,-70.684],[42.293,-70.668],[42.284,-70.650],
-    [42.275,-70.632],[42.268,-70.610],[42.263,-70.586]]},
-
-  {id:'RT9',label:'Route 9',type:'arterial',pts:[
-    [42.350,-71.058],[42.338,-71.080],[42.330,-71.102],[42.325,-71.128],
-    [42.320,-71.155],[42.318,-71.182],[42.316,-71.210],[42.314,-71.238],
-    [42.312,-71.268],[42.310,-71.298],[42.308,-71.328],[42.306,-71.358],
-    [42.304,-71.390],[42.302,-71.422],[42.300,-71.455],[42.300,-71.488],
-    [42.300,-71.522],[42.302,-71.556],[42.305,-71.590],[42.308,-71.624],
-    [42.310,-71.660],[42.312,-71.698],[42.314,-71.734],[42.316,-71.768],
-    [42.314,-71.804],[42.310,-71.838],[42.305,-71.872],[42.298,-71.905]]},
-
-  {id:'RT20',label:'Route 20',type:'arterial',pts:[
-    [42.360,-71.058],[42.348,-71.088],[42.342,-71.118],[42.340,-71.150],
-    [42.338,-71.183],[42.336,-71.217],[42.333,-71.252],[42.328,-71.288],
-    [42.322,-71.324],[42.318,-71.360],[42.316,-71.397],[42.315,-71.435],
-    [42.315,-71.473],[42.315,-71.511],[42.315,-71.549],[42.315,-71.588],
-    [42.312,-71.627],[42.308,-71.667],[42.304,-71.707],[42.300,-71.748],
-    [42.296,-71.790],[42.292,-71.832],[42.288,-71.874],[42.283,-71.917],
-    [42.278,-71.960],[42.271,-72.002],[42.263,-72.043],[42.254,-72.082],
-    [42.244,-72.120],[42.233,-72.158],[42.221,-72.195],[42.208,-72.230],
-    [42.195,-72.268],[42.182,-72.308],[42.169,-72.349],[42.157,-72.390],
-    [42.145,-72.432],[42.133,-72.475],[42.121,-72.518],[42.109,-72.560],
-    [42.098,-72.603],[42.088,-72.648],[42.078,-72.692]]},
-
-  {id:'RT1',label:'Route 1',type:'arterial',pts:[
-    [42.360,-71.058],[42.378,-71.042],[42.396,-71.028],[42.413,-71.018],
-    [42.429,-71.010],[42.446,-71.002],[42.463,-70.995],[42.480,-70.988],
-    [42.498,-70.980],[42.516,-70.972],[42.534,-70.962],[42.552,-70.950],
-    [42.568,-70.938],[42.584,-70.925],[42.600,-70.912],[42.618,-70.900],
-    [42.636,-70.885],[42.653,-70.868],[42.668,-70.850],[42.684,-70.832],
-    [42.700,-70.812],[42.718,-70.795],[42.735,-70.778],[42.752,-70.762],
-    [42.768,-70.748],[42.785,-70.738],[42.802,-70.728],[42.820,-70.720],
-    [42.838,-70.715],[42.855,-70.715],[42.870,-70.718]]},
-
-  {id:'RT44',label:'Route 44',type:'arterial',pts:[
-    [42.088,-70.950],[42.080,-70.985],[42.075,-71.022],[42.072,-71.060],
-    [42.070,-71.098],[42.068,-71.138],[42.066,-71.178],[42.063,-71.218],
-    [42.060,-71.258],[42.056,-71.298],[42.052,-71.338],[42.048,-71.378],
-    [42.044,-71.418],[42.040,-71.458],[42.036,-71.498],[42.032,-71.538]]},
-
-  {id:'RT28',label:'Route 28',type:'arterial',pts:[
-    [42.360,-71.058],[42.380,-71.048],[42.400,-71.040],[42.420,-71.038],
-    [42.440,-71.038],[42.458,-71.040],[42.475,-71.045],[42.490,-71.052],
-    [42.505,-71.060],[42.518,-71.070],[42.528,-71.082],[42.534,-71.095],
-    [42.538,-71.110],[42.538,-71.125],[42.535,-71.142],[42.528,-71.158],
-    [42.518,-71.172]]},
-
-  {id:'RT16',label:'Route 16',type:'arterial',pts:[
-    [42.290,-71.340],[42.302,-71.318],[42.316,-71.298],[42.330,-71.280],
-    [42.344,-71.262],[42.356,-71.244],[42.365,-71.226],[42.371,-71.208],
-    [42.374,-71.190],[42.374,-71.172],[42.370,-71.155],[42.364,-71.140],
-    [42.355,-71.128],[42.344,-71.120],[42.332,-71.116]]},
-
-  {id:'RT30',label:'Route 30',type:'arterial',pts:[
-    [42.360,-71.058],[42.348,-71.092],[42.340,-71.128],[42.334,-71.162],
-    [42.328,-71.198],[42.322,-71.235],[42.316,-71.272],[42.310,-71.308],
-    [42.304,-71.345],[42.298,-71.382],[42.292,-71.418],[42.286,-71.455],
-    [42.280,-71.492],[42.274,-71.528],[42.268,-71.565],[42.262,-71.602],
-    [42.256,-71.638],[42.250,-71.675],[42.244,-71.712]]},
-
-  {id:'RT135',label:'Route 135',type:'arterial',pts:[
-    [42.292,-70.962],[42.290,-70.998],[42.288,-71.035],[42.286,-71.072],
-    [42.284,-71.110],[42.282,-71.148],[42.280,-71.186],[42.279,-71.222],
-    [42.278,-71.260],[42.278,-71.298],[42.279,-71.335],[42.280,-71.372],
-    [42.282,-71.409],[42.284,-71.446],[42.286,-71.483],[42.288,-71.519],
-    [42.291,-71.555],[42.294,-71.592],[42.298,-71.628],[42.302,-71.662]]},
-
-  {id:'RT109',label:'Route 109',type:'arterial',pts:[
-    [42.210,-71.292],[42.210,-71.328],[42.208,-71.365],[42.205,-71.402],
-    [42.200,-71.438],[42.194,-71.472],[42.188,-71.508],[42.182,-71.542],
-    [42.175,-71.575],[42.168,-71.608],[42.160,-71.640],[42.152,-71.672],
-    [42.144,-71.703],[42.135,-71.732],[42.125,-71.760],[42.115,-71.785]]},
-
-  {id:'RT140',label:'Route 140',type:'arterial',pts:[
-    [41.900,-71.095],[41.922,-71.082],[41.944,-71.068],[41.966,-71.055],
-    [41.988,-71.042],[42.010,-71.032],[42.032,-71.022],[42.054,-71.012],
-    [42.076,-71.002],[42.098,-70.992],[42.120,-70.985],[42.142,-70.978],
-    [42.165,-70.972],[42.188,-70.968],[42.210,-70.962],[42.232,-70.958],
-    [42.255,-70.955],[42.278,-70.952],[42.300,-70.950]]},
-
-  {id:'RT138',label:'Route 138',type:'arterial',pts:[
-    [42.082,-70.955],[42.095,-70.985],[42.108,-71.015],[42.120,-71.044],
-    [42.132,-71.072],[42.142,-71.100],[42.150,-71.128],[42.156,-71.158],
-    [42.160,-71.188],[42.163,-71.218],[42.165,-71.248],[42.166,-71.278],
-    [42.165,-71.308]]},
-
-  {id:'RT62',label:'Route 62',type:'arterial',pts:[
-    [42.418,-71.068],[42.422,-71.098],[42.424,-71.128],[42.424,-71.158],
-    [42.422,-71.188],[42.418,-71.218],[42.412,-71.248],[42.405,-71.278],
-    [42.397,-71.308],[42.388,-71.338],[42.378,-71.368],[42.368,-71.398],
-    [42.357,-71.428],[42.345,-71.458],[42.332,-71.488],[42.318,-71.515]]},
-
-  {id:'RT119',label:'Route 119',type:'arterial',pts:[
-    [42.418,-71.068],[42.428,-71.100],[42.436,-71.132],[42.442,-71.166],
-    [42.446,-71.200],[42.448,-71.234],[42.448,-71.268],[42.446,-71.302],
-    [42.442,-71.336],[42.436,-71.370],[42.428,-71.404],[42.418,-71.438],
-    [42.406,-71.472],[42.393,-71.506],[42.378,-71.540],[42.362,-71.574],
-    [42.344,-71.608],[42.325,-71.642],[42.304,-71.676],[42.282,-71.710]]},
-
-  {id:'RT2A',label:'Route 2A',type:'arterial',pts:[
-    [42.418,-71.068],[42.432,-71.098],[42.444,-71.130],[42.454,-71.162],
-    [42.460,-71.195],[42.464,-71.228],[42.466,-71.262],[42.466,-71.296],
-    [42.464,-71.330],[42.460,-71.364],[42.454,-71.398],[42.446,-71.432],
-    [42.436,-71.466],[42.424,-71.500],[42.410,-71.533],[42.395,-71.566],
-    [42.378,-71.598],[42.360,-71.629],[42.340,-71.659],[42.318,-71.688],
-    [42.295,-71.716],[42.270,-71.742],[42.244,-71.766]]},
-
-  {id:'RT38',label:'Route 38',type:'arterial',pts:[
-    [42.632,-71.316],[42.618,-71.305],[42.602,-71.295],[42.586,-71.285],
-    [42.570,-71.275],[42.554,-71.265],[42.538,-71.255],[42.522,-71.248],
-    [42.505,-71.242],[42.488,-71.238],[42.472,-71.235],[42.455,-71.232],
-    [42.438,-71.230],[42.422,-71.228]]},
-
-  {id:'RT110',label:'Route 110',type:'arterial',pts:[
-    [42.726,-70.972],[42.718,-71.000],[42.710,-71.028],[42.700,-71.055],
-    [42.688,-71.082],[42.675,-71.108],[42.660,-71.132],[42.644,-71.155],
-    [42.628,-71.176],[42.610,-71.196],[42.590,-71.214],[42.568,-71.232],
-    [42.545,-71.248],[42.520,-71.264],[42.494,-71.280],[42.468,-71.296]]},
-
-  {id:'MEMORIAL',label:'Memorial Drive',type:'local',pts:[
-    [42.360,-71.058],[42.362,-71.078],[42.362,-71.098],[42.358,-71.118],[42.355,-71.135]]},
-  {id:'STORROW',label:'Storrow Drive',type:'local',pts:[
-    [42.360,-71.058],[42.358,-71.075],[42.357,-71.090],[42.358,-71.108],[42.360,-71.125],[42.362,-71.140]]},
-  {id:'RT9E',label:'Route 9 East',type:'local',pts:[
-    [42.360,-71.058],[42.350,-71.030],[42.340,-71.000],[42.328,-70.962],[42.318,-70.930]]},
-  {id:'RT1A-BOSTON',label:'Route 1A',type:'local',pts:[
-    [42.360,-71.058],[42.378,-71.042],[42.398,-71.028],[42.418,-71.018],
-    [42.438,-71.008],[42.458,-70.998],[42.478,-70.988]]},
+  {id:'I-90',label:'Mass Pike (I-90)',type:'interstate',pts:[[42.348,-71.059],[42.346,-71.073],[42.348,-71.083],[42.350,-71.100],[42.352,-71.120],[42.344,-71.139],[42.330,-71.156],[42.320,-71.170],[42.313,-71.185],[42.302,-71.220],[42.295,-71.268],[42.290,-71.310],[42.284,-71.346],[42.282,-71.370],[42.280,-71.395],[42.272,-71.446],[42.262,-71.497],[42.252,-71.549],[42.244,-71.600],[42.229,-71.680],[42.212,-71.762],[42.200,-71.830],[42.190,-71.908],[42.182,-71.982],[42.165,-72.056],[42.150,-72.120],[42.128,-72.212],[42.115,-72.340],[42.100,-72.440],[42.100,-72.520],[42.104,-72.622],[42.100,-72.700],[42.098,-72.790],[42.088,-72.900],[42.072,-73.018],[42.051,-73.100],[42.035,-73.190],[42.023,-73.292],[42.023,-73.362]]},
+  {id:'I-93N',label:'I-93 North',type:'interstate',pts:[[42.358,-71.058],[42.370,-71.058],[42.385,-71.057],[42.398,-71.057],[42.415,-71.057],[42.432,-71.058],[42.448,-71.060],[42.462,-71.062],[42.478,-71.065],[42.494,-71.068],[42.510,-71.072],[42.525,-71.076],[42.540,-71.080],[42.555,-71.086],[42.570,-71.092],[42.584,-71.098],[42.600,-71.105],[42.616,-71.113],[42.634,-71.122],[42.652,-71.132],[42.670,-71.143],[42.690,-71.154],[42.710,-71.163],[42.730,-71.174],[42.750,-71.190],[42.770,-71.210],[42.790,-71.232],[42.810,-71.254],[42.832,-71.278],[42.854,-71.298],[42.862,-71.310]]},
+  {id:'I-93S',label:'I-93 South / SE Expressway',type:'interstate',pts:[[42.358,-71.058],[42.340,-71.060],[42.320,-71.062],[42.300,-71.065],[42.280,-71.068],[42.260,-71.072],[42.240,-71.074],[42.220,-71.068],[42.200,-71.048],[42.182,-71.025],[42.165,-71.000],[42.150,-70.982],[42.132,-70.968],[42.114,-70.955],[42.096,-70.948]]},
+  {id:'SE-EXP',label:'Southeast Expressway',type:'interstate',pts:[[42.358,-71.058],[42.340,-71.060],[42.320,-71.062],[42.300,-71.064],[42.278,-71.062],[42.258,-71.052],[42.238,-71.038],[42.218,-71.018],[42.198,-70.998],[42.178,-70.985],[42.158,-70.975],[42.138,-70.965],[42.116,-70.958]]},
+  {id:'I-95N',label:'I-95 / Route 128',type:'interstate',pts:[[41.877,-71.374],[41.905,-71.338],[41.938,-71.295],[41.972,-71.264],[42.006,-71.248],[42.040,-71.244],[42.075,-71.250],[42.110,-71.260],[42.133,-71.248],[42.150,-71.220],[42.164,-71.182],[42.168,-71.158],[42.185,-71.152],[42.208,-71.152],[42.230,-71.158],[42.252,-71.168],[42.272,-71.190],[42.292,-71.210],[42.312,-71.210],[42.332,-71.198],[42.352,-71.188],[42.370,-71.196],[42.388,-71.210],[42.402,-71.212],[42.420,-71.200],[42.438,-71.185],[42.455,-71.172],[42.470,-71.162],[42.485,-71.160],[42.500,-71.165],[42.515,-71.174],[42.526,-71.186],[42.536,-71.168],[42.548,-71.145],[42.558,-71.108],[42.562,-71.062],[42.556,-71.020],[42.544,-70.982],[42.530,-70.950],[42.515,-70.920],[42.505,-70.890],[42.515,-70.858],[42.535,-70.836],[42.555,-70.818],[42.580,-70.808],[42.608,-70.800],[42.638,-70.800],[42.668,-70.800],[42.698,-70.812],[42.724,-70.830],[42.750,-70.845],[42.774,-70.848],[42.802,-70.836],[42.832,-70.820],[42.860,-70.818]]},
+  {id:'RT128S',label:'Route 128 South',type:'interstate',pts:[[42.540,-71.150],[42.522,-71.148],[42.502,-71.155],[42.480,-71.158],[42.460,-71.162],[42.442,-71.172],[42.422,-71.188],[42.404,-71.210],[42.385,-71.208],[42.364,-71.196],[42.346,-71.188],[42.330,-71.198],[42.310,-71.210],[42.288,-71.210],[42.268,-71.190],[42.248,-71.168],[42.228,-71.158],[42.206,-71.152],[42.184,-71.152],[42.164,-71.158]]},
+  {id:'I-495',label:'I-495',type:'interstate',pts:[[42.856,-70.860],[42.832,-70.878],[42.808,-70.898],[42.784,-70.920],[42.762,-70.942],[42.740,-70.958],[42.726,-70.972],[42.712,-70.994],[42.700,-71.022],[42.690,-71.060],[42.678,-71.098],[42.664,-71.136],[42.648,-71.152],[42.632,-71.178],[42.618,-71.210],[42.605,-71.248],[42.592,-71.288],[42.578,-71.330],[42.562,-71.368],[42.545,-71.402],[42.526,-71.432],[42.506,-71.458],[42.485,-71.478],[42.462,-71.496],[42.438,-71.510],[42.412,-71.520],[42.386,-71.528],[42.360,-71.534],[42.340,-71.538],[42.318,-71.540],[42.294,-71.545],[42.270,-71.565],[42.248,-71.572],[42.225,-71.572],[42.204,-71.560],[42.184,-71.540],[42.165,-71.515],[42.146,-71.490],[42.128,-71.462],[42.110,-71.432],[42.092,-71.400],[42.072,-71.366],[42.054,-71.330],[42.038,-71.295],[42.020,-71.258],[42.002,-71.218],[41.985,-71.182],[41.966,-71.148],[41.948,-71.110],[41.930,-71.072],[41.912,-71.038],[41.894,-71.008],[41.876,-70.982],[41.858,-70.962],[41.840,-70.948],[41.820,-70.938],[41.800,-70.934],[41.780,-70.930]]},
+  {id:'I-290',label:'I-290',type:'interstate',pts:[[42.264,-71.800],[42.272,-71.768],[42.282,-71.738],[42.292,-71.710],[42.305,-71.688],[42.318,-71.662],[42.330,-71.638],[42.342,-71.615],[42.352,-71.590],[42.360,-71.566],[42.366,-71.540],[42.368,-71.512],[42.370,-71.484],[42.370,-71.456],[42.368,-71.428],[42.364,-71.402],[42.358,-71.378]]},
+  {id:'I-291',label:'I-291 Springfield',type:'interstate',pts:[[42.115,-72.340],[42.128,-72.366],[42.138,-72.394],[42.145,-72.422],[42.148,-72.452],[42.148,-72.482],[42.145,-72.510],[42.138,-72.538],[42.128,-72.560],[42.115,-72.580]]},
+  {id:'I-91',label:'I-91',type:'interstate',pts:[[42.104,-72.622],[42.114,-72.598],[42.124,-72.575],[42.135,-72.554],[42.148,-72.538],[42.162,-72.524],[42.180,-72.513],[42.200,-72.508],[42.220,-72.506],[42.242,-72.503],[42.265,-72.498],[42.288,-72.490],[42.310,-72.478],[42.332,-72.463],[42.352,-72.446],[42.372,-72.426],[42.392,-72.402],[42.414,-72.375],[42.434,-72.346],[42.455,-72.316],[42.475,-72.288],[42.498,-72.263],[42.522,-72.246],[42.547,-72.236],[42.570,-72.226],[42.592,-72.220]]},
+  {id:'RT2',label:'Route 2',type:'expressway',pts:[[42.360,-71.058],[42.372,-71.076],[42.382,-71.096],[42.392,-71.118],[42.400,-71.142],[42.405,-71.168],[42.408,-71.196],[42.408,-71.224],[42.406,-71.253],[42.402,-71.282],[42.400,-71.313],[42.398,-71.344],[42.396,-71.376],[42.395,-71.410],[42.394,-71.444],[42.392,-71.480],[42.390,-71.518],[42.388,-71.555],[42.386,-71.592],[42.384,-71.630],[42.380,-71.672],[42.375,-71.714],[42.370,-71.756],[42.364,-71.798],[42.358,-71.840],[42.352,-71.882],[42.346,-71.924],[42.340,-71.966],[42.333,-72.008],[42.326,-72.050],[42.318,-72.094],[42.310,-72.138],[42.302,-72.182],[42.294,-72.228],[42.287,-72.276],[42.280,-72.326],[42.272,-72.378],[42.264,-72.430],[42.254,-72.485],[42.244,-72.540],[42.232,-72.598],[42.219,-72.658],[42.206,-72.718],[42.192,-72.780],[42.178,-72.844],[42.165,-72.908],[42.152,-72.972],[42.140,-73.038],[42.128,-73.106],[42.120,-73.168],[42.114,-73.226]]},
+  {id:'RT3',label:'Route 3',type:'expressway',pts:[[42.358,-71.058],[42.338,-71.054],[42.318,-71.050],[42.298,-71.046],[42.278,-71.040],[42.258,-71.035],[42.238,-71.030],[42.218,-71.024],[42.198,-71.018],[42.178,-71.012],[42.158,-71.008],[42.138,-71.004],[42.118,-71.000],[42.098,-70.995],[42.078,-70.990],[42.058,-70.984],[42.038,-70.978],[42.018,-70.972],[41.998,-70.966],[41.978,-70.960],[41.958,-70.954],[41.938,-70.948],[41.918,-70.940],[41.898,-70.932],[41.878,-70.922],[41.858,-70.912],[41.838,-70.900],[41.818,-70.888],[41.798,-70.875],[41.778,-70.860],[41.758,-70.845],[41.738,-70.828],[41.718,-70.810],[41.698,-70.790],[41.678,-70.768],[41.660,-70.744]]},
+  {id:'RT6',label:'Route 6 (Cape)',type:'expressway',pts:[[41.762,-71.238],[41.752,-71.185],[41.742,-71.132],[41.732,-71.078],[41.722,-71.024],[41.718,-70.968],[41.716,-70.912],[41.715,-70.856],[41.716,-70.800],[41.718,-70.744],[41.722,-70.688],[41.726,-70.632],[41.730,-70.576],[41.736,-70.520],[41.742,-70.464],[41.748,-70.408],[41.754,-70.354],[41.760,-70.300],[41.767,-70.248],[41.774,-70.196],[41.780,-70.144],[41.782,-70.082]]},
+  {id:'RT24',label:'Route 24',type:'expressway',pts:[[42.088,-70.950],[42.070,-70.940],[42.052,-70.930],[42.034,-70.920],[42.015,-70.912],[41.995,-70.904],[41.975,-70.897],[41.955,-70.889],[41.935,-70.881],[41.915,-70.872],[41.895,-70.861],[41.875,-70.848],[41.855,-70.836],[41.835,-70.826],[41.815,-70.816],[41.795,-70.806],[41.775,-70.798],[41.758,-70.790]]},
+  {id:'RT18',label:'Route 18',type:'expressway',pts:[[42.088,-70.950],[42.068,-70.940],[42.048,-70.932],[42.028,-70.925],[42.008,-70.918],[41.988,-70.912],[41.968,-70.908],[41.948,-70.904],[41.928,-70.899],[41.908,-70.893],[41.888,-70.885],[41.868,-70.875],[41.848,-70.862]]},
+  {id:'RT128N-EXT',label:'Route 128 North Shore',type:'expressway',pts:[[42.540,-71.148],[42.548,-71.108],[42.555,-71.068],[42.558,-71.022],[42.552,-70.984],[42.540,-70.952],[42.525,-70.922],[42.508,-70.894],[42.492,-70.870],[42.476,-70.848],[42.460,-70.828],[42.445,-70.810],[42.430,-70.795],[42.415,-70.780],[42.400,-70.766],[42.385,-70.755],[42.370,-70.745],[42.355,-70.735],[42.340,-70.723],[42.326,-70.712],[42.314,-70.699],[42.303,-70.684],[42.293,-70.668],[42.284,-70.650],[42.275,-70.632],[42.268,-70.610],[42.263,-70.586]]},
+  {id:'RT9',label:'Route 9',type:'arterial',pts:[[42.350,-71.058],[42.338,-71.080],[42.330,-71.102],[42.325,-71.128],[42.320,-71.155],[42.318,-71.182],[42.316,-71.210],[42.314,-71.238],[42.312,-71.268],[42.310,-71.298],[42.308,-71.328],[42.306,-71.358],[42.304,-71.390],[42.302,-71.422],[42.300,-71.455],[42.300,-71.488],[42.300,-71.522],[42.302,-71.556],[42.305,-71.590],[42.308,-71.624],[42.310,-71.660],[42.312,-71.698],[42.314,-71.734],[42.316,-71.768],[42.314,-71.804],[42.310,-71.838],[42.305,-71.872],[42.298,-71.905]]},
+  {id:'RT20',label:'Route 20',type:'arterial',pts:[[42.360,-71.058],[42.348,-71.088],[42.342,-71.118],[42.340,-71.150],[42.338,-71.183],[42.336,-71.217],[42.333,-71.252],[42.328,-71.288],[42.322,-71.324],[42.318,-71.360],[42.316,-71.397],[42.315,-71.435],[42.315,-71.473],[42.315,-71.511],[42.315,-71.549],[42.315,-71.588],[42.312,-71.627],[42.308,-71.667],[42.304,-71.707],[42.300,-71.748],[42.296,-71.790],[42.292,-71.832],[42.288,-71.874],[42.283,-71.917],[42.278,-71.960],[42.271,-72.002],[42.263,-72.043],[42.254,-72.082],[42.244,-72.120],[42.233,-72.158],[42.221,-72.195],[42.208,-72.230],[42.195,-72.268],[42.182,-72.308],[42.169,-72.349],[42.157,-72.390],[42.145,-72.432],[42.133,-72.475],[42.121,-72.518],[42.109,-72.560],[42.098,-72.603],[42.088,-72.648],[42.078,-72.692]]},
+  {id:'RT1',label:'Route 1',type:'arterial',pts:[[42.360,-71.058],[42.378,-71.042],[42.396,-71.028],[42.413,-71.018],[42.429,-71.010],[42.446,-71.002],[42.463,-70.995],[42.480,-70.988],[42.498,-70.980],[42.516,-70.972],[42.534,-70.962],[42.552,-70.950],[42.568,-70.938],[42.584,-70.925],[42.600,-70.912],[42.618,-70.900],[42.636,-70.885],[42.653,-70.868],[42.668,-70.850],[42.684,-70.832],[42.700,-70.812],[42.718,-70.795],[42.735,-70.778],[42.752,-70.762],[42.768,-70.748],[42.785,-70.738],[42.802,-70.728],[42.820,-70.720],[42.838,-70.715],[42.855,-70.715],[42.870,-70.718]]},
+  {id:'RT44',label:'Route 44',type:'arterial',pts:[[42.088,-70.950],[42.080,-70.985],[42.075,-71.022],[42.072,-71.060],[42.070,-71.098],[42.068,-71.138],[42.066,-71.178],[42.063,-71.218],[42.060,-71.258],[42.056,-71.298],[42.052,-71.338],[42.048,-71.378],[42.044,-71.418],[42.040,-71.458],[42.036,-71.498],[42.032,-71.538]]},
+  {id:'RT28',label:'Route 28',type:'arterial',pts:[[42.360,-71.058],[42.380,-71.048],[42.400,-71.040],[42.420,-71.038],[42.440,-71.038],[42.458,-71.040],[42.475,-71.045],[42.490,-71.052],[42.505,-71.060],[42.518,-71.070],[42.528,-71.082],[42.534,-71.095],[42.538,-71.110],[42.538,-71.125],[42.535,-71.142],[42.528,-71.158],[42.518,-71.172]]},
+  {id:'RT16',label:'Route 16',type:'arterial',pts:[[42.290,-71.340],[42.302,-71.318],[42.316,-71.298],[42.330,-71.280],[42.344,-71.262],[42.356,-71.244],[42.365,-71.226],[42.371,-71.208],[42.374,-71.190],[42.374,-71.172],[42.370,-71.155],[42.364,-71.140],[42.355,-71.128],[42.344,-71.120],[42.332,-71.116]]},
+  {id:'RT30',label:'Route 30',type:'arterial',pts:[[42.360,-71.058],[42.348,-71.092],[42.340,-71.128],[42.334,-71.162],[42.328,-71.198],[42.322,-71.235],[42.316,-71.272],[42.310,-71.308],[42.304,-71.345],[42.298,-71.382],[42.292,-71.418],[42.286,-71.455],[42.280,-71.492],[42.274,-71.528],[42.268,-71.565],[42.262,-71.602],[42.256,-71.638],[42.250,-71.675],[42.244,-71.712]]},
+  {id:'RT135',label:'Route 135',type:'arterial',pts:[[42.292,-70.962],[42.290,-70.998],[42.288,-71.035],[42.286,-71.072],[42.284,-71.110],[42.282,-71.148],[42.280,-71.186],[42.279,-71.222],[42.278,-71.260],[42.278,-71.298],[42.279,-71.335],[42.280,-71.372],[42.282,-71.409],[42.284,-71.446],[42.286,-71.483],[42.288,-71.519],[42.291,-71.555],[42.294,-71.592],[42.298,-71.628],[42.302,-71.662]]},
+  {id:'RT109',label:'Route 109',type:'arterial',pts:[[42.210,-71.292],[42.210,-71.328],[42.208,-71.365],[42.205,-71.402],[42.200,-71.438],[42.194,-71.472],[42.188,-71.508],[42.182,-71.542],[42.175,-71.575],[42.168,-71.608],[42.160,-71.640],[42.152,-71.672],[42.144,-71.703],[42.135,-71.732],[42.125,-71.760],[42.115,-71.785]]},
+  {id:'RT140',label:'Route 140',type:'arterial',pts:[[41.900,-71.095],[41.922,-71.082],[41.944,-71.068],[41.966,-71.055],[41.988,-71.042],[42.010,-71.032],[42.032,-71.022],[42.054,-71.012],[42.076,-71.002],[42.098,-70.992],[42.120,-70.985],[42.142,-70.978],[42.165,-70.972],[42.188,-70.968],[42.210,-70.962],[42.232,-70.958],[42.255,-70.955],[42.278,-70.952],[42.300,-70.950]]},
+  {id:'RT138',label:'Route 138',type:'arterial',pts:[[42.082,-70.955],[42.095,-70.985],[42.108,-71.015],[42.120,-71.044],[42.132,-71.072],[42.142,-71.100],[42.150,-71.128],[42.156,-71.158],[42.160,-71.188],[42.163,-71.218],[42.165,-71.248],[42.166,-71.278],[42.165,-71.308]]},
+  {id:'RT62',label:'Route 62',type:'arterial',pts:[[42.418,-71.068],[42.422,-71.098],[42.424,-71.128],[42.424,-71.158],[42.422,-71.188],[42.418,-71.218],[42.412,-71.248],[42.405,-71.278],[42.397,-71.308],[42.388,-71.338],[42.378,-71.368],[42.368,-71.398],[42.357,-71.428],[42.345,-71.458],[42.332,-71.488],[42.318,-71.515]]},
+  {id:'RT119',label:'Route 119',type:'arterial',pts:[[42.418,-71.068],[42.428,-71.100],[42.436,-71.132],[42.442,-71.166],[42.446,-71.200],[42.448,-71.234],[42.448,-71.268],[42.446,-71.302],[42.442,-71.336],[42.436,-71.370],[42.428,-71.404],[42.418,-71.438],[42.406,-71.472],[42.393,-71.506],[42.378,-71.540],[42.362,-71.574],[42.344,-71.608],[42.325,-71.642],[42.304,-71.676],[42.282,-71.710]]},
+  {id:'RT2A',label:'Route 2A',type:'arterial',pts:[[42.418,-71.068],[42.432,-71.098],[42.444,-71.130],[42.454,-71.162],[42.460,-71.195],[42.464,-71.228],[42.466,-71.262],[42.466,-71.296],[42.464,-71.330],[42.460,-71.364],[42.454,-71.398],[42.446,-71.432],[42.436,-71.466],[42.424,-71.500],[42.410,-71.533],[42.395,-71.566],[42.378,-71.598],[42.360,-71.629],[42.340,-71.659],[42.318,-71.688],[42.295,-71.716],[42.270,-71.742],[42.244,-71.766]]},
+  {id:'RT38',label:'Route 38',type:'arterial',pts:[[42.632,-71.316],[42.618,-71.305],[42.602,-71.295],[42.586,-71.285],[42.570,-71.275],[42.554,-71.265],[42.538,-71.255],[42.522,-71.248],[42.505,-71.242],[42.488,-71.238],[42.472,-71.235],[42.455,-71.232],[42.438,-71.230],[42.422,-71.228]]},
+  {id:'RT110',label:'Route 110',type:'arterial',pts:[[42.726,-70.972],[42.718,-71.000],[42.710,-71.028],[42.700,-71.055],[42.688,-71.082],[42.675,-71.108],[42.660,-71.132],[42.644,-71.155],[42.628,-71.176],[42.610,-71.196],[42.590,-71.214],[42.568,-71.232],[42.545,-71.248],[42.520,-71.264],[42.494,-71.280],[42.468,-71.296]]},
+  {id:'MEMORIAL',label:'Memorial Drive',type:'local',pts:[[42.360,-71.058],[42.362,-71.078],[42.362,-71.098],[42.358,-71.118],[42.355,-71.135]]},
+  {id:'STORROW',label:'Storrow Drive',type:'local',pts:[[42.360,-71.058],[42.358,-71.075],[42.357,-71.090],[42.358,-71.108],[42.360,-71.125],[42.362,-71.140]]},
+  {id:'RT9E',label:'Route 9 East',type:'local',pts:[[42.360,-71.058],[42.350,-71.030],[42.340,-71.000],[42.328,-70.962],[42.318,-70.930]]},
+  {id:'RT1A-BOSTON',label:'Route 1A',type:'local',pts:[[42.360,-71.058],[42.378,-71.042],[42.398,-71.028],[42.418,-71.018],[42.438,-71.008],[42.458,-70.998],[42.478,-70.988]]},
 ];
 
-
-
-
-/* ── EXIT DATABASE ── */
 const EXITS=[
-  {id:'I90-9', route:'I-90',exit:'9', name:'Mass Ave Boston',       lat:42.343,lon:-71.073,mi:1},
-  {id:'I90-10',route:'I-90',exit:'10',name:'Copley Sq/Prudential',  lat:42.348,lon:-71.082,mi:2},
-  {id:'I90-11',route:'I-90',exit:'11',name:'Allston/Brighton',      lat:42.352,lon:-71.120,mi:4},
-  {id:'I90-12',route:'I-90',exit:'12',name:'Newton/Watertown',      lat:42.330,lon:-71.155,mi:7},
-  {id:'I90-14',route:'I-90',exit:'14',name:'I-95/Rt.128',          lat:42.313,lon:-71.185,mi:11},
-  {id:'I90-15',route:'I-90',exit:'15',name:'Rt.30 Weston',         lat:42.298,lon:-71.270,mi:14},
-  {id:'I90-16',route:'I-90',exit:'16',name:'Rt.16 Natick',         lat:42.290,lon:-71.340,mi:17},
-  {id:'I90-17',route:'I-90',exit:'17',name:'Rt.9 Framingham',      lat:42.282,lon:-71.395,mi:20},
-  {id:'I90-18',route:'I-90',exit:'18',name:'Rt.30 Westborough',    lat:42.262,lon:-71.496,mi:25},
-  {id:'I90-19',route:'I-90',exit:'19',name:'I-495 Interchange',    lat:42.243,lon:-71.602,mi:30},
-  {id:'I90-21',route:'I-90',exit:'21',name:'Rt.20 Auburn',         lat:42.200,lon:-71.810,mi:44},
-  {id:'I90-22',route:'I-90',exit:'22',name:'I-290 Worcester',      lat:42.182,lon:-71.980,mi:48},
-  {id:'I90-23',route:'I-90',exit:'23',name:'I-291 Springfield',    lat:42.115,lon:-72.340,mi:72},
-  {id:'I90-24',route:'I-90',exit:'24',name:'I-91 Interchange',     lat:42.104,lon:-72.620,mi:82},
-  {id:'I90-26',route:'I-90',exit:'26',name:'Palmer/Ware',          lat:42.098,lon:-72.790,mi:90},
-  {id:'I90-29',route:'I-90',exit:'29',name:'Sturbridge/I-84',      lat:42.051,lon:-73.180,mi:105},
-  {id:'I93N-7', route:'I-93N',exit:'7', name:'Storrow Dr/Back Bay', lat:42.362,lon:-71.058,mi:0},
-  {id:'I93N-11',route:'I-93N',exit:'11',name:'Rt.1N/Revere',       lat:42.400,lon:-71.058,mi:5},
-  {id:'I93N-14',route:'I-93N',exit:'14',name:'Rt.28 Medford',      lat:42.450,lon:-71.062,mi:8},
-  {id:'I93N-15',route:'I-93N',exit:'15',name:'Rt.128/Woburn',      lat:42.480,lon:-71.068,mi:11},
-  {id:'I93N-20',route:'I-93N',exit:'20',name:'Rt.3/Burlington',    lat:42.540,lon:-71.080,mi:14},
-  {id:'I93N-33',route:'I-93N',exit:'33',name:'Rt.93/Lowell',       lat:42.600,lon:-71.105,mi:18},
-  {id:'I93N-37',route:'I-93N',exit:'37',name:'Rt.213/Methuen',     lat:42.700,lon:-71.140,mi:26},
-  {id:'I93N-44',route:'I-93N',exit:'44',name:'Rt.111 Salem NH',    lat:42.780,lon:-71.210,mi:32},
-  {id:'I93S-11',route:'I-93S',exit:'11',name:'Rt.138/Milton',      lat:42.250,lon:-71.095,mi:5},
-  {id:'I93S-4', route:'I-93S',exit:'4', name:'Neponset/Milton',    lat:42.265,lon:-71.082,mi:4},
-  {id:'I93S-1', route:'I-93S',exit:'1', name:'Rt.3/Braintree',     lat:42.210,lon:-71.150,mi:8},
-  {id:'I93S-20',route:'I-93S',exit:'20',name:'Rt.24/Randolph',     lat:42.168,lon:-71.158,mi:13},
-  {id:'I95-7', route:'I-95N',exit:'7', name:'Rt.1A Wrentham',      lat:41.978,lon:-71.33,mi:8},
-  {id:'I95-9', route:'I-95N',exit:'9', name:'Rt.1 Attleboro',      lat:42.008,lon:-71.285,mi:12},
-  {id:'I95-16',route:'I-95N',exit:'16',name:'Rt.109 Medfield',     lat:42.122,lon:-71.285,mi:20},
-  {id:'I95-20',route:'I-95N',exit:'20',name:'Rt.135 Needham',      lat:42.218,lon:-71.292,mi:27},
-  {id:'I95-27',route:'I-95N',exit:'27',name:'Rt.9 Newton',         lat:42.302,lon:-71.200,mi:32},
-  {id:'I95-29',route:'I-95N',exit:'29',name:'I-90/Mass Pike',      lat:42.345,lon:-71.148,mi:36},
-  {id:'I95-33',route:'I-95N',exit:'33',name:'Rt.2A/Lexington',     lat:42.416,lon:-71.152,mi:42},
-  {id:'I95-37',route:'I-95N',exit:'37',name:'Rt.225/Burlington',   lat:42.46,lon:-71.15,mi:46},
-  {id:'I95-43',route:'I-95N',exit:'43',name:'Rt.129/Lynnfield',    lat:42.535,lon:-71.040,mi:54},
-  {id:'I95-47',route:'I-95N',exit:'47',name:'Rt.128/Salem',        lat:42.572,lon:-70.965,mi:60},
-  {id:'I495-6', route:'I-495',exit:'6', name:'Rt.44 Raynham',     lat:41.935,lon:-70.940,mi:6},
-  {id:'I495-10',route:'I-495',exit:'10',name:'Rt.140 Mansfield',  lat:41.982,lon:-70.924,mi:14},
-  {id:'I495-14',route:'I-495',exit:'14',name:'Rt.1A Mansfield',   lat:42.002,lon:-70.922,mi:18},
-  {id:'I495-19',route:'I-495',exit:'19',name:'Rt.115 Millis',     lat:42.165,lon:-71.412,mi:30},
-  {id:'I495-22',route:'I-495',exit:'22',name:'Rt.85 Hopkinton',   lat:42.212,lon:-71.52,mi:42},
-  {id:'I495-25',route:'I-495',exit:'25',name:'I-290 Marlborough', lat:42.268,lon:-71.572,mi:54},
-  {id:'I495-27',route:'I-495',exit:'27',name:'I-290/Worcester',   lat:42.35,lon:-71.545,mi:62},
-  {id:'I495-30',route:'I-495',exit:'30',name:'Rt.20 Marlborough', lat:42.405,lon:-71.54,mi:74},
-  {id:'I495-34',route:'I-495',exit:'34',name:'Rt.2A/Littleton',   lat:42.53,lon:-71.495,mi:82},
-  {id:'I495-38',route:'I-495',exit:'38',name:'Rt.110 Westford',   lat:42.562,lon:-71.44,mi:90},
-  {id:'I495-42',route:'I-495',exit:'42',name:'Rt.38 Lowell',      lat:42.64,lon:-71.32,mi:100},
-  {id:'I495-44',route:'I-495',exit:'44',name:'Rt.125/Andover',    lat:42.68,lon:-71.138,mi:108},
-  {id:'I495-48',route:'I-495',exit:'48',name:'Rt.110 Amesbury',   lat:42.726,lon:-70.968,mi:116},
-  {id:'I290-1',route:'I-290',exit:'1', name:'I-90 Mass Pike',      lat:42.252,lon:-71.800,mi:0},
-  {id:'I290-5',route:'I-290',exit:'5', name:'Rt.122A Worcester',   lat:42.310,lon:-71.720,mi:5},
-  {id:'I290-10',route:'I-290',exit:'10',name:'Rt.20 Auburn',       lat:42.362,lon:-71.612,mi:12},
-  {id:'I290-16',route:'I-290',exit:'16',name:'I-495/Marlborough',  lat:42.380,lon:-71.550,mi:18},
-  {id:'I91-4', route:'I-91',exit:'4', name:'Northampton',         lat:42.108,lon:-72.608,mi:4},
-  {id:'I91-19',route:'I-91',exit:'19',name:'Hatfield/Whately',    lat:42.234,lon:-72.543,mi:19},
-  {id:'I91-26',route:'I-91',exit:'26',name:'Rt.2 Greenfield',     lat:42.384,lon:-72.404,mi:26},
-  {id:'MA2-15',route:'RT2',exit:'15',name:'I-95/Rt.128',          lat:42.402,lon:-71.165,mi:15},
-  {id:'MA2-49',route:'RT2',exit:'49',name:'Rt.110 Shirley',        lat:42.414,lon:-71.425,mi:49},
-  {id:'MA2-63',route:'RT2',exit:'63',name:'Rt.31 Gardner',         lat:42.406,lon:-71.680,mi:63},
-  {id:'MA24-14',route:'RT24',exit:'14',name:'Brockton',            lat:42.060,lon:-71.038,mi:14},
-  {id:'MA24-16',route:'RT24',exit:'16',name:'I-495 Interchange',   lat:42.028,lon:-70.978,mi:18},
-  {id:'US3-25',route:'RT3',exit:'25',name:'Rt.225 Littleton',      lat:42.520,lon:-71.335,mi:25},
-  {id:'US3-35',route:'RT3',exit:'35',name:'Rt.110 Lowell',         lat:42.618,lon:-71.335,mi:35},
-  {id:'BOSTON',  route:'I-93N',exit:'0',  name:'Boston Downtown',   lat:42.362,lon:-71.058,mi:0},
-  {id:'WORCESTER',route:'I-90',exit:'22', name:'Worcester Center',  lat:42.262,lon:-71.802,mi:48},
-  {id:'SPRINGFIELD',route:'I-90',exit:'24',name:'Springfield',      lat:42.101,lon:-72.590,mi:82},
-  {id:'LOWELL',  route:'I-93N',exit:'33', name:'Lowell Center',     lat:42.633,lon:-71.316,mi:20},
-  {id:'NEW_BED', route:'RT24',exit:'20', name:'New Bedford',       lat:41.634,lon:-70.934,mi:35},
-  {id:'CAPE_COD',route:'RT6',exit:'5',  name:'Hyannis/Cape Cod',   lat:41.650,lon:-70.286,mi:90},
-  {id:'PITTSFIELD',route:'I-90',exit:'29',name:'Pittsfield',        lat:42.450,lon:-73.180,mi:130},
-  {id:'GREENFIELD',route:'I-91',exit:'26',name:'Greenfield',       lat:42.585,lon:-72.598,mi:28},
-  {id:'NORTHAMPTON',route:'I-91',exit:'4',name:'Northampton',      lat:42.325,lon:-72.638,mi:4},
-  {id:'GLOUCESTER',route:'I-95N',exit:'47',name:'Gloucester',       lat:42.614,lon:-70.662,mi:65},
-  {id:'ATTLEBORO',route:'I-95N',exit:'9', name:'Attleboro',         lat:41.943,lon:-71.286,mi:12},
-  // I-290 exits
-  {id:'I290-A',route:'I-290',exit:'1', name:'I-90 Mass Pike',      lat:42.252,lon:-71.800,mi:0},
-  {id:'I290-B',route:'I-290',exit:'5', name:'Rt.122A Worcester',   lat:42.305,lon:-71.720,mi:5},
-  {id:'I290-C',route:'I-290',exit:'10',name:'Rt.20 Auburn',        lat:42.350,lon:-71.640,mi:10},
-  {id:'I290-D',route:'I-290',exit:'16',name:'I-495/Marlborough',   lat:42.362,lon:-71.412,mi:17},
-  // I-291 exits
-  {id:'I291-A',route:'I-291',exit:'1', name:'I-90 Springfield',    lat:42.115,lon:-72.340,mi:0},
-  {id:'I291-B',route:'I-291',exit:'3', name:'Springfield Center',  lat:42.148,lon:-72.510,mi:8},
-  {id:'I291-C',route:'I-291',exit:'5', name:'I-91 Springfield',    lat:42.128,lon:-72.575,mi:14},
-  // I-91 exits
-  {id:'I91-A', route:'I-91',exit:'1', name:'I-90 Interchange',     lat:42.104,lon:-72.620,mi:0},
-  {id:'I91-B', route:'I-91',exit:'7', name:'Northampton',          lat:42.214,lon:-72.515,mi:15},
-  {id:'I91-C', route:'I-91',exit:'13',name:'Deerfield',            lat:42.340,lon:-72.468,mi:30},
-  {id:'I91-D', route:'I-91',exit:'19',name:'Greenfield',           lat:42.440,lon:-72.320,mi:48},
-  {id:'I91-E', route:'I-91',exit:'26',name:'Northampton/I-90',     lat:42.545,lon:-72.248,mi:64},
-  // Rt28
-  {id:'RT28-A',route:'RT28',exit:'1', name:'Boston/Roxbury',       lat:42.360,lon:-71.058,mi:0},
-  {id:'RT28-B',route:'RT28',exit:'4', name:'Medford Sq',           lat:42.470,lon:-71.042,mi:10},
-  {id:'RT28-C',route:'RT28',exit:'7', name:'Stoneham',             lat:42.530,lon:-71.155,mi:18},
-  // Rt16
-  {id:'RT16-A',route:'RT16',exit:'1', name:'Natick/Rt.30',         lat:42.290,lon:-71.340,mi:0},
-  {id:'RT16-B',route:'RT16',exit:'3', name:'Newton Upper Falls',   lat:42.366,lon:-71.248,mi:8},
-  {id:'RT16-C',route:'RT16',exit:'5', name:'Cambridge',            lat:42.340,lon:-71.122,mi:18},
-  // Rt30
-  {id:'RT30-A',route:'RT30',exit:'1', name:'Boston/Kenmore',       lat:42.360,lon:-71.058,mi:0},
-  {id:'RT30-B',route:'RT30',exit:'3', name:'Weston',               lat:42.325,lon:-71.358,mi:14},
-  {id:'RT30-C',route:'RT30',exit:'5', name:'Framingham',           lat:42.268,lon:-71.710,mi:30},
-  // Rt135
-  {id:'RT135-A',route:'RT135',exit:'1',name:'Needham',             lat:42.290,lon:-70.950,mi:0},
-  {id:'RT135-B',route:'RT135',exit:'3',name:'Natick Center',       lat:42.278,lon:-71.240,mi:16},
-  {id:'RT135-C',route:'RT135',exit:'5',name:'Framingham/I-495',    lat:42.302,lon:-71.612,mi:36},
-  // Rt109
-  {id:'RT109-A',route:'RT109',exit:'1',name:'Dedham',              lat:42.210,lon:-71.290,mi:0},
-  {id:'RT109-B',route:'RT109',exit:'3',name:'Millis',              lat:42.192,lon:-71.578,mi:18},
-  {id:'RT109-C',route:'RT109',exit:'5',name:'Milford',             lat:42.150,lon:-71.750,mi:32},
-  // Rt140
-  {id:'RT140-A',route:'RT140',exit:'1',name:'Taunton',             lat:41.900,lon:-71.090,mi:0},
-  {id:'RT140-B',route:'RT140',exit:'4',name:'Mansfield/I-495',     lat:42.018,lon:-71.045,mi:18},
-  {id:'RT140-C',route:'RT140',exit:'7',name:'Gardner',             lat:42.218,lon:-70.948,mi:44},
-  // Rt138
-  {id:'RT138-A',route:'RT138',exit:'1',name:'Canton/I-95',         lat:42.080,lon:-70.960,mi:0},
-  {id:'RT138-B',route:'RT138',exit:'3',name:'Stoughton',           lat:42.140,lon:-71.072,mi:10},
-  {id:'RT138-C',route:'RT138',exit:'5',name:'Braintree/I-93',      lat:42.192,lon:-71.210,mi:22},
-  // Rt62
-  {id:'RT62-A', route:'RT62',exit:'1',name:'Lexington/I-95',       lat:42.416,lon:-71.068,mi:0},
-  {id:'RT62-B', route:'RT62',exit:'3',name:'Bedford',              lat:42.410,lon:-71.295,mi:12},
-  {id:'RT62-C', route:'RT62',exit:'5',name:'Marlborough',          lat:42.344,lon:-71.448,mi:24},
-  // Rt119
-  {id:'RT119-A',route:'RT119',exit:'1',name:'Lexington/I-95',      lat:42.416,lon:-71.068,mi:0},
-  {id:'RT119-B',route:'RT119',exit:'3',name:'Groton',              lat:42.456,lon:-71.290,mi:14},
-  {id:'RT119-C',route:'RT119',exit:'5',name:'Townsend/I-495',      lat:42.398,lon:-71.590,mi:28},
-  // Rt2A
-  {id:'RT2A-A', route:'RT2A',exit:'1',name:'Arlington/I-95',       lat:42.416,lon:-71.068,mi:0},
-  {id:'RT2A-B', route:'RT2A',exit:'3',name:'Concord',              lat:42.452,lon:-71.265,mi:12},
-  {id:'RT2A-C', route:'RT2A',exit:'5',name:'Leominster',           lat:42.398,lon:-71.810,mi:38},
-  // Rt38
-  {id:'RT38-A', route:'RT38',exit:'1',name:'Lowell/I-93',          lat:42.633,lon:-71.316,mi:0},
-  {id:'RT38-B', route:'RT38',exit:'3',name:'Tewksbury',            lat:42.542,lon:-71.248,mi:12},
-  {id:'RT38-C', route:'RT38',exit:'5',name:'Burlington',           lat:42.422,lon:-71.228,mi:26},
-  // Rt110
-  {id:'RT110-A',route:'RT110',exit:'1',name:'Amesbury/I-495',      lat:42.726,lon:-71.845,mi:0},
-  {id:'RT110-B',route:'RT110',exit:'3',name:'Haverhill',           lat:42.668,lon:-71.592,mi:14},
-  {id:'RT110-C',route:'RT110',exit:'5',name:'Lowell/I-495',        lat:42.558,lon:-71.350,mi:32},
-  // Rt18
-  {id:'RT18-A', route:'RT18',exit:'1',name:'Brockton/Rt24',        lat:42.090,lon:-70.950,mi:0},
-  {id:'RT18-B', route:'RT18',exit:'3',name:'Abington',             lat:42.040,lon:-70.918,mi:8},
-  {id:'RT18-C', route:'RT18',exit:'5',name:'Rockland',             lat:41.980,lon:-70.906,mi:16},
+  {id:'I90-9',route:'I-90',exit:'9',name:'Mass Ave Boston',lat:42.343,lon:-71.073,mi:1},{id:'I90-10',route:'I-90',exit:'10',name:'Copley Sq/Prudential',lat:42.348,lon:-71.082,mi:2},{id:'I90-11',route:'I-90',exit:'11',name:'Allston/Brighton',lat:42.352,lon:-71.120,mi:4},{id:'I90-12',route:'I-90',exit:'12',name:'Newton/Watertown',lat:42.330,lon:-71.155,mi:7},{id:'I90-14',route:'I-90',exit:'14',name:'I-95/Rt.128',lat:42.313,lon:-71.185,mi:11},{id:'I90-15',route:'I-90',exit:'15',name:'Rt.30 Weston',lat:42.298,lon:-71.270,mi:14},{id:'I90-16',route:'I-90',exit:'16',name:'Rt.16 Natick',lat:42.290,lon:-71.340,mi:17},{id:'I90-17',route:'I-90',exit:'17',name:'Rt.9 Framingham',lat:42.282,lon:-71.395,mi:20},{id:'I90-18',route:'I-90',exit:'18',name:'Rt.30 Westborough',lat:42.262,lon:-71.496,mi:25},{id:'I90-19',route:'I-90',exit:'19',name:'I-495 Interchange',lat:42.243,lon:-71.602,mi:30},{id:'I90-21',route:'I-90',exit:'21',name:'Rt.20 Auburn',lat:42.200,lon:-71.810,mi:44},{id:'I90-22',route:'I-90',exit:'22',name:'I-290 Worcester',lat:42.182,lon:-71.980,mi:48},{id:'I90-23',route:'I-90',exit:'23',name:'I-291 Springfield',lat:42.115,lon:-72.340,mi:72},{id:'I90-24',route:'I-90',exit:'24',name:'I-91 Interchange',lat:42.104,lon:-72.620,mi:82},{id:'I90-26',route:'I-90',exit:'26',name:'Palmer/Ware',lat:42.098,lon:-72.790,mi:90},{id:'I90-29',route:'I-90',exit:'29',name:'Sturbridge/I-84',lat:42.051,lon:-73.180,mi:105},
+  {id:'I93N-7',route:'I-93N',exit:'7',name:'Storrow Dr/Back Bay',lat:42.362,lon:-71.058,mi:0},{id:'I93N-11',route:'I-93N',exit:'11',name:'Rt.1N/Revere',lat:42.400,lon:-71.058,mi:5},{id:'I93N-14',route:'I-93N',exit:'14',name:'Rt.28 Medford',lat:42.450,lon:-71.062,mi:8},{id:'I93N-15',route:'I-93N',exit:'15',name:'Rt.128/Woburn',lat:42.480,lon:-71.068,mi:11},{id:'I93N-20',route:'I-93N',exit:'20',name:'Rt.3/Burlington',lat:42.540,lon:-71.080,mi:14},{id:'I93N-33',route:'I-93N',exit:'33',name:'Rt.93/Lowell',lat:42.600,lon:-71.105,mi:18},{id:'I93N-37',route:'I-93N',exit:'37',name:'Rt.213/Methuen',lat:42.700,lon:-71.140,mi:26},{id:'I93N-44',route:'I-93N',exit:'44',name:'Rt.111 Salem NH',lat:42.780,lon:-71.210,mi:32},
+  {id:'I93S-11',route:'I-93S',exit:'11',name:'Rt.138/Milton',lat:42.250,lon:-71.095,mi:5},{id:'I93S-4',route:'I-93S',exit:'4',name:'Neponset/Milton',lat:42.265,lon:-71.082,mi:4},{id:'I93S-1',route:'I-93S',exit:'1',name:'Rt.3/Braintree',lat:42.210,lon:-71.150,mi:8},{id:'I93S-20',route:'I-93S',exit:'20',name:'Rt.24/Randolph',lat:42.168,lon:-71.158,mi:13},
+  {id:'I95-7',route:'I-95N',exit:'7',name:'Rt.1A Wrentham',lat:41.978,lon:-71.33,mi:8},{id:'I95-9',route:'I-95N',exit:'9',name:'Rt.1 Attleboro',lat:42.008,lon:-71.285,mi:12},{id:'I95-16',route:'I-95N',exit:'16',name:'Rt.109 Medfield',lat:42.122,lon:-71.285,mi:20},{id:'I95-20',route:'I-95N',exit:'20',name:'Rt.135 Needham',lat:42.218,lon:-71.292,mi:27},{id:'I95-27',route:'I-95N',exit:'27',name:'Rt.9 Newton',lat:42.302,lon:-71.200,mi:32},{id:'I95-29',route:'I-95N',exit:'29',name:'I-90/Mass Pike',lat:42.345,lon:-71.148,mi:36},{id:'I95-33',route:'I-95N',exit:'33',name:'Rt.2A/Lexington',lat:42.416,lon:-71.152,mi:42},{id:'I95-37',route:'I-95N',exit:'37',name:'Rt.225/Burlington',lat:42.46,lon:-71.15,mi:46},{id:'I95-43',route:'I-95N',exit:'43',name:'Rt.129/Lynnfield',lat:42.535,lon:-71.040,mi:54},{id:'I95-47',route:'I-95N',exit:'47',name:'Rt.128/Salem',lat:42.572,lon:-70.965,mi:60},
+  {id:'I495-6',route:'I-495',exit:'6',name:'Rt.44 Raynham',lat:41.935,lon:-70.940,mi:6},{id:'I495-10',route:'I-495',exit:'10',name:'Rt.140 Mansfield',lat:41.982,lon:-70.924,mi:14},{id:'I495-14',route:'I-495',exit:'14',name:'Rt.1A Mansfield',lat:42.002,lon:-70.922,mi:18},{id:'I495-19',route:'I-495',exit:'19',name:'Rt.115 Millis',lat:42.165,lon:-71.412,mi:30},{id:'I495-22',route:'I-495',exit:'22',name:'Rt.85 Hopkinton',lat:42.212,lon:-71.52,mi:42},{id:'I495-25',route:'I-495',exit:'25',name:'I-290 Marlborough',lat:42.268,lon:-71.572,mi:54},{id:'I495-27',route:'I-495',exit:'27',name:'I-290/Worcester',lat:42.35,lon:-71.545,mi:62},{id:'I495-30',route:'I-495',exit:'30',name:'Rt.20 Marlborough',lat:42.405,lon:-71.54,mi:74},{id:'I495-34',route:'I-495',exit:'34',name:'Rt.2A/Littleton',lat:42.53,lon:-71.495,mi:82},{id:'I495-38',route:'I-495',exit:'38',name:'Rt.110 Westford',lat:42.562,lon:-71.44,mi:90},{id:'I495-42',route:'I-495',exit:'42',name:'Rt.38 Lowell',lat:42.64,lon:-71.32,mi:100},{id:'I495-44',route:'I-495',exit:'44',name:'Rt.125/Andover',lat:42.68,lon:-71.138,mi:108},{id:'I495-48',route:'I-495',exit:'48',name:'Rt.110 Amesbury',lat:42.726,lon:-70.968,mi:116},
+  {id:'I290-1',route:'I-290',exit:'1',name:'I-90 Mass Pike',lat:42.252,lon:-71.800,mi:0},{id:'I290-5',route:'I-290',exit:'5',name:'Rt.122A Worcester',lat:42.310,lon:-71.720,mi:5},{id:'I290-10',route:'I-290',exit:'10',name:'Rt.20 Auburn',lat:42.362,lon:-71.612,mi:12},{id:'I290-16',route:'I-290',exit:'16',name:'I-495/Marlborough',lat:42.380,lon:-71.550,mi:18},
+  {id:'I91-4',route:'I-91',exit:'4',name:'Northampton',lat:42.108,lon:-72.608,mi:4},{id:'I91-19',route:'I-91',exit:'19',name:'Hatfield/Whately',lat:42.234,lon:-72.543,mi:19},{id:'I91-26',route:'I-91',exit:'26',name:'Rt.2 Greenfield',lat:42.384,lon:-72.404,mi:26},
+  {id:'MA2-15',route:'RT2',exit:'15',name:'I-95/Rt.128',lat:42.402,lon:-71.165,mi:15},{id:'MA2-49',route:'RT2',exit:'49',name:'Rt.110 Shirley',lat:42.414,lon:-71.425,mi:49},{id:'MA2-63',route:'RT2',exit:'63',name:'Rt.31 Gardner',lat:42.406,lon:-71.680,mi:63},
+  {id:'MA24-14',route:'RT24',exit:'14',name:'Brockton',lat:42.060,lon:-71.038,mi:14},{id:'MA24-16',route:'RT24',exit:'16',name:'I-495 Interchange',lat:42.028,lon:-70.978,mi:18},
+  {id:'US3-25',route:'RT3',exit:'25',name:'Rt.225 Littleton',lat:42.520,lon:-71.335,mi:25},{id:'US3-35',route:'RT3',exit:'35',name:'Rt.110 Lowell',lat:42.618,lon:-71.335,mi:35},
+  {id:'BOSTON',route:'I-93N',exit:'0',name:'Boston Downtown',lat:42.362,lon:-71.058,mi:0},{id:'WORCESTER',route:'I-90',exit:'22',name:'Worcester Center',lat:42.262,lon:-71.802,mi:48},{id:'SPRINGFIELD',route:'I-90',exit:'24',name:'Springfield',lat:42.101,lon:-72.590,mi:82},{id:'LOWELL',route:'I-93N',exit:'33',name:'Lowell Center',lat:42.633,lon:-71.316,mi:20},{id:'NEW_BED',route:'RT24',exit:'20',name:'New Bedford',lat:41.634,lon:-70.934,mi:35},{id:'CAPE_COD',route:'RT6',exit:'5',name:'Hyannis/Cape Cod',lat:41.650,lon:-70.286,mi:90},{id:'PITTSFIELD',route:'I-90',exit:'29',name:'Pittsfield',lat:42.450,lon:-73.180,mi:130},{id:'GREENFIELD',route:'I-91',exit:'26',name:'Greenfield',lat:42.585,lon:-72.598,mi:28},{id:'NORTHAMPTON',route:'I-91',exit:'4',name:'Northampton',lat:42.325,lon:-72.638,mi:4},{id:'GLOUCESTER',route:'I-95N',exit:'47',name:'Gloucester',lat:42.614,lon:-70.662,mi:65},{id:'ATTLEBORO',route:'I-95N',exit:'9',name:'Attleboro',lat:41.943,lon:-71.286,mi:12},
+  {id:'I290-A',route:'I-290',exit:'1',name:'I-90 Mass Pike',lat:42.252,lon:-71.800,mi:0},{id:'I290-B',route:'I-290',exit:'5',name:'Rt.122A Worcester',lat:42.305,lon:-71.720,mi:5},{id:'I290-C',route:'I-290',exit:'10',name:'Rt.20 Auburn',lat:42.350,lon:-71.640,mi:10},{id:'I290-D',route:'I-290',exit:'16',name:'I-495/Marlborough',lat:42.362,lon:-71.412,mi:17},
+  {id:'I291-A',route:'I-291',exit:'1',name:'I-90 Springfield',lat:42.115,lon:-72.340,mi:0},{id:'I291-B',route:'I-291',exit:'3',name:'Springfield Center',lat:42.148,lon:-72.510,mi:8},{id:'I291-C',route:'I-291',exit:'5',name:'I-91 Springfield',lat:42.128,lon:-72.575,mi:14},
+  {id:'I91-A',route:'I-91',exit:'1',name:'I-90 Interchange',lat:42.104,lon:-72.620,mi:0},{id:'I91-B',route:'I-91',exit:'7',name:'Northampton',lat:42.214,lon:-72.515,mi:15},{id:'I91-C',route:'I-91',exit:'13',name:'Deerfield',lat:42.340,lon:-72.468,mi:30},{id:'I91-D',route:'I-91',exit:'19',name:'Greenfield',lat:42.440,lon:-72.320,mi:48},{id:'I91-E',route:'I-91',exit:'26',name:'Northampton/I-90',lat:42.545,lon:-72.248,mi:64},
+  {id:'RT28-A',route:'RT28',exit:'1',name:'Boston/Roxbury',lat:42.360,lon:-71.058,mi:0},{id:'RT28-B',route:'RT28',exit:'4',name:'Medford Sq',lat:42.470,lon:-71.042,mi:10},{id:'RT28-C',route:'RT28',exit:'7',name:'Stoneham',lat:42.530,lon:-71.155,mi:18},
+  {id:'RT16-A',route:'RT16',exit:'1',name:'Natick/Rt.30',lat:42.290,lon:-71.340,mi:0},{id:'RT16-B',route:'RT16',exit:'3',name:'Newton Upper Falls',lat:42.366,lon:-71.248,mi:8},{id:'RT16-C',route:'RT16',exit:'5',name:'Cambridge',lat:42.340,lon:-71.122,mi:18},
+  {id:'RT30-A',route:'RT30',exit:'1',name:'Boston/Kenmore',lat:42.360,lon:-71.058,mi:0},{id:'RT30-B',route:'RT30',exit:'3',name:'Weston',lat:42.325,lon:-71.358,mi:14},{id:'RT30-C',route:'RT30',exit:'5',name:'Framingham',lat:42.268,lon:-71.710,mi:30},
+  {id:'RT135-A',route:'RT135',exit:'1',name:'Needham',lat:42.290,lon:-70.950,mi:0},{id:'RT135-B',route:'RT135',exit:'3',name:'Natick Center',lat:42.278,lon:-71.240,mi:16},{id:'RT135-C',route:'RT135',exit:'5',name:'Framingham/I-495',lat:42.302,lon:-71.612,mi:36},
+  {id:'RT109-A',route:'RT109',exit:'1',name:'Dedham',lat:42.210,lon:-71.290,mi:0},{id:'RT109-B',route:'RT109',exit:'3',name:'Millis',lat:42.192,lon:-71.578,mi:18},{id:'RT109-C',route:'RT109',exit:'5',name:'Milford',lat:42.150,lon:-71.750,mi:32},
+  {id:'RT140-A',route:'RT140',exit:'1',name:'Taunton',lat:41.900,lon:-71.090,mi:0},{id:'RT140-B',route:'RT140',exit:'4',name:'Mansfield/I-495',lat:42.018,lon:-71.045,mi:18},{id:'RT140-C',route:'RT140',exit:'7',name:'Gardner',lat:42.218,lon:-70.948,mi:44},
+  {id:'RT138-A',route:'RT138',exit:'1',name:'Canton/I-95',lat:42.080,lon:-70.960,mi:0},{id:'RT138-B',route:'RT138',exit:'3',name:'Stoughton',lat:42.140,lon:-71.072,mi:10},{id:'RT138-C',route:'RT138',exit:'5',name:'Braintree/I-93',lat:42.192,lon:-71.210,mi:22},
+  {id:'RT62-A',route:'RT62',exit:'1',name:'Lexington/I-95',lat:42.416,lon:-71.068,mi:0},{id:'RT62-B',route:'RT62',exit:'3',name:'Bedford',lat:42.410,lon:-71.295,mi:12},{id:'RT62-C',route:'RT62',exit:'5',name:'Marlborough',lat:42.344,lon:-71.448,mi:24},
+  {id:'RT119-A',route:'RT119',exit:'1',name:'Lexington/I-95',lat:42.416,lon:-71.068,mi:0},{id:'RT119-B',route:'RT119',exit:'3',name:'Groton',lat:42.456,lon:-71.290,mi:14},{id:'RT119-C',route:'RT119',exit:'5',name:'Townsend/I-495',lat:42.398,lon:-71.590,mi:28},
+  {id:'RT2A-A',route:'RT2A',exit:'1',name:'Arlington/I-95',lat:42.416,lon:-71.068,mi:0},{id:'RT2A-B',route:'RT2A',exit:'3',name:'Concord',lat:42.452,lon:-71.265,mi:12},{id:'RT2A-C',route:'RT2A',exit:'5',name:'Leominster',lat:42.398,lon:-71.810,mi:38},
+  {id:'RT38-A',route:'RT38',exit:'1',name:'Lowell/I-93',lat:42.633,lon:-71.316,mi:0},{id:'RT38-B',route:'RT38',exit:'3',name:'Tewksbury',lat:42.542,lon:-71.248,mi:12},{id:'RT38-C',route:'RT38',exit:'5',name:'Burlington',lat:42.422,lon:-71.228,mi:26},
+  {id:'RT110-A',route:'RT110',exit:'1',name:'Amesbury/I-495',lat:42.726,lon:-71.845,mi:0},{id:'RT110-B',route:'RT110',exit:'3',name:'Haverhill',lat:42.668,lon:-71.592,mi:14},{id:'RT110-C',route:'RT110',exit:'5',name:'Lowell/I-495',lat:42.558,lon:-71.350,mi:32},
+  {id:'RT18-A',route:'RT18',exit:'1',name:'Brockton/Rt24',lat:42.090,lon:-70.950,mi:0},{id:'RT18-B',route:'RT18',exit:'3',name:'Abington',lat:42.040,lon:-70.918,mi:8},{id:'RT18-C',route:'RT18',exit:'5',name:'Rockland',lat:41.980,lon:-70.906,mi:16},
 ];
 
 EXITS.forEach((e,i)=>{if(!e.id)e.id=`exit_${i}`;if(e.mi===undefined)e.mi=i*2;});
 const EXITS_DB=EXITS;
-
 const TOD_PAT={
   interstate:[0.95,0.95,0.95,0.95,0.92,0.85,0.72,0.58,0.65,0.82,0.88,0.87,0.85,0.84,0.83,0.80,0.68,0.60,0.70,0.82,0.88,0.92,0.94,0.95],
-  expressway: [0.95,0.95,0.95,0.92,0.88,0.80,0.65,0.52,0.60,0.78,0.86,0.85,0.83,0.82,0.80,0.76,0.62,0.55,0.67,0.80,0.86,0.90,0.93,0.95],
-  arterial:   [0.95,0.95,0.95,0.92,0.88,0.78,0.62,0.50,0.58,0.75,0.84,0.83,0.80,0.79,0.78,0.74,0.60,0.52,0.65,0.78,0.84,0.88,0.92,0.95],
-  local:      [0.95,0.95,0.95,0.92,0.90,0.80,0.65,0.52,0.56,0.72,0.82,0.80,0.78,0.76,0.75,0.72,0.58,0.50,0.64,0.76,0.82,0.86,0.90,0.94],
+  expressway:[0.95,0.95,0.95,0.92,0.88,0.80,0.65,0.52,0.60,0.78,0.86,0.85,0.83,0.82,0.80,0.76,0.62,0.55,0.67,0.80,0.86,0.90,0.93,0.95],
+  arterial:  [0.95,0.95,0.95,0.92,0.88,0.78,0.62,0.50,0.58,0.75,0.84,0.83,0.80,0.79,0.78,0.74,0.60,0.52,0.65,0.78,0.84,0.88,0.92,0.95],
+  local:     [0.95,0.95,0.95,0.92,0.90,0.80,0.65,0.52,0.56,0.72,0.82,0.80,0.78,0.76,0.75,0.72,0.58,0.50,0.64,0.76,0.82,0.86,0.90,0.94],
 };
 const RUSH_HOURS=[7,8,16,17,18];
-
-
 function todMult(type,hour){const pat=TOD_PAT[type]||TOD_PAT.arterial;const h=Math.floor(hour)%24,m=hour-Math.floor(hour),n=(h+1)%24;return pat[h]*(1-m)+pat[n]*m;}
 function todSpeed(route,hour){return route.baseSpd*todMult(route.type,hour);}
 function formatTT(min){if(min<60)return Math.round(min)+'min';const h=Math.floor(min/60),m=Math.round(min%60);return h+'h '+m+'min';}
-
-/* ── Route state ── */
-ROUTES.forEach(r=>{
-  r.speed=r.type==='local'?30:65;
-  r.volume=r.type==='local'?400:1200;
-  r.incidents=[];r.congestionFactor=1.0;
-  r.history=new Array(60).fill(65);
-  r.baseSpd=r.type==='local'?35:r.type==='arterial'?45:65;
-});
-
-/* ── Sensors ── */
+ROUTES.forEach(r=>{r.speed=r.type==='local'?30:65;r.volume=r.type==='local'?400:1200;r.incidents=[];r.congestionFactor=1.0;r.history=new Array(60).fill(65);r.baseSpd=r.type==='local'?35:r.type==='arterial'?45:65;});
 const SENSORS=[];
-ROUTES.forEach(r=>{
-  const step=Math.max(1,Math.floor(r.pts.length/4));
-  for(let i=step;i<r.pts.length-1;i+=step){
-    SENSORS.push({id:`${r.id}-S${i}`,route:r.id,routeLabel:r.label,
-      lat:r.pts[i][0],lon:r.pts[i][1],speed:65,volume:1200,type:'loop',active:true});
-  }
-});
-
-/* ── Speed color ── */
-function speedColor(spd,type){
-  if(type==='local')return spd<15?'#cc1100':spd<25?'#cc8800':'#8a7050';
-  if(type==='arterial')return spd<20?'#cc1100':spd<35?'#cc8800':'#1a8c1a';
-  return spd>45?'#1a8c1a':spd>25?'#cc8800':spd>12?'#cc5500':'#cc1100';
-}
-
-/* ── Simulation state ── */
-let simRunning=true,simTime=0,simInterval=null;
-let rushHour=false,weatherActive=false;
-let incidents=[],eventCount=0;
-let sliders={traffic:85,weather:0,const:20};
-let showSensors=true,showLabels=true,showIncidents=true;
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SEGMENTS  —  one per consecutive exit pair on each route
-   Each segment tracks its own speed, giving per-segment traffic granularity
-═══════════════════════════════════════════════════════════════════════════ */
+ROUTES.forEach(r=>{const step=Math.max(1,Math.floor(r.pts.length/4));for(let i=step;i<r.pts.length-1;i+=step){SENSORS.push({id:`${r.id}-S${i}`,route:r.id,routeLabel:r.label,lat:r.pts[i][0],lon:r.pts[i][1],speed:65,volume:1200,type:'loop',active:true});}});
+function speedColor(spd,type){if(type==='local')return spd<15?'#cc1100':spd<25?'#cc8800':'#8a7050';if(type==='arterial')return spd<20?'#cc1100':spd<35?'#cc8800':'#1a8c1a';return spd>45?'#1a8c1a':spd>25?'#cc8800':spd>12?'#cc5500':'#cc1100';}
+let simRunning=true,simTime=0,simInterval=null,rushHour=false,weatherActive=false,incidents=[],eventCount=0,sliders={traffic:85,weather:0,const:20},showSensors=true,showLabels=true,showIncidents=true;
 const SEGMENTS=[];
-
 function buildSegments(){
-  const byRoute={};
-  EXITS_DB.forEach(e=>{
-    if(!byRoute[e.route])byRoute[e.route]=[];
-    byRoute[e.route].push(e);
-  });
+  const byRoute={};EXITS_DB.forEach(e=>{if(!byRoute[e.route])byRoute[e.route]=[];byRoute[e.route].push(e);});
   Object.entries(byRoute).forEach(([rid,exits])=>{
-    const route=ROUTES.find(r=>r.id===rid);
-    const sorted=exits.sort((a,b)=>a.mi-b.mi);
-    for(let i=0;i<sorted.length-1;i++){
-      const A=sorted[i],B=sorted[i+1];
-      const distMi=Math.max(0.5,Math.abs(B.mi-A.mi));
-      SEGMENTS.push({
-        id:`${rid}-${i}`,routeId:rid,
-        label:(route?.label||rid)+` • Exit ${A.exit}→${B.exit}`,
-        type:route?.type||'arterial',
-        baseSpd:route?(route.type==='local'?35:route.type==='arterial'?45:65):65,
-        exitA:A,exitB:B,distMi,
-        speed:65,volume:1200,incidents:[],history:new Array(60).fill(65),
-      });
-    }
+    const route=ROUTES.find(r=>r.id===rid);const sorted=exits.sort((a,b)=>a.mi-b.mi);
+    for(let i=0;i<sorted.length-1;i++){const A=sorted[i],B=sorted[i+1],distMi=Math.max(0.5,Math.abs(B.mi-A.mi));
+      SEGMENTS.push({id:`${rid}-${i}`,routeId:rid,label:(route?.label||rid)+` • Exit ${A.exit}→${B.exit}`,type:route?.type||'arterial',baseSpd:route?(route.type==='local'?35:route.type==='arterial'?45:65):65,exitA:A,exitB:B,distMi,speed:65,volume:1200,incidents:[],history:new Array(60).fill(65)});}
   });
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MAPLIBRE GL MAP  —  OpenFreeMap positron style
-   Traffic overlay: GeoJSON sources updated on every simulation tick
-   OSM geometry: loaded async from Overpass, replaces approximate coords
-═══════════════════════════════════════════════════════════════════════════ */
-const map=new maplibregl.Map({
-  container:'map',
-  style:'https://tiles.openfreemap.org/styles/bright',
-  center:[-71.5,42.0],
-  zoom:8,
-  maxBounds:[[-74.5,40.8],[-69.5,43.4]],
-});
-
-/* DOM markers / popup objects */
-const exitMarkerMap={};
-const sensorMarkerMap={};
-const incidentMarkerMap={};
-let osmWaysLoaded=false;
-let osmFeatures=[];   // will hold real OSM way features after load
-
-/* ── Build GeoJSON FeatureCollection from current SEGMENTS state ── */
-function buildTrafficGeoJSON(){
-  return{
-    type:'FeatureCollection',
-    features:SEGMENTS.map(seg=>{
-      const coords=segCoords(seg);
-      return{
-        type:'Feature',
-        geometry:{type:'LineString',coordinates:coords},
-        properties:{
-          id:seg.id,routeId:seg.routeId,
-          label:seg.label,
-          speed:Math.round(seg.speed),
-          color:speedColor(seg.speed,seg.type),
-          roadType:seg.type,
-          distMi:seg.distMi,
-          volume:Math.round(seg.volume),
-        }
-      };
-    })
-  };
-}
-
-/* Get GeoJSON coords [lon,lat][] for a segment from its route pts spine */
-function segCoords(seg){
-  const route=ROUTES.find(r=>r.id===seg.routeId);
-  if(!route?.pts?.length) return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];
-  const pts=route.pts;
-  // Find nearest spine indices to each exit
-  let iA=0,iB=0,dA=Infinity,dB=Infinity;
-  pts.forEach((p,i)=>{
-    const da=(p[0]-seg.exitA.lat)**2+(p[1]-seg.exitA.lon)**2;
-    const db=(p[0]-seg.exitB.lat)**2+(p[1]-seg.exitB.lon)**2;
-    if(da<dA){dA=da;iA=i;}
-    if(db<dB){dB=db;iB=i;}
-  });
-  const lo=Math.min(iA,iB),hi=Math.max(iA,iB);
-  const spine=pts.slice(lo,hi+1).map(p=>[p[1],p[0]]); // flip to [lon,lat]
-  if(spine.length<2) return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];
-  // Replace first/last with exact exit coords for endpoint accuracy
-  spine[0]=[seg.exitA.lon,seg.exitA.lat];
-  spine[spine.length-1]=[seg.exitB.lon,seg.exitB.lat];
-  return spine;
-}
-
-/* ── Push updated GeoJSON to the map source on each tick ── */
-function updateTrafficSource(){
-  const src=map.getSource('traffic');
-  if(!src)return;
-  if(osmWaysLoaded){
-    // Update colors on OSM features from current segment speeds
-    osmFeatures.forEach(f=>{
-      const seg=SEGMENTS.find(s=>s.id===f.properties.segId);
-      const route=ROUTES.find(r=>r.id===f.properties.routeId);
-      const spd=seg?.speed??route?.speed??65;
-      const type=f.properties.roadType||route?.type||'arterial';
-      f.properties.color=speedColor(spd,type);
-      f.properties.speed=Math.round(spd);
-    });
-    src.setData({type:'FeatureCollection',features:osmFeatures});
-  } else {
-    src.setData(buildTrafficGeoJSON());
-  }
-}
-
-/* ── Update work zone source ── */
-function updateWorkzoneSource(features){
-  const src=map.getSource('workzones');
-  if(!src)return;
-  src.setData({type:'FeatureCollection',features:features||[]});
-}
-
-/* ── Update incidents source ── */
-function updateIncidentSource(){
-  const src=map.getSource('incidents');
-  if(!src)return;
-  src.setData({
-    type:'FeatureCollection',
-    features:incidents.map(inc=>({
-      type:'Feature',
-      geometry:{type:'Point',coordinates:[inc.lon,inc.lat]},
-      properties:{id:String(inc.id),icon:inc.icon,msg:inc.msg,route:inc.route,sev:inc.severity}
-    }))
-  });
-}
-
-/* ── Update route planner path on map ── */
+const map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/bright',center:[-71.5,42.0],zoom:8,maxBounds:[[-74.5,40.8],[-69.5,43.4]]});
+const exitMarkerMap={},sensorMarkerMap={},incidentMarkerMap={};
+let osmWaysLoaded=false,osmFeatures=[];
+function buildTrafficGeoJSON(){return{type:'FeatureCollection',features:SEGMENTS.map(seg=>{const coords=segCoords(seg);return{type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{id:seg.id,routeId:seg.routeId,label:seg.label,speed:Math.round(seg.speed),color:speedColor(seg.speed,seg.type),roadType:seg.type,distMi:seg.distMi,volume:Math.round(seg.volume)}};})}}
+function segCoords(seg){const route=ROUTES.find(r=>r.id===seg.routeId);if(!route?.pts?.length)return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];const pts=route.pts;let iA=0,iB=0,dA=Infinity,dB=Infinity;pts.forEach((p,i)=>{const da=(p[0]-seg.exitA.lat)**2+(p[1]-seg.exitA.lon)**2,db=(p[0]-seg.exitB.lat)**2+(p[1]-seg.exitB.lon)**2;if(da<dA){dA=da;iA=i;}if(db<dB){dB=db;iB=i;}});const lo=Math.min(iA,iB),hi=Math.max(iA,iB);const spine=pts.slice(lo,hi+1).map(p=>[p[1],p[0]]);if(spine.length<2)return[[seg.exitA.lon,seg.exitA.lat],[seg.exitB.lon,seg.exitB.lat]];spine[0]=[seg.exitA.lon,seg.exitA.lat];spine[spine.length-1]=[seg.exitB.lon,seg.exitB.lat];return spine;}
+function updateTrafficSource(){const src=map.getSource('traffic');if(!src)return;if(osmWaysLoaded){osmFeatures.forEach(f=>{const seg=SEGMENTS.find(s=>s.id===f.properties.segId),route=ROUTES.find(r=>r.id===f.properties.routeId);const spd=seg?.speed??route?.speed??65;f.properties.color=speedColor(spd,f.properties.roadType||route?.type||'arterial');f.properties.speed=Math.round(spd);});src.setData({type:'FeatureCollection',features:osmFeatures});}else{src.setData(buildTrafficGeoJSON());}}
+function updateWorkzoneSource(features){const src=map.getSource('workzones');if(src)src.setData({type:'FeatureCollection',features:features||[]});}
+function updateIncidentSource(){const src=map.getSource('incidents');if(!src)return;src.setData({type:'FeatureCollection',features:incidents.map(inc=>({type:'Feature',geometry:{type:'Point',coordinates:[inc.lon,inc.lat]},properties:{id:String(inc.id),icon:inc.icon,msg:inc.msg,route:inc.route,sev:inc.severity}}))});}
 let activeRoute=null,activeAlt=null;
+function updateRoutePathSource(){const src=map.getSource('route-path');if(!src)return;const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);const features=[];if(activeRoute?.path?.length>=2){const coords=activeRoute.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);if(coords.length>=2)features.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{color:'#ff8800',width:7,opacity:0.92,isAlt:false}});}if(activeAlt?.path?.length>=2){const coords=activeAlt.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);if(coords.length>=2)features.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{color:'#003399',width:5,opacity:0.7,isAlt:true}});}if(features.length&&activeRoute){const first=exitMap[activeRoute.path[0]?.node],last=exitMap[activeRoute.path[activeRoute.path.length-1]?.node];if(first)features.push({type:'Feature',geometry:{type:'Point',coordinates:[first.lon,first.lat]},properties:{marker:'S',color:'#ff8800'}});if(last)features.push({type:'Feature',geometry:{type:'Point',coordinates:[last.lon,last.lat]},properties:{marker:'E',color:'#ff8800'}});}src.setData({type:'FeatureCollection',features});}
 
-function updateRoutePathSource(){
-  const src=map.getSource('route-path');
-  if(!src)return;
-  const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);
-  const features=[];
-  if(activeRoute?.path?.length>=2){
-    const coords=activeRoute.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);
-    if(coords.length>=2) features.push({type:'Feature',
-      geometry:{type:'LineString',coordinates:coords},
-      properties:{color:'#ff8800',width:7,opacity:0.92,isAlt:false}});
-  }
-  if(activeAlt?.path?.length>=2){
-    const coords=activeAlt.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);
-    if(coords.length>=2) features.push({type:'Feature',
-      geometry:{type:'LineString',coordinates:coords},
-      properties:{color:'#003399',width:5,opacity:0.7,isAlt:true}});
-  }
-  // Endpoint markers
-  if(features.length&&activeRoute){
-    const first=exitMap[activeRoute.path[0]?.node];
-    const last=exitMap[activeRoute.path[activeRoute.path.length-1]?.node];
-    if(first) features.push({type:'Feature',
-      geometry:{type:'Point',coordinates:[first.lon,first.lat]},
-      properties:{marker:'S',color:'#ff8800'}});
-    if(last) features.push({type:'Feature',
-      geometry:{type:'Point',coordinates:[last.lon,last.lat]},
-      properties:{marker:'E',color:'#ff8800'}});
-  }
-  src.setData({type:'FeatureCollection',features});
-}
+map.on('load',()=>{
+  /* ── FIX: Font glyphs – openfreemap CDN path changed ── */
+  map.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
 
-/* ── Map load: add sources, layers, interactivity ── */
-map.on('load',()=>{   map.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
-  // ── Boost secondary/tertiary road visibility in the base style ────────────
-  // Iterate style layers; find road-line layers by ID pattern and beef them up
   map.getStyle().layers.forEach(layer=>{
-    if(layer.type!=='line') return;
-    const id=layer.id;
-    // Secondary & tertiary roads: make them medium-brown, clearly visible
-    if(/secondary|tertiary/.test(id)){
-      try{
-        map.setPaintProperty(id,'line-color','#b0956e');
-        map.setPaintProperty(id,'line-width',
-          ['interpolate',['linear'],['zoom'],7,1.2,10,2.5,13,4,16,7]);
-        map.setPaintProperty(id,'line-opacity',0.75);
-      }catch(e){}
-    }
-    // Residential / service: slightly darker than default
-    if(/residential|living_street|service/.test(id)){
-      try{
-        map.setPaintProperty(id,'line-color','#c8b898');
-        map.setPaintProperty(id,'line-opacity',0.65);
-      }catch(e){}
-    }
+    if(layer.type!=='line')return;const id=layer.id;
+    if(/secondary|tertiary/.test(id)){try{map.setPaintProperty(id,'line-color','#b0956e');map.setPaintProperty(id,'line-width',['interpolate',['linear'],['zoom'],7,1.2,10,2.5,13,4,16,7]);map.setPaintProperty(id,'line-opacity',0.75);}catch(e){}}
+    if(/residential|living_street|service/.test(id)){try{map.setPaintProperty(id,'line-color','#c8b898');map.setPaintProperty(id,'line-opacity',0.65);}catch(e){}}
   });
-  // Boost secondary road LABELS (symbol layers) — make ref shields visible
   map.getStyle().layers.forEach(layer=>{
-    if(layer.type!=='symbol') return;
-    const id=layer.id;
-    if(/road.*label|highway.*ref|route.*ref|secondary.*label|road_label/.test(id)){
-      try{
-        map.setLayoutProperty(id,'text-size',
-          ['interpolate',['linear'],['zoom'],9,9,12,11,15,13]);
-        map.setPaintProperty(id,'text-color','#4a3520');
-        map.setPaintProperty(id,'text-halo-color','rgba(255,252,240,0.9)');
-        map.setPaintProperty(id,'text-halo-width',1.5);
-      }catch(e){}
-    }
+    if(layer.type!=='symbol')return;const id=layer.id;
+    if(/road.*label|highway.*ref|route.*ref|secondary.*label|road_label/.test(id)){try{map.setLayoutProperty(id,'text-size',['interpolate',['linear'],['zoom'],9,9,12,11,15,13]);map.setPaintProperty(id,'text-color','#4a3520');map.setPaintProperty(id,'text-halo-color','rgba(255,252,240,0.9)');map.setPaintProperty(id,'text-halo-width',1.5);}catch(e){}}
   });
-
-  const styleLayerIds=map.getStyle().layers.map(l=>l.id);
-  // Insert traffic below labels but above road fills — find first symbol layer
   const firstLabel=map.getStyle().layers.find(l=>l.type==='symbol')?.id;
 
+  /* ── NWS NEXRAD Weather Radar ── */
+  map.addSource('nws-radar',{type:'raster',tiles:['https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png'],tileSize:256,attribution:'NOAA/NWS NEXRAD'});
+  map.addLayer({id:'nws-radar-layer',type:'raster',source:'nws-radar',paint:{'raster-opacity':0.65},layout:{visibility:'none'}},firstLabel);
+
   /* Traffic source */
-  map.addSource('traffic',{type:'geojson',
-    data:{type:'FeatureCollection',features:[]},
-    buffer:4,tolerance:0.3
-  });
-
-  /* Casing (dark outline) for interstates/expressways */
-  map.addLayer({
-    id:'traffic-casing',type:'line',source:'traffic',
-    filter:['in',['get','roadType'],['literal',['interstate','expressway']]],
-    layout:{'line-join':'round','line-cap':'round','visibility':'none'},
-    paint:{
-      'line-color':'rgba(20,10,5,0.45)',
-      'line-width':['interpolate',['linear'],['zoom'],
-        7,['match',['get','roadType'],'interstate',6,'expressway',5,4],
-        10,['match',['get','roadType'],'interstate',10,'expressway',8,6],
-        13,['match',['get','roadType'],'interstate',13,'expressway',10,8],
-        16,['match',['get','roadType'],'interstate',18,'expressway',14,10]],
-      'line-opacity':0.7
-    }
-  },firstLabel);
-
-  /* Traffic color fill */
-  map.addLayer({
-    id:'traffic-fill',type:'line',source:'traffic',
-    layout:{'line-join':'round','line-cap':'round','visibility':'none'},
-    paint:{
-      'line-color':['get','color'],
-      'line-width':['interpolate',['linear'],['zoom'],
-        7,['match',['get','roadType'],'interstate',4,'expressway',3,'arterial',2,1.5],
-        10,['match',['get','roadType'],'interstate',7,'expressway',5,'arterial',4,2.5],
-        13,['match',['get','roadType'],'interstate',10,'expressway',7,'arterial',5,3],
-        16,['match',['get','roadType'],'interstate',14,'expressway',10,'arterial',7,4]],
-      'line-opacity':0.90
-    }
-  },firstLabel);
-
-  /* Work zones — real GPS LineString geometry from MassDOT WZDx feed */
+  map.addSource('traffic',{type:'geojson',data:{type:'FeatureCollection',features:[]},buffer:4,tolerance:0.3});
+  map.addLayer({id:'traffic-casing',type:'line',source:'traffic',filter:['in',['get','roadType'],['literal',['interstate','expressway']]],layout:{'line-join':'round','line-cap':'round','visibility':'none'},paint:{'line-color':'rgba(20,10,5,0.45)','line-width':['interpolate',['linear'],['zoom'],7,['match',['get','roadType'],'interstate',6,'expressway',5,4],10,['match',['get','roadType'],'interstate',10,'expressway',8,6],13,['match',['get','roadType'],'interstate',13,'expressway',10,8],16,['match',['get','roadType'],'interstate',18,'expressway',14,10]],'line-opacity':0.7}},firstLabel);
+  map.addLayer({id:'traffic-fill',type:'line',source:'traffic',layout:{'line-join':'round','line-cap':'round','visibility':'none'},paint:{'line-color':['get','color'],'line-width':['interpolate',['linear'],['zoom'],7,['match',['get','roadType'],'interstate',4,'expressway',3,'arterial',2,1.5],10,['match',['get','roadType'],'interstate',7,'expressway',5,'arterial',4,2.5],13,['match',['get','roadType'],'interstate',10,'expressway',7,'arterial',5,3],16,['match',['get','roadType'],'interstate',14,'expressway',10,'arterial',7,4]],'line-opacity':0.90}},firstLabel);
   map.addSource('workzones',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
-  map.addLayer({
-    id:'workzone-lines',type:'line',source:'workzones',
-    filter:['==',['geometry-type'],'LineString'],
-    layout:{'line-join':'round','line-cap':'round'},
-    paint:{
-      'line-color':['match',['get','severity'],'crit','#cc2200','warn','#cc7700','#cc9900'],
-      'line-width':['interpolate',['linear'],['zoom'],7,3,12,6,15,10],
-      'line-opacity':0.85,
-      'line-dasharray':[4,3],
-    }
-  },firstLabel);
-  map.addLayer({
-    id:'workzone-points',type:'circle',source:'workzones',
-    filter:['==',['geometry-type'],'Point'],
-    paint:{
-      'circle-radius':['interpolate',['linear'],['zoom'],7,5,13,9],
-      'circle-color':['match',['get','severity'],'crit','#cc2200','warn','#cc7700','#ffaa00'],
-      'circle-stroke-width':2,'circle-stroke-color':'#fff','circle-opacity':0.9,
-    }
-  });
-
-  /* Incidents */
+  map.addLayer({id:'workzone-lines',type:'line',source:'workzones',filter:['==',['geometry-type'],'LineString'],layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['match',['get','severity'],'crit','#cc2200','warn','#cc7700','#cc9900'],'line-width':['interpolate',['linear'],['zoom'],7,3,12,6,15,10],'line-opacity':0.85,'line-dasharray':[4,3]}},firstLabel);
+  map.addLayer({id:'workzone-points',type:'circle',source:'workzones',filter:['==',['geometry-type'],'Point'],paint:{'circle-radius':['interpolate',['linear'],['zoom'],7,5,13,9],'circle-color':['match',['get','severity'],'crit','#cc2200','warn','#cc7700','#ffaa00'],'circle-stroke-width':2,'circle-stroke-color':'#fff','circle-opacity':0.9}});
   map.addSource('incidents',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
-  map.addLayer({id:'incident-circles',type:'circle',source:'incidents',
-    paint:{'circle-radius':['interpolate',['linear'],['zoom'],7,5,13,9],
-      'circle-color':'#cc1100','circle-stroke-width':2,'circle-stroke-color':'#fff','circle-opacity':0.95}});
-  map.addLayer({id:'incident-icons',type:'symbol',source:'incidents',
-    layout:{'text-field':['get','icon'],'text-size':10,'text-allow-overlap':true,
-      'text-offset':[0,0]}});
-
-  /* Route planner path */
+  map.addLayer({id:'incident-circles',type:'circle',source:'incidents',paint:{'circle-radius':['interpolate',['linear'],['zoom'],7,5,13,9],'circle-color':'#cc1100','circle-stroke-width':2,'circle-stroke-color':'#fff','circle-opacity':0.95}});
+  map.addLayer({id:'incident-icons',type:'symbol',source:'incidents',layout:{'text-field':['get','icon'],'text-size':10,'text-allow-overlap':true,'text-offset':[0,0]}});
   map.addSource('route-path',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
-  map.addLayer({id:'route-path-main',type:'line',source:'route-path',
-    filter:['==',['get','isAlt'],false],
-    layout:{'line-join':'round','line-cap':'round'},
-    paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity']}});
-  map.addLayer({id:'route-path-alt',type:'line',source:'route-path',
-    filter:['==',['get','isAlt'],true],
-    layout:{'line-join':'round','line-cap':'round'},
-    paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity'],
-      'line-dasharray':[8,5]}});
-  map.addLayer({id:'route-endpoint-labels',type:'symbol',source:'route-path',
-    filter:['has','marker'],
-    layout:{'text-field':['get','marker'],'text-size':11,'text-font':['Noto Sans Bold','Arial Unicode MS Bold'],
-      'text-allow-overlap':true},
-    paint:{'text-color':'#ffffff','text-halo-color':['get','color'],'text-halo-width':6}});
+  map.addLayer({id:'route-path-main',type:'line',source:'route-path',filter:['==',['get','isAlt'],false],layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity']}});
+  map.addLayer({id:'route-path-alt',type:'line',source:'route-path',filter:['==',['get','isAlt'],true],layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['get','color'],'line-width':['get','width'],'line-opacity':['get','opacity'],'line-dasharray':[8,5]}});
+  map.addLayer({id:'route-endpoint-labels',type:'symbol',source:'route-path',filter:['has','marker'],layout:{'text-field':['get','marker'],'text-size':11,'text-font':['Noto Sans Bold','Arial Unicode MS Bold'],'text-allow-overlap':true},paint:{'text-color':'#ffffff','text-halo-color':['get','color'],'text-halo-width':6}});
 
-  /* Workzone hover */
-  map.on('mousemove','workzone-lines',(e)=>{
-    if(!e.features?.length)return;
-    map.getCanvas().style.cursor='pointer';
-    const p=e.features[0].properties;
-    const tip=document.getElementById('tooltip');
-    document.getElementById('tip-title').textContent='🚧 Work Zone';
-    document.getElementById('tip-speed').textContent=p.impact?.replace(/-/g,' ')||'-';
-    document.getElementById('tip-vol').textContent=p.route||'-';
-    document.getElementById('tip-time').textContent=p.name||'-';
-    document.getElementById('tip-status').textContent=p.msg||'-';
-    tip.style.display='block';
-    tip.style.left=(e.point.x+14)+'px';tip.style.top=(e.point.y-10)+'px';
-  });
-  map.on('mouseleave','workzone-lines',()=>{
-    map.getCanvas().style.cursor='';
-    document.getElementById('tooltip').style.display='none';
-  });
+  map.on('mousemove','workzone-lines',(e)=>{if(!e.features?.length)return;map.getCanvas().style.cursor='pointer';const p=e.features[0].properties,tip=document.getElementById('tooltip');document.getElementById('tip-title').textContent='🚧 Work Zone';document.getElementById('tip-speed').textContent=p.impact?.replace(/-/g,' ')||'-';document.getElementById('tip-vol').textContent=p.route||'-';document.getElementById('tip-time').textContent=p.name||'-';document.getElementById('tip-status').textContent=p.msg||'-';tip.style.display='block';tip.style.left=(e.point.x+14)+'px';tip.style.top=(e.point.y-10)+'px';});
+  map.on('mouseleave','workzone-lines',()=>{map.getCanvas().style.cursor='';document.getElementById('tooltip').style.display='none';});
+  map.on('mousemove','traffic-fill',(e)=>{if(!e.features?.length)return;map.getCanvas().style.cursor='pointer';const p=e.features[0].properties,tip=document.getElementById('tooltip');document.getElementById('tip-title').textContent=p.label||p.routeId;document.getElementById('tip-speed').textContent=(p.speed||0)+' mph';document.getElementById('tip-vol').textContent=Math.round(p.volume||0)+' veh/hr';document.getElementById('tip-time').textContent=(p.distMi||0).toFixed(1)+' mi segment';document.getElementById('tip-status').textContent=p.speed>45?'Free Flow':p.speed>25?'Slow':'Congested';tip.style.display='block';tip.style.left=(e.point.x+14)+'px';tip.style.top=(e.point.y-10)+'px';});
+  map.on('mouseleave','traffic-fill',()=>{map.getCanvas().style.cursor='';document.getElementById('tooltip').style.display='none';});
 
-  /* Hover on traffic segments */
-  map.on('mousemove','traffic-fill',(e)=>{
-    if(!e.features?.length)return;
-    map.getCanvas().style.cursor='pointer';
-    const p=e.features[0].properties;
-    const tip=document.getElementById('tooltip');
-    document.getElementById('tip-title').textContent=p.label||p.routeId;
-    document.getElementById('tip-speed').textContent=(p.speed||0)+' mph';
-    document.getElementById('tip-vol').textContent=Math.round(p.volume||0)+' veh/hr';
-    document.getElementById('tip-time').textContent=(p.distMi||0).toFixed(1)+' mi segment';
-    const st=p.speed>45?'Free Flow':p.speed>25?'Slow':'Congested';
-    document.getElementById('tip-status').textContent=st;
-    tip.style.display='block';
-    tip.style.left=(e.point.x+14)+'px';
-    tip.style.top=(e.point.y-10)+'px';
-  });
-  map.on('mouseleave','traffic-fill',()=>{
-    map.getCanvas().style.cursor='';
-    document.getElementById('tooltip').style.display='none';
-  });
-
-  /* Initial data push */
-  updateTrafficSource();
-  updateExitMarkers();
-  updateSensorMarkers();
-
-  /* Start systems */
-  buildSegments();
-  populateSelects();
-  startLiveData();
-  startSim();
+  updateTrafficSource();updateExitMarkers();updateSensorMarkers();
+  buildSegments();populateSelects();startLiveData();startSim();
   logEvent('clear','MA Traffic Twin v3 — MapLibre GL + OpenStreetMap');
   logEvent('clear',`${ROUTES.length} routes • ${SEGMENTS.length} segments • ${SENSORS.length} sensors`);
-
-  /* Async: load real OSM road geometry */
   loadOSMGeometry();
 });
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   OSM GEOMETRY LOADER  —  Overpass API → real road shapes per way
-   Each OSM way becomes its own GeoJSON feature, colored by nearest segment.
-   No stitching, no stitching bugs.
-═══════════════════════════════════════════════════════════════════════════ */
-const REF_MAP={
-  'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N',
-  'I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91',
-  'MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6',
-  'MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20',
-  'MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38',
-  'MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110',
-  'MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140',
-  'US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON',
-};
-
-function refToRouteId(ref){
-  if(!ref)return null;
-  for(const r of ref.split(/[;,]/).map(s=>s.trim())){
-    if(REF_MAP[r])return REF_MAP[r];
-  }
-  return null;
-}
-
-function nearestSegment(lat,lon,routeId){
-  const segs=SEGMENTS.filter(s=>s.routeId===routeId);
-  if(!segs.length)return null;
-  let best=null,bestD=Infinity;
-  segs.forEach(s=>{
-    const mLat=(s.exitA.lat+s.exitB.lat)/2, mLon=(s.exitA.lon+s.exitB.lon)/2;
-    const d=Math.hypot((lat-mLat)*111320,(lon-mLon)*78470);
-    if(d<bestD){bestD=d;best=s;}
-  });
-  return best;
-}
+const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
+function refToRouteId(ref){if(!ref)return null;for(const r of ref.split(/[;,]/).map(s=>s.trim())){if(REF_MAP[r])return REF_MAP[r];}return null;}
+function nearestSegment(lat,lon,routeId){const segs=SEGMENTS.filter(s=>s.routeId===routeId);if(!segs.length)return null;let best=null,bestD=Infinity;segs.forEach(s=>{const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;const d=Math.hypot((lat-mLat)*111320,(lon-mLon)*78470);if(d<bestD){bestD=d;best=s;}});return best;}
 
 async function loadOSMGeometry(){
-  const badge=document.getElementById('osm-badge');
-  const ftOsm=document.getElementById('ft-osm');
+  const badge=document.getElementById('osm-badge'),ftOsm=document.getElementById('ft-osm');
   badge.textContent='⏳ Fetching OSM roads…';
-
-  const query=`[out:json][timeout:60];
-way["highway"~"motorway|trunk|primary|secondary"]["ref"](41.1,-73.6,42.9,-69.8);
-out geom qt;`;
-
+  const query=`[out:json][timeout:60];\nway["highway"~"motorway|trunk|primary|secondary"]["ref"](41.1,-73.6,42.9,-69.8);\nout geom qt;`;
   let elements;
-  try{
-    const r=await fetch('https://overpass.kumi.systems/api/interpreter',{
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:'data='+encodeURIComponent(query),
-      signal:AbortSignal.timeout(65000)
-    });
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    elements=data.elements||[];
-  }catch(e){
-    badge.textContent='⚠ OSM unavailable — using route geometry';
-    badge.style.color='#cc8800';
-    if(ftOsm)ftOsm.textContent='fallback';
-    // Still show traffic with approximate coords rather than blank map
-    ['traffic-casing','traffic-fill'].forEach(id=>{
-      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
-    });
-    logEvent('warn','⚠ OSM Overpass unreachable — using approximate route geometry');
-    return;
-  }
-
-  const newFeatures=[];
-  let matched=0,skipped=0;
-
-  elements.filter(el=>el.type==='way'&&el.geometry?.length>=2).forEach(way=>{
-    const ref=way.tags?.ref;
-    const routeId=refToRouteId(ref);
-    if(!routeId){skipped++;return;}
-    const route=ROUTES.find(r=>r.id===routeId);
-    if(!route){skipped++;return;}
-
-    // GeoJSON uses [lon,lat]
-    const coords=way.geometry.map(n=>[n.lon,n.lat]);
-    // Mid-point for segment assignment
-    const mid=coords[Math.floor(coords.length/2)];
-    const seg=nearestSegment(mid[1],mid[0],routeId);
-
-    newFeatures.push({
-      type:'Feature',
-      geometry:{type:'LineString',coordinates:coords},
-      properties:{
-        osmId:way.id,routeId,
-        segId:seg?.id||null,
-        label:(route.label)+(seg?` • Exit ${seg.exitA.exit}→${seg.exitB.exit}`:''),
-        speed:Math.round(seg?.speed||route.speed||65),
-        color:speedColor(seg?.speed||route.speed||65,route.type),
-        roadType:route.type,
-        distMi:seg?.distMi||1,
-        volume:Math.round(seg?.volume||route.volume||1200),
-        ref:ref||''
-      }
-    });
-    matched++;
-  });
-
-  if(matched>0){
-    osmFeatures=newFeatures;
-    osmWaysLoaded=true;
-    updateTrafficSource();
-    // Reveal traffic layers now that real geometry is loaded
-    ['traffic-casing','traffic-fill'].forEach(id=>{
-      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
-    });
-    badge.textContent=`✓ ${matched} OSM road segments`;
-    badge.style.color='#1a5c1a';
-    if(ftOsm)ftOsm.textContent=`${matched} ways`;
-    logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);
-    document.getElementById('ft-segs').textContent=matched;
-  } else {
-    badge.textContent='⚠ No OSM matches — using route geometry';
-    badge.style.color='#cc8800';
-    if(ftOsm)ftOsm.textContent='no match';
-    ['traffic-casing','traffic-fill'].forEach(id=>{
-      if(map.getLayer(id)) map.setLayoutProperty(id,'visibility','visible');
-    });
-    logEvent('warn','OSM returned no matching ways — using approximate geometry');
-  }
+  try{const r=await fetch('https://overpass.kumi.systems/api/interpreter',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:AbortSignal.timeout(65000)});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();elements=data.elements||[];}
+  catch(e){badge.textContent='⚠ OSM unavailable — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='fallback';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','⚠ OSM Overpass unreachable — using approximate route geometry');return;}
+  const newFeatures=[];let matched=0,skipped=0;
+  elements.filter(el=>el.type==='way'&&el.geometry?.length>=2).forEach(way=>{const ref=way.tags?.ref,routeId=refToRouteId(ref);if(!routeId){skipped++;return;}const route=ROUTES.find(r=>r.id===routeId);if(!route){skipped++;return;}const coords=way.geometry.map(n=>[n.lon,n.lat]);const mid=coords[Math.floor(coords.length/2)];const seg=nearestSegment(mid[1],mid[0],routeId);newFeatures.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{osmId:way.id,routeId,segId:seg?.id||null,label:(route.label)+(seg?` • Exit ${seg.exitA.exit}→${seg.exitB.exit}`:''),speed:Math.round(seg?.speed||route.speed||65),color:speedColor(seg?.speed||route.speed||65,route.type),roadType:route.type,distMi:seg?.distMi||1,volume:Math.round(seg?.volume||route.volume||1200),ref:ref||''}});matched++;});
+  if(matched>0){osmFeatures=newFeatures;osmWaysLoaded=true;updateTrafficSource();['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});badge.textContent=`✓ ${matched} OSM road segments`;badge.style.color='#1a5c1a';if(ftOsm)ftOsm.textContent=`${matched} ways`;logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);document.getElementById('ft-segs').textContent=matched;}
+  else{badge.textContent='⚠ No OSM matches — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='no match';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','OSM returned no matching ways — using approximate geometry');}
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   EXIT / SENSOR / INCIDENT MARKERS  (MapLibre DOM markers)
-═══════════════════════════════════════════════════════════════════════════ */
-function updateExitMarkers(){
-  if(!showLabels){
-    Object.values(exitMarkerMap).forEach(m=>m.remove());
-    Object.keys(exitMarkerMap).forEach(k=>delete exitMarkerMap[k]);
-    return;
-  }
-  EXITS_DB.forEach(ex=>{
-    if(exitMarkerMap[ex.id])return;
-    const el=document.createElement('div');
-    el.className='exit-dot';
-    const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false})
-      .setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);
-    const m=new maplibregl.Marker({element:el,anchor:'top-left'})
-      .setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);
-    exitMarkerMap[ex.id]=m;
-  });
-}
+function updateExitMarkers(){if(!showLabels){Object.values(exitMarkerMap).forEach(m=>m.remove());Object.keys(exitMarkerMap).forEach(k=>delete exitMarkerMap[k]);return;}EXITS_DB.forEach(ex=>{if(exitMarkerMap[ex.id])return;const el=document.createElement('div');el.className='exit-dot';const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false}).setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);exitMarkerMap[ex.id]=m;});}
+function updateSensorMarkers(){if(!showSensors){Object.values(sensorMarkerMap).forEach(m=>m.remove());Object.keys(sensorMarkerMap).forEach(k=>delete sensorMarkerMap[k]);return;}SENSORS.forEach(s=>{if(sensorMarkerMap[s.id])return;const el=document.createElement('div');el.className='sensor-dot';const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([s.lon,s.lat]).addTo(map);sensorMarkerMap[s.id]=m;});}
+function redrawIncidentMarkers(){Object.values(incidentMarkerMap).forEach(m=>m.remove());Object.keys(incidentMarkerMap).forEach(k=>delete incidentMarkerMap[k]);incidents.forEach(inc=>{const wrap=document.createElement('div');wrap.className='inc-marker-wrap';wrap.innerHTML=`<div class="inc-ring"></div><div class="inc-dot">${inc.icon}</div>`;const popup=new maplibregl.Popup({offset:16,closeButton:false}).setHTML(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br><b>${inc.route}</b><br>${inc.msg}`);const m=new maplibregl.Marker({element:wrap,anchor:'top-left'}).setLngLat([inc.lon,inc.lat]).setPopup(popup).addTo(map);if(!showIncidents)m.getElement().style.display='none';incidentMarkerMap[inc.id]=m;});updateIncidentSource();}
 
-function updateSensorMarkers(){
-  if(!showSensors){
-    Object.values(sensorMarkerMap).forEach(m=>m.remove());
-    Object.keys(sensorMarkerMap).forEach(k=>delete sensorMarkerMap[k]);
-    return;
-  }
-  SENSORS.forEach(s=>{
-    if(sensorMarkerMap[s.id])return;
-    const el=document.createElement('div');
-    el.className='sensor-dot';
-    const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([s.lon,s.lat]).addTo(map);
-    sensorMarkerMap[s.id]=m;
-  });
-}
-
-function redrawIncidentMarkers(){
-  // Remove old
-  Object.values(incidentMarkerMap).forEach(m=>m.remove());
-  Object.keys(incidentMarkerMap).forEach(k=>delete incidentMarkerMap[k]);
-  // Add new
-  incidents.forEach(inc=>{
-    const wrap=document.createElement('div');
-    wrap.className='inc-marker-wrap';
-    wrap.innerHTML=`<div class="inc-ring"></div><div class="inc-dot">${inc.icon}</div>`;
-    const popup=new maplibregl.Popup({offset:16,closeButton:false})
-      .setHTML(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br><b>${inc.route}</b><br>${inc.msg}`);
-    const m=new maplibregl.Marker({element:wrap,anchor:'top-left'})
-      .setLngLat([inc.lon,inc.lat]).setPopup(popup).addTo(map);
-    // Respect current visibility toggle
-    if(!showIncidents) m.getElement().style.display='none';
-    incidentMarkerMap[inc.id]=m;
-  });
-  updateIncidentSource();
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SIMULATION TICK
-═══════════════════════════════════════════════════════════════════════════ */
 function tick(){
-  simTime++;
-  const t=simTime*0.03;
-  const trafficLoad=sliders.traffic/100;
-  const weatherFactor=1-sliders.weather/200;
-  const constFactor=1-sliders.const/400;
-  const rushFactor=rushHour?0.55:1.0;
-
-  // Update route-level speed (smooth average)
-  ROUTES.forEach(r=>{
-    const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3);
-    const loadFactor=0.88+(1.0-trafficLoad)*0.12;
-    let speed=r.baseSpd*wave*loadFactor*weatherFactor*constFactor*rushFactor;
-    if(r.incidents?.length) speed*=0.4;
-    speed*=(1+(Math.random()-0.5)*0.05*2);
-    speed=Math.max(5,Math.min(r.baseSpd,speed));
-    r.speed=r.speed*0.85+speed*0.15;
-    r.volume=Math.max(50,Math.min(3000,trafficLoad*2200*wave*(rushHour?1.4:1)*(r.type==='local'?0.3:1)));
-    r.history.push(r.speed);r.history.shift();
-    r.congestionFactor=r.speed/r.baseSpd;
-  });
-
-  // Per-segment variation — low noise, strong EMA so colors are stable
-  SEGMENTS.forEach(seg=>{
-    const route=ROUTES.find(r=>r.id===seg.routeId);
-    if(!route)return;
-    // ±3% noise max — stays in same colour band unless real condition changes
-    const noise=(Math.random()-0.5)*0.06;
-    const incPen=seg.incidents.length>0?0.45:1.0;
-    const target=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));
-    // 92% EMA: takes ~12 ticks (~6 sec) to move through a full speed range
-    seg.speed=seg.speed*0.92+target*0.08;
-    seg.volume=route.volume*(1+(Math.random()-0.5)*0.08);
-    seg.history.push(seg.speed);seg.history.shift();
-  });
-
-  // Push to map every 2 ticks (~1 sec) to avoid WebGL thrash
+  simTime++;const t=simTime*0.03,trafficLoad=sliders.traffic/100,weatherFactor=1-sliders.weather/200,constFactor=1-sliders.const/400,rushFactor=rushHour?0.55:1.0;
+  ROUTES.forEach(r=>{const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3),loadFactor=0.88+(1.0-trafficLoad)*0.12;let speed=r.baseSpd*wave*loadFactor*weatherFactor*constFactor*rushFactor;if(r.incidents?.length)speed*=0.4;speed*=(1+(Math.random()-0.5)*0.05*2);speed=Math.max(5,Math.min(r.baseSpd,speed));r.speed=r.speed*0.85+speed*0.15;r.volume=Math.max(50,Math.min(3000,trafficLoad*2200*wave*(rushHour?1.4:1)*(r.type==='local'?0.3:1)));r.history.push(r.speed);r.history.shift();r.congestionFactor=r.speed/r.baseSpd;});
+  SEGMENTS.forEach(seg=>{const route=ROUTES.find(r=>r.id===seg.routeId);if(!route)return;const noise=(Math.random()-0.5)*0.06,incPen=seg.incidents.length>0?0.45:1.0;const target=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));seg.speed=seg.speed*0.92+target*0.08;seg.volume=route.volume*(1+(Math.random()-0.5)*0.08);seg.history.push(seg.speed);seg.history.shift();});
   if(map.getSource&&simTime%2===0)updateTrafficSource();
-
-  // Gauges
-  const allSpeeds=ROUTES.filter(r=>r.type!=='local').map(r=>r.speed);
-  const avgSpeed=allSpeeds.reduce((a,b)=>a+b,0)/allSpeeds.length;
-  const totalVol=ROUTES.filter(r=>r.type!=='local').reduce((a,r)=>a+r.volume,0)/ROUTES.length;
-  const congestPct=allSpeeds.filter(s=>s<40).length/allSpeeds.length*100;
-  setGauge('avgspeed',avgSpeed.toFixed(0),(avgSpeed/70)*100,avgSpeed>50?'#1a8c1a':avgSpeed>35?'#cc8800':'#cc1100');
-  setGauge('volume',Math.round(totalVol),(totalVol/3000)*100,'#003399');
-  setGauge('incidents',incidents.length,Math.min(100,incidents.length*20),'#cc1100');
-  setGauge('congestion',congestPct.toFixed(0),congestPct,'#886600');
-
-  // System status
-  const dot=document.getElementById('sys-dot'),lbl=document.getElementById('sys-label');
-  if(incidents.length>3||congestPct>70){dot.className='dot crit';lbl.textContent='CRITICAL';}
-  else if(incidents.length>0||congestPct>40){dot.className='dot warn';lbl.textContent='WARNING';}
-  else{dot.className='dot ok';lbl.textContent='NOMINAL';}
-
+  const allSpeeds=ROUTES.filter(r=>r.type!=='local').map(r=>r.speed);const avgSpeed=allSpeeds.reduce((a,b)=>a+b,0)/allSpeeds.length;const totalVol=ROUTES.filter(r=>r.type!=='local').reduce((a,r)=>a+r.volume,0)/ROUTES.length;const congestPct=allSpeeds.filter(s=>s<40).length/allSpeeds.length*100;
+  setGauge('avgspeed',avgSpeed.toFixed(0),(avgSpeed/70)*100,avgSpeed>50?'#1a8c1a':avgSpeed>35?'#cc8800':'#cc1100');setGauge('volume',Math.round(totalVol),(totalVol/3000)*100,'#003399');setGauge('incidents',incidents.length,Math.min(100,incidents.length*20),'#cc1100');setGauge('congestion',congestPct.toFixed(0),congestPct,'#886600');
+  const dot=document.getElementById('sys-dot'),lbl=document.getElementById('sys-label');if(incidents.length>3||congestPct>70){dot.className='dot crit';lbl.textContent='CRITICAL';}else if(incidents.length>0||congestPct>40){dot.className='dot warn';lbl.textContent='WARNING';}else{dot.className='dot ok';lbl.textContent='NOMINAL';}
   updateClock();updateFooter();
 }
-
-function setGauge(id,val,pct,color){
-  const el=document.getElementById('g-'+id);if(el){el.textContent=val;el.style.color=color;}
-  const fill=document.getElementById('gf-'+id);if(fill){fill.style.width=Math.max(0,Math.min(100,pct))+'%';fill.style.background=color;}
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   INCIDENT MANAGEMENT
-═══════════════════════════════════════════════════════════════════════════ */
-function addIncident(type,route,lat,lon,icon,msg,severity){
-  const inc={id:Date.now()+'_'+Math.random(),type,route,lat,lon,icon,msg,severity,time:simTime};
-  incidents.push(inc);
-  const r=ROUTES.find(r=>r.id===route);
-  if(r&&r.incidents)r.incidents.push(inc.id);
-  // Also mark overlapping segments
-  SEGMENTS.filter(s=>s.routeId===route).forEach(s=>{
-    const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;
-    if(Math.hypot((lat-mLat)*111320,(lon-mLon)*78470)<8000) s.incidents.push(inc.id);
-  });
-  logEvent(severity,`${icon} <span class="inc-route">${route}</span> — ${msg}`);
-  eventCount++;
-  redrawIncidentMarkers();
-}
-
-function clearIncidents(){
-  incidents=[];
-  ROUTES.forEach(r=>{r.incidents=[];});
-  SEGMENTS.forEach(s=>{s.incidents=[];});
-  redrawIncidentMarkers();
-  logEvent('clear','[OK] All incidents cleared — traffic normalizing');
-}
-
-function logEvent(sev,msg){
-  const ts=String(Math.floor(simTime/60)).padStart(2,'0')+':'+String(simTime%60).padStart(2,'0');
-  const log=document.getElementById('incident-log');
-  const div=document.createElement('div');
-  div.className=`inc-item inc-${sev}`;
-  div.innerHTML=`<span class="inc-time">${ts}</span><span class="inc-body">${msg}</span>`;
-  log.prepend(div);
-  if(log.children.length>40)log.removeChild(log.lastChild);
-}
-
-function injectEvent(type){
-  switch(type){
-    case 'accident':   addIncident('accident','I-93N',42.400,-71.058,'!','Multi-vehicle — 2 lanes blocked','crit');break;
-    case 'breakdown':  addIncident('breakdown','I-95N',42.340,-71.188,'⚠','Vehicle breakdown — right lane','warn');break;
-    case 'construction':addIncident('construction','I-90',42.279,-71.395,'🚧','Lane closure — construction to 6pm','warn');break;
-    case 'flood':      addIncident('flood','SE-EXP',42.200,-71.045,'🌊','Flooding — use alternates','crit');break;
-    case 'event':
-      addIncident('event','I-90',42.348,-71.059,'🏟','TD Garden — heavy downtown traffic','warn');
-      addIncident('event','I-93N',42.380,-71.058,'⚾','Fenway — Red Sox game congestion','warn');break;
-    case 'clearall':   clearIncidents();break;
-  }
-}
-
-function triggerAccident(){
-  addIncident('accident','I-93N',42.400,-71.058,'!','Major accident — all lanes stopped','crit');
-  addIncident('accident','RT128S',42.330,-71.198,'!','Secondary — rubbernecking delay','warn');
-  logEvent('crit','🚨 Emergency response dispatched');
-}
-function triggerWeather(){
-  const sl=document.getElementById('sl-weather'),sv=document.getElementById('sv-weather');
-  // Toggle: if already active, turn off; if off, turn on
-  if(weatherActive){
-    weatherActive=false;
-    document.getElementById('btn-weather').classList.remove('on');
-    sliders.weather=0;
-    if(sl)sl.value=0;if(sv)sv.textContent='0%';
-    logEvent('clear','🌤 Storm cleared — conditions returning to normal');
-  } else {
-    weatherActive=true;
-    sliders.weather=75;
-    document.getElementById('btn-weather').classList.add('on');
-    if(sl)sl.value=75;if(sv)sv.textContent='75%';
-    logEvent('warn','❄ Winter storm warning — reduced visibility statewide');
-    logEvent('warn','Speed limits reduced — use caution on all routes');
-  }
-}
-function toggleRush(){
-  rushHour=!rushHour;
-  document.getElementById('btn-rush').classList.toggle('on',rushHour);
-  if(rushHour){
-    sliders.traffic=90;document.getElementById('sl-traffic').value=90;document.getElementById('sv-traffic').textContent='90%';
-    logEvent('warn','⚡ Rush hour — peak period active');
-  } else {
-    sliders.traffic=50;document.getElementById('sl-traffic').value=50;document.getElementById('sv-traffic').textContent='50%';
-    logEvent('clear','Rush hour ended — normalizing');
-  }
-}
-function toggleSensors(){
-  showSensors=!showSensors;
-  document.getElementById('btn-sensors').classList.toggle('on',showSensors);
-  updateSensorMarkers();
-}
-function toggleLabels(){
-  showLabels=!showLabels;
-  document.getElementById('btn-labels').classList.toggle('on',showLabels);
-  updateExitMarkers();
-}
-function toggleIncidents(){
-  showIncidents=!showIncidents;
-  document.getElementById('btn-incidents').classList.toggle('on',showIncidents);
-  // Toggle DOM incident markers
-  Object.values(incidentMarkerMap).forEach(m=>{
-    m.getElement().style.display=showIncidents?'':'none';
-  });
-  // Toggle map layers (workzones + incident circles)
-  ['workzone-lines','workzone-points','incident-circles','incident-icons'].forEach(id=>{
-    if(map.getLayer(id)){
-      map.setLayoutProperty(id,'visibility',showIncidents?'visible':'none');
-    }
-  });
-}
-function toggleSim(){
-  simRunning=!simRunning;
-  const btn=document.getElementById('btn-run');
-  if(simRunning){startSim();btn.textContent='|| LIVE';btn.classList.add('on');}
-  else{clearInterval(simInterval);btn.textContent='▶ RUN';btn.classList.remove('on');}
-}
-function resetSim(){
-  clearInterval(simInterval);simTime=0;incidents=[];eventCount=0;
-  ROUTES.forEach(r=>{r.incidents=[];r.speed=r.type==='local'?30:65;r.history.fill(65);});
-  SEGMENTS.forEach(s=>{s.incidents=[];s.speed=65;s.history.fill(65);});
-  document.getElementById('incident-log').innerHTML='';
-  redrawIncidentMarkers();
-  logEvent('clear','System reset — all routes nominal');
-  if(simRunning)startSim();
-}
+function setGauge(id,val,pct,color){const el=document.getElementById('g-'+id);if(el){el.textContent=val;el.style.color=color;}const fill=document.getElementById('gf-'+id);if(fill){fill.style.width=Math.max(0,Math.min(100,pct))+'%';fill.style.background=color;}}
+function addIncident(type,route,lat,lon,icon,msg,severity){const inc={id:Date.now()+'_'+Math.random(),type,route,lat,lon,icon,msg,severity,time:simTime};incidents.push(inc);const r=ROUTES.find(r=>r.id===route);if(r&&r.incidents)r.incidents.push(inc.id);SEGMENTS.filter(s=>s.routeId===route).forEach(s=>{const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;if(Math.hypot((lat-mLat)*111320,(lon-mLon)*78470)<8000)s.incidents.push(inc.id);});logEvent(severity,`${icon} <span class="inc-route">${route}</span> — ${msg}`);eventCount++;redrawIncidentMarkers();}
+function clearIncidents(){incidents=[];ROUTES.forEach(r=>{r.incidents=[];});SEGMENTS.forEach(s=>{s.incidents=[];});redrawIncidentMarkers();logEvent('clear','[OK] All incidents cleared — traffic normalizing');}
+function logEvent(sev,msg){const ts=String(Math.floor(simTime/60)).padStart(2,'0')+':'+String(simTime%60).padStart(2,'0');const log=document.getElementById('incident-log');const div=document.createElement('div');div.className=`inc-item inc-${sev}`;div.innerHTML=`<span class="inc-time">${ts}</span><span class="inc-body">${msg}</span>`;log.prepend(div);if(log.children.length>40)log.removeChild(log.lastChild);}
+function injectEvent(type){switch(type){case 'accident':addIncident('accident','I-93N',42.400,-71.058,'!','Multi-vehicle — 2 lanes blocked','crit');break;case 'breakdown':addIncident('breakdown','I-95N',42.340,-71.188,'⚠','Vehicle breakdown — right lane','warn');break;case 'construction':addIncident('construction','I-90',42.279,-71.395,'🚧','Lane closure — construction to 6pm','warn');break;case 'flood':addIncident('flood','SE-EXP',42.200,-71.045,'🌊','Flooding — use alternates','crit');break;case 'event':addIncident('event','I-90',42.348,-71.059,'🏟','TD Garden — heavy downtown traffic','warn');addIncident('event','I-93N',42.380,-71.058,'⚾','Fenway — Red Sox game congestion','warn');break;case 'clearall':clearIncidents();break;}}
+function triggerAccident(){addIncident('accident','I-93N',42.400,-71.058,'!','Major accident — all lanes stopped','crit');addIncident('accident','RT128S',42.330,-71.198,'!','Secondary — rubbernecking delay','warn');logEvent('crit','🚨 Emergency response dispatched');}
+function triggerWeather(){const sl=document.getElementById('sl-weather'),sv=document.getElementById('sv-weather');if(weatherActive){weatherActive=false;document.getElementById('btn-weather').classList.remove('on');sliders.weather=0;if(sl)sl.value=0;if(sv)sv.textContent='0%';logEvent('clear','🌤 Storm cleared — conditions returning to normal');}else{weatherActive=true;sliders.weather=75;document.getElementById('btn-weather').classList.add('on');if(sl)sl.value=75;if(sv)sv.textContent='75%';logEvent('warn','❄ Winter storm warning — reduced visibility statewide');logEvent('warn','Speed limits reduced — use caution on all routes');}}
+function toggleRush(){rushHour=!rushHour;document.getElementById('btn-rush').classList.toggle('on',rushHour);if(rushHour){sliders.traffic=90;document.getElementById('sl-traffic').value=90;document.getElementById('sv-traffic').textContent='90%';logEvent('warn','⚡ Rush hour — peak period active');}else{sliders.traffic=50;document.getElementById('sl-traffic').value=50;document.getElementById('sv-traffic').textContent='50%';logEvent('clear','Rush hour ended — normalizing');}}
+function toggleSensors(){showSensors=!showSensors;document.getElementById('btn-sensors').classList.toggle('on',showSensors);updateSensorMarkers();}
+function toggleLabels(){showLabels=!showLabels;document.getElementById('btn-labels').classList.toggle('on',showLabels);updateExitMarkers();}
+function toggleIncidents(){showIncidents=!showIncidents;document.getElementById('btn-incidents').classList.toggle('on',showIncidents);Object.values(incidentMarkerMap).forEach(m=>{m.getElement().style.display=showIncidents?'':'none';});['workzone-lines','workzone-points','incident-circles','incident-icons'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',showIncidents?'visible':'none');});}
+function toggleSim(){simRunning=!simRunning;const btn=document.getElementById('btn-run');if(simRunning){startSim();btn.textContent='|| LIVE';btn.classList.add('on');}else{clearInterval(simInterval);btn.textContent='▶ RUN';btn.classList.remove('on');}}
+function resetSim(){clearInterval(simInterval);simTime=0;incidents=[];eventCount=0;ROUTES.forEach(r=>{r.incidents=[];r.speed=r.type==='local'?30:65;r.history.fill(65);});SEGMENTS.forEach(s=>{s.incidents=[];s.speed=65;s.history.fill(65);});document.getElementById('incident-log').innerHTML='';redrawIncidentMarkers();logEvent('clear','System reset — all routes nominal');if(simRunning)startSim();}
 function updateSl(k,v){sliders[k]=parseInt(v);document.getElementById('sv-'+k).textContent=v+'%';}
-function updateClock(){
-  const now=new Date();
-  document.getElementById('sim-clock').textContent=
-    now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' — SIM+'+simTime+'s';
-}
-function updateFooter(){
-  document.getElementById('ft-routes').textContent=ROUTES.length;
-  document.getElementById('ft-segs').textContent=osmWaysLoaded?osmFeatures.length:SEGMENTS.length;
-  document.getElementById('ft-time').textContent=simTime+'s';
-}
+function updateClock(){const now=new Date();document.getElementById('sim-clock').textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' — SIM+'+simTime+'s';}
+function updateFooter(){document.getElementById('ft-routes').textContent=ROUTES.length;document.getElementById('ft-segs').textContent=osmWaysLoaded?osmFeatures.length:SEGMENTS.length;document.getElementById('ft-time').textContent=simTime+'s';}
 function startSim(){clearInterval(simInterval);simInterval=setInterval(tick,500);}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ROUTING ENGINE  —  Dijkstra  (unchanged)
-═══════════════════════════════════════════════════════════════════════════ */
-function buildGraph(deptHr){
-  const graph={};
-  const byRoute={};
-  EXITS_DB.forEach(e=>{if(!byRoute[e.route])byRoute[e.route]=[];byRoute[e.route].push(e);});
-  Object.keys(byRoute).forEach(rid=>{
-    const route=ROUTES.find(r=>r.id===rid);
-    const sorted=byRoute[rid].sort((a,b)=>a.mi-b.mi);
-    for(let i=0;i<sorted.length-1;i++){
-      const A=sorted[i],B=sorted[i+1];
-      const distMi=Math.abs(B.mi-A.mi)||0.5;
-      const spd=Math.max(5,route?todSpeed(route,deptHr)*sliders.traffic/100*(1-sliders.weather/200)*(1-sliders.const/300):40);
-      const incPen=incidents.filter(ic=>ic.route===rid).length*0.4;
-      const timeFwd=distMi/spd*60*(1+incPen);
-      if(!graph[A.id])graph[A.id]=[];
-      if(!graph[B.id])graph[B.id]=[];
-      graph[A.id].push({to:B.id,dist:distMi,time:timeFwd,route:rid,routeLabel:route?.label||rid});
-      graph[B.id].push({to:A.id,dist:distMi,time:timeFwd,route:rid,routeLabel:route?.label||rid});
-    }
-  });
-  // Interchange detection (exits within 1 mile on different routes)
-  EXITS_DB.forEach(A=>{
-    EXITS_DB.forEach(B=>{
-      if(A.id===B.id||A.route===B.route)return;
-      const d=Math.hypot((A.lat-B.lat)*68.7,(A.lon-B.lon)*52.5);
-      if(d<1.0){
-        if(!graph[A.id])graph[A.id]=[];
-        graph[A.id].push({to:B.id,dist:0.3,time:2,route:'XCHANGE',routeLabel:'Interchange'});
-      }
-    });
-  });
-  return graph;
+/* ── MODE TOGGLE ── */
+let twinMode=false;
+function toggleTwinMode(){
+  twinMode=!twinMode;
+  document.querySelector('.app').classList.toggle('twin-mode',twinMode);
+  const btn=document.getElementById('btn-mode');
+  btn.textContent=twinMode?'🔬 TWIN MODE':'🗺 STATUS';
+  btn.classList.toggle('twin-active',twinMode);
+  logEvent(twinMode?'info':'clear',twinMode?'🔬 Digital Twin mode — simulation controls active':'🗺 Status view — live monitoring');
 }
 
-function dijkstra(graph,startId,endId){
-  const dist={},prev={},visited=new Set();
-  EXITS_DB.forEach(e=>dist[e.id]=Infinity);
-  dist[startId]=0;
-  const pq=[[0,startId]];
-  while(pq.length){
-    pq.sort((a,b)=>a[0]-b[0]);
-    const [d,u]=pq.shift();
-    if(visited.has(u))continue;
-    visited.add(u);
-    if(u===endId)break;
-    (graph[u]||[]).forEach(({to,time,dist:eDist,route,routeLabel})=>{
-      const nd=d+time;
-      if(nd<dist[to]){dist[to]=nd;prev[to]={from:u,route,routeLabel,dist:eDist,time};pq.push([nd,to]);}
-    });
-  }
-  const path=[];let cur=endId;
-  while(cur&&prev[cur]){path.unshift({node:cur,...prev[cur]});cur=prev[cur].from;}
-  if(cur===startId)path.unshift({node:startId,from:null,route:null,dist:0,time:0});
-  return{totalTime:dist[endId],path};
+/* ── RADAR TOGGLE ── */
+let radarOn=false;
+function toggleRadarLayer(){
+  radarOn=!radarOn;
+  if(map.getLayer('nws-radar-layer'))map.setLayoutProperty('nws-radar-layer','visibility',radarOn?'visible':'none');
+  document.getElementById('btn-radar').classList.toggle('on',radarOn);
+  logEvent(radarOn?'info':'clear',radarOn?'🌧 NEXRAD radar overlay ON':'🌤 Radar overlay OFF');
 }
 
-function findAlternates(fromId,toId,mainPath,deptHr){
-  const alts=[],tried=new Set();
-  for(const seg of mainPath){
-    if(!seg.route||seg.route==='XCHANGE'||tried.has(seg.route))continue;
-    tried.add(seg.route);
-    const g2=buildGraph(deptHr);
-    Object.keys(g2).forEach(n=>{g2[n]=g2[n].filter(e=>e.route!==seg.route);});
-    const res=dijkstra(g2,fromId,toId);
-    if(res.totalTime<Infinity&&res.path.length>1){
-      res.avoids=ROUTES.find(r=>r.id===seg.route)?.label||seg.route;
-      alts.push(res);
-      if(alts.length>=2)break;
-    }
-  }
-  return alts;
-}
+/* ── ROUTING ENGINE ── */
+function buildGraph(deptHr){const graph={};const byRoute={};EXITS_DB.forEach(e=>{if(!byRoute[e.route])byRoute[e.route]=[];byRoute[e.route].push(e);});Object.keys(byRoute).forEach(rid=>{const route=ROUTES.find(r=>r.id===rid);const sorted=byRoute[rid].sort((a,b)=>a.mi-b.mi);for(let i=0;i<sorted.length-1;i++){const A=sorted[i],B=sorted[i+1],distMi=Math.abs(B.mi-A.mi)||0.5;const spd=Math.max(5,route?todSpeed(route,deptHr)*sliders.traffic/100*(1-sliders.weather/200)*(1-sliders.const/300):40);const incPen=incidents.filter(ic=>ic.route===rid).length*0.4;const timeFwd=distMi/spd*60*(1+incPen);if(!graph[A.id])graph[A.id]=[];if(!graph[B.id])graph[B.id]=[];graph[A.id].push({to:B.id,dist:distMi,time:timeFwd,route:rid,routeLabel:route?.label||rid});graph[B.id].push({to:A.id,dist:distMi,time:timeFwd,route:rid,routeLabel:route?.label||rid});}});EXITS_DB.forEach(A=>{EXITS_DB.forEach(B=>{if(A.id===B.id||A.route===B.route)return;const d=Math.hypot((A.lat-B.lat)*68.7,(A.lon-B.lon)*52.5);if(d<1.0){if(!graph[A.id])graph[A.id]=[];graph[A.id].push({to:B.id,dist:0.3,time:2,route:'XCHANGE',routeLabel:'Interchange'});}});});return graph;}
+function dijkstra(graph,startId,endId){const dist={},prev={},visited=new Set();EXITS_DB.forEach(e=>dist[e.id]=Infinity);dist[startId]=0;const pq=[[0,startId]];while(pq.length){pq.sort((a,b)=>a[0]-b[0]);const[d,u]=pq.shift();if(visited.has(u))continue;visited.add(u);if(u===endId)break;(graph[u]||[]).forEach(({to,time,dist:eDist,route,routeLabel})=>{const nd=d+time;if(nd<dist[to]){dist[to]=nd;prev[to]={from:u,route,routeLabel,dist:eDist,time};pq.push([nd,to]);}});}const path=[];let cur=endId;while(cur&&prev[cur]){path.unshift({node:cur,...prev[cur]});cur=prev[cur].from;}if(cur===startId)path.unshift({node:startId,from:null,route:null,dist:0,time:0});return{totalTime:dist[endId],path};}
+function findAlternates(fromId,toId,mainPath,deptHr){const alts=[],tried=new Set();for(const seg of mainPath){if(!seg.route||seg.route==='XCHANGE'||tried.has(seg.route))continue;tried.add(seg.route);const g2=buildGraph(deptHr);Object.keys(g2).forEach(n=>{g2[n]=g2[n].filter(e=>e.route!==seg.route);});const res=dijkstra(g2,fromId,toId);if(res.totalTime<Infinity&&res.path.length>1){res.avoids=ROUTES.find(r=>r.id===seg.route)?.label||seg.route;alts.push(res);if(alts.length>=2)break;}}return alts;}
+let departHour=8,_alts=[];
+function populateSelects(){const opts=EXITS_DB.map(e=>`<option value="${e.id}">${e.route} Exit ${e.exit} - ${e.name}</option>`).join('');const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to');if(sf){sf.innerHTML=opts;sf.value='I93N-7';}if(st){st.innerHTML=opts;st.value='I93N-20';}}
+function getHour(){const t=document.getElementById('depart-time')?.value;if(!t)return new Date().getHours();const[h,m]=t.split(':').map(Number);return h+m/60;}
+function calcRoute(){const fromId=document.getElementById('sel-from')?.value,toId=document.getElementById('sel-to')?.value;if(!fromId||!toId||fromId===toId){logEvent('warn','Select different origin and destination.');return;}departHour=getHour();const graph=buildGraph(departHour);const result=dijkstra(graph,fromId,toId);if(result.totalTime===Infinity){logEvent('warn','No route found. Try different endpoints.');return;}activeRoute=result;activeAlt=null;showRouteResult(result,fromId,toId);logEvent('info',`Route: ${formatTT(result.totalTime)} - ${result.path.length} segments`);}
+function calcAltRoutes(){if(!activeRoute){calcRoute();return;}const fromId=document.getElementById('sel-from')?.value,toId=document.getElementById('sel-to')?.value;departHour=getHour();_alts=findAlternates(fromId,toId,activeRoute.path,departHour);showRouteResult(activeRoute,fromId,toId,_alts);logEvent('info',`Found ${_alts.length} alternate routes`);}
+function recalcRoute(){if(!activeRoute)return;const fromId=document.getElementById('sel-from')?.value,toId=document.getElementById('sel-to')?.value;if(!fromId||!toId)return;departHour=getHour();const result=dijkstra(buildGraph(departHour),fromId,toId);if(result.totalTime<Infinity){activeRoute=result;showRouteResult(result,fromId,toId,_alts);}}
+function showRouteResult(result,fromId,toId,alts){const fromEx=EXITS_DB.find(e=>e.id===fromId),toEx=EXITS_DB.find(e=>e.id===toId);const totalDist=result.path.reduce((s,p)=>s+(p.dist||0),0);const avgSpd=totalDist>0?(totalDist/(result.totalTime/60)):0;const dh=Math.floor(departHour),dm=Math.round((departHour%1)*60);const dep=new Date();dep.setHours(dh,dm,0);const arr=new Date(dep.getTime()+result.totalTime*60000);const arrStr=arr.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});const el=id=>document.getElementById(id);if(el('rr-head'))el('rr-head').textContent=(fromEx?.name||fromId)+' → '+(toEx?.name||toId);if(el('rr-dist'))el('rr-dist').textContent=totalDist.toFixed(1)+' mi';if(el('rr-time'))el('rr-time').textContent=formatTT(result.totalTime);if(el('rr-spd'))el('rr-spd').textContent=avgSpd.toFixed(0)+' mph';if(el('rr-arrive'))el('rr-arrive').textContent=arrStr;const segs=[...new Set(result.path.map(p=>p.routeLabel).filter(Boolean))];if(el('rr-path'))el('rr-path').innerHTML='<strong>Via:</strong> '+segs.join(' → ');if(el('alt-routes')&&alts&&alts.length){el('alt-routes').innerHTML='<div style="font-size:7px;color:#6a5840;margin-bottom:3px;font-weight:bold;">ALTERNATE ROUTES:</div>'+alts.map((alt,i)=>{const aDist=alt.path.reduce((s,p)=>s+(p.dist||0),0);const diff=alt.totalTime-result.totalTime;const diffStr=diff>0?'+'+formatTT(diff)+' slower':formatTT(-diff)+' faster';const aSegs=[...new Set(alt.path.map(p=>p.routeLabel).filter(Boolean))].slice(0,3).join(' → ');return `<div class="alt-route-item" onclick="selectAlt(${i})"><div class="alt-head"><span>Alt Route ${i+2}</span><span style="color:${diff>0?'#cc8800':'#1a8c1a'}">${diffStr}</span></div><div style="font-size:7px;color:#3a2818">${aSegs}</div><div style="font-size:6px;color:#6a5840;margin-top:2px">Avoids: ${alt.avoids||'-'} - ${aDist.toFixed(1)}mi</div></div>`;}).join('');}else if(el('alt-routes')){el('alt-routes').innerHTML='';}updateRoutePathSource();drawTODChart(fromId,toId);const rr=document.getElementById('route-result');if(rr)rr.classList.add('visible');}
+function selectAlt(idx){document.querySelectorAll('.alt-route-item').forEach((el,i)=>el.classList.toggle('selected-alt',i===idx));activeAlt=_alts[idx];updateRoutePathSource();}
+function clearRoute(){activeRoute=null;activeAlt=null;_alts=[];updateRoutePathSource();const rr=document.getElementById('route-result');if(rr)rr.classList.remove('visible');}
+function drawTODChart(fromId,toId){const c=document.getElementById('tod-canvas');if(!c)return;const par=c.parentElement;c.width=par?par.clientWidth-12:240;c.height=55;const ctx=c.getContext('2d'),W2=c.width,H2=c.height;ctx.fillStyle='#f8f4e8';ctx.fillRect(0,0,W2,H2);const times=[];for(let h=0;h<24;h++){const g=buildGraph(h);const r=dijkstra(g,fromId,toId);times.push(r.totalTime<Infinity?r.totalTime:null);}const valid=times.filter(t=>t!==null);if(!valid.length)return;const minT=Math.min(...valid)*0.92,maxT=Math.max(...valid)*1.05;RUSH_HOURS.forEach(h=>{ctx.fillStyle='rgba(204,17,0,0.07)';ctx.fillRect(h/24*W2,0,W2/24,H2);});ctx.strokeStyle='rgba(160,140,100,0.2)';ctx.lineWidth=0.5;[6,12,18].forEach(h=>{ctx.beginPath();ctx.moveTo(h/24*W2,0);ctx.lineTo(h/24*W2,H2);ctx.stroke();});ctx.beginPath();times.forEach((t,h)=>{if(t===null)return;const x=(h+0.5)/24*W2,y=H2-(t-minT)/(maxT-minT)*(H2-14)-4;h===0||times[h-1]===null?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.strokeStyle='#003399';ctx.lineWidth=1.8;ctx.stroke();const ch=getHour(),ct=times[Math.floor(ch)];if(ct!==null){const x=(ch+0.5)/24*W2,y=H2-(ct-minT)/(maxT-minT)*(H2-14)-4;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#cc1100';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();ctx.font='bold 7px Arial';ctx.fillStyle='#cc1100';ctx.textAlign='center';ctx.fillText(formatTT(ct),x,y-6);ctx.textAlign='left';}ctx.font='6px Arial';ctx.fillStyle='rgba(100,80,50,0.75)';ctx.textAlign='center';[0,6,12,18].forEach(h=>ctx.fillText(h+':00',(h)/24*W2+W2/48,H2-1));ctx.textAlign='left';ctx.fillStyle='#1a8c1a';ctx.font='6px Arial';ctx.fillText(formatTT(minT)+' best',2,H2-10);ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);}
 
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ROUTE PLANNER UI  (unchanged logic, MapLibre path rendering)
-═══════════════════════════════════════════════════════════════════════════ */
-let departHour=8;
-let _alts=[];
-
-function populateSelects(){
-  const opts=EXITS_DB.map(e=>`<option value="${e.id}">${e.route} Exit ${e.exit} - ${e.name}</option>`).join('');
-  const sf=document.getElementById('sel-from'),st=document.getElementById('sel-to');
-  if(sf){sf.innerHTML=opts;sf.value='I93N-7';}
-  if(st){st.innerHTML=opts;st.value='I93N-20';}
-}
-
-function getHour(){
-  const t=document.getElementById('depart-time')?.value;
-  if(!t)return new Date().getHours();
-  const[h,m]=t.split(':').map(Number);return h+m/60;
-}
-
-function calcRoute(){
-  const fromId=document.getElementById('sel-from')?.value;
-  const toId=document.getElementById('sel-to')?.value;
-  if(!fromId||!toId||fromId===toId){logEvent('warn','Select different origin and destination.');return;}
-  departHour=getHour();
-  const graph=buildGraph(departHour);
-  const result=dijkstra(graph,fromId,toId);
-  if(result.totalTime===Infinity){logEvent('warn','No route found. Try different endpoints.');return;}
-  activeRoute=result;activeAlt=null;
-  showRouteResult(result,fromId,toId);
-  logEvent('info',`Route: ${formatTT(result.totalTime)} - ${result.path.length} segments`);
-}
-
-function calcAltRoutes(){
-  if(!activeRoute){calcRoute();return;}
-  const fromId=document.getElementById('sel-from')?.value;
-  const toId=document.getElementById('sel-to')?.value;
-  departHour=getHour();
-  _alts=findAlternates(fromId,toId,activeRoute.path,departHour);
-  showRouteResult(activeRoute,fromId,toId,_alts);
-  logEvent('info',`Found ${_alts.length} alternate routes`);
-}
-
-function recalcRoute(){
-  if(!activeRoute)return;
-  const fromId=document.getElementById('sel-from')?.value;
-  const toId=document.getElementById('sel-to')?.value;
-  if(!fromId||!toId)return;
-  departHour=getHour();
-  const result=dijkstra(buildGraph(departHour),fromId,toId);
-  if(result.totalTime<Infinity){activeRoute=result;showRouteResult(result,fromId,toId,_alts);}
-}
-
-function showRouteResult(result,fromId,toId,alts){
-  const fromEx=EXITS_DB.find(e=>e.id===fromId),toEx=EXITS_DB.find(e=>e.id===toId);
-  const totalDist=result.path.reduce((s,p)=>s+(p.dist||0),0);
-  const avgSpd=totalDist>0?(totalDist/(result.totalTime/60)):0;
-  const dh=Math.floor(departHour),dm=Math.round((departHour%1)*60);
-  const dep=new Date();dep.setHours(dh,dm,0);
-  const arr=new Date(dep.getTime()+result.totalTime*60000);
-  const arrStr=arr.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-
-  const el=id=>document.getElementById(id);
-  if(el('rr-head'))el('rr-head').textContent=(fromEx?.name||fromId)+' → '+(toEx?.name||toId);
-  if(el('rr-dist'))el('rr-dist').textContent=totalDist.toFixed(1)+' mi';
-  if(el('rr-time'))el('rr-time').textContent=formatTT(result.totalTime);
-  if(el('rr-spd'))el('rr-spd').textContent=avgSpd.toFixed(0)+' mph';
-  if(el('rr-arrive'))el('rr-arrive').textContent=arrStr;
-
-  const segs=[...new Set(result.path.map(p=>p.routeLabel).filter(Boolean))];
-  if(el('rr-path'))el('rr-path').innerHTML='<strong>Via:</strong> '+segs.join(' → ');
-
-  if(el('alt-routes')&&alts&&alts.length){
-    el('alt-routes').innerHTML='<div style="font-size:7px;color:#6a5840;margin-bottom:3px;font-weight:bold;">ALTERNATE ROUTES:</div>'+
-      alts.map((alt,i)=>{
-        const aDist=alt.path.reduce((s,p)=>s+(p.dist||0),0);
-        const diff=alt.totalTime-result.totalTime;
-        const diffStr=diff>0?'+'+formatTT(diff)+' slower':formatTT(-diff)+' faster';
-        const aSegs=[...new Set(alt.path.map(p=>p.routeLabel).filter(Boolean))].slice(0,3).join(' → ');
-        return `<div class="alt-route-item" onclick="selectAlt(${i})">
-          <div class="alt-head"><span>Alt Route ${i+2}</span><span style="color:${diff>0?'#cc8800':'#1a8c1a'}">${diffStr}</span></div>
-          <div style="font-size:7px;color:#3a2818">${aSegs}</div>
-          <div style="font-size:6px;color:#6a5840;margin-top:2px">Avoids: ${alt.avoids||'-'} - ${aDist.toFixed(1)}mi</div>
-        </div>`;
-      }).join('');
-  } else if(el('alt-routes')){el('alt-routes').innerHTML='';}
-
-  // Draw route on Leaflet map
-  clearLeafletRoutePath();
-  routePathMain = drawLeafletRoutePath(result, '#ff8800', false);
-  drawRouteEndpoints(result);
-
-  drawTODChart(fromId,toId);
-  const rr=document.getElementById('route-result');if(rr)rr.classList.add('visible');
-}
-
-function selectAlt(idx){
-  document.querySelectorAll('.alt-route-item').forEach((el,i)=>el.classList.toggle('selected-alt',i===idx));
-  activeAlt=_alts[idx];
-  // Redraw alt path
-  if(routePathAlt){ routePathGroup.removeLayer(routePathAlt); routePathAlt=null; }
-  if(activeAlt) routePathAlt = drawLeafletRoutePath(activeAlt,'#003399',true);
-}
-
-function clearRoute(){
-  activeRoute=null;activeAlt=null;_alts=[];
-  clearLeafletRoutePath();
-  const rr=document.getElementById('route-result');
-  if(rr)rr.classList.remove('visible');
-}
-
-/* ── TOD Chart ── */
-function drawTODChart(fromId,toId){
-  const c=document.getElementById('tod-canvas');if(!c)return;
-  const par=c.parentElement;c.width=par?par.clientWidth-12:240;c.height=55;
-  const ctx=c.getContext('2d'),W2=c.width,H2=c.height;
-  ctx.fillStyle='#f8f4e8';ctx.fillRect(0,0,W2,H2);
-  const times=[];
-  for(let h=0;h<24;h++){
-    const g=buildGraph(h);const r=dijkstra(g,fromId,toId);
-    times.push(r.totalTime<Infinity?r.totalTime:null);
-  }
-  const valid=times.filter(t=>t!==null);if(!valid.length)return;
-  const minT=Math.min(...valid)*0.92,maxT=Math.max(...valid)*1.05;
-  RUSH_HOURS.forEach(h=>{ctx.fillStyle='rgba(204,17,0,0.07)';ctx.fillRect(h/24*W2,0,W2/24,H2);});
-  ctx.strokeStyle='rgba(160,140,100,0.2)';ctx.lineWidth=0.5;
-  [6,12,18].forEach(h=>{ctx.beginPath();ctx.moveTo(h/24*W2,0);ctx.lineTo(h/24*W2,H2);ctx.stroke();});
-  ctx.beginPath();
-  times.forEach((t,h)=>{
-    if(t===null)return;
-    const x=(h+0.5)/24*W2,y=H2-(t-minT)/(maxT-minT)*(H2-14)-4;
-    h===0||times[h-1]===null?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.strokeStyle='#003399';ctx.lineWidth=1.8;ctx.stroke();
-  const ch=getHour(),ct=times[Math.floor(ch)];
-  if(ct!==null){
-    const x=(ch+0.5)/24*W2,y=H2-(ct-minT)/(maxT-minT)*(H2-14)-4;
-    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fillStyle='#cc1100';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
-    ctx.font='bold 7px Arial';ctx.fillStyle='#cc1100';ctx.textAlign='center';
-    ctx.fillText(formatTT(ct),x,y-6);ctx.textAlign='left';
-  }
-  ctx.font='6px Arial';ctx.fillStyle='rgba(100,80,50,0.75)';ctx.textAlign='center';
-  [0,6,12,18].forEach(h=>ctx.fillText(h+':00',(h)/24*W2+W2/48,H2-1));
-  ctx.textAlign='left';
-  ctx.fillStyle='#1a8c1a';ctx.font='6px Arial';ctx.fillText(formatTT(minT)+' best',2,H2-10);
-  ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);
-}
-
-
-// Override showRouteResult to also update map
-const _origShowRoute=showRouteResult;
-function showRouteResult(result,fromId,toId,alts){
-  _origShowRoute(result,fromId,toId,alts);
-  updateRoutePathSource();
-}
-
-function clearRoute(){
-  activeRoute=null;activeAlt=null;_alts=[];
-  updateRoutePathSource();
-  const rr=document.getElementById('route-result');
-  if(rr)rr.classList.remove('visible');
-}
-
-function selectAlt(idx){
-  document.querySelectorAll('.alt-route-item').forEach((el,i)=>el.classList.toggle('selected-alt',i===idx));
-  activeAlt=_alts[idx];
-  updateRoutePathSource();
-}
-
-function drawTODChart(fromId,toId){
-  const c=document.getElementById('tod-canvas');if(!c)return;
-  const par=c.parentElement;c.width=par?par.clientWidth-12:240;c.height=55;
-  const ctx=c.getContext('2d'),W2=c.width,H2=c.height;
-  ctx.fillStyle='#f8f4e8';ctx.fillRect(0,0,W2,H2);
-  const times=[];
-  for(let h=0;h<24;h++){
-    const g=buildGraph(h);const r=dijkstra(g,fromId,toId);
-    times.push(r.totalTime<Infinity?r.totalTime:null);
-  }
-  const valid=times.filter(t=>t!==null);if(!valid.length)return;
-  const minT=Math.min(...valid)*0.92,maxT=Math.max(...valid)*1.05;
-  RUSH_HOURS.forEach(h=>{ctx.fillStyle='rgba(204,17,0,0.07)';ctx.fillRect(h/24*W2,0,W2/24,H2);});
-  ctx.strokeStyle='rgba(160,140,100,0.2)';ctx.lineWidth=0.5;
-  [6,12,18].forEach(h=>{ctx.beginPath();ctx.moveTo(h/24*W2,0);ctx.lineTo(h/24*W2,H2);ctx.stroke();});
-  ctx.beginPath();
-  times.forEach((t,h)=>{
-    if(t===null)return;
-    const x=(h+0.5)/24*W2,y=H2-(t-minT)/(maxT-minT)*(H2-14)-4;
-    h===0||times[h-1]===null?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.strokeStyle='#003399';ctx.lineWidth=1.8;ctx.stroke();
-  const ch=getHour(),ct=times[Math.floor(ch)];
-  if(ct!==null){
-    const x=(ch+0.5)/24*W2,y=H2-(ct-minT)/(maxT-minT)*(H2-14)-4;
-    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fillStyle='#cc1100';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
-    ctx.font='bold 7px Arial';ctx.fillStyle='#cc1100';ctx.textAlign='center';
-    ctx.fillText(formatTT(ct),x,y-6);ctx.textAlign='left';
-  }
-  ctx.font='6px Arial';ctx.fillStyle='rgba(100,80,50,0.75)';ctx.textAlign='center';
-  [0,6,12,18].forEach(h=>ctx.fillText(h+':00',(h)/24*W2+W2/48,H2-1));
-  ctx.textAlign='left';
-  ctx.fillStyle='#1a8c1a';ctx.font='6px Arial';ctx.fillText(formatTT(minT)+' best',2,H2-10);
-  ctx.fillStyle='#cc1100';ctx.fillText(formatTT(maxT)+' worst',2,9);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   LIVE DATA  —  Cloudflare Worker hookup  (unchanged)
-═══════════════════════════════════════════════════════════════════════════ */
-const WORKER_URL='https://ma-traffic-twin.jsj-ai.workers.dev';
-const POLL_MS=30000;
-let liveActive=false,fetchErrs=0;
-
-async function fetchLiveState(){
-  try{
-    const res=await fetch(`${WORKER_URL}/api/state`,{signal:AbortSignal.timeout(8000)});
-    if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    const state=await res.json();
-    fetchErrs=0;liveActive=true;
-    applyLiveState(state);
-    return state;
-  }catch(err){
-    fetchErrs++;
-    if(fetchErrs>=3){liveActive=false;setLiveBadge(false);}
-    return null;
-  }
-}
-
-function applyLiveState(state){
-  if(!state)return;
-
-  // Route speed adjustments (GoTime overrides weather-derived)
-  if(state.routeAdjustments){
-    ROUTES.forEach(r=>{
-      const mult=state.routeAdjustments[r.id];
-      if(mult!==undefined){
-        const sim=r.baseSpd*todMult(r.type,new Date().getHours());
-        // Blend: 40% time-of-day sim + 60% live multiplier
-        r.speed=r.speed*0.7+(sim*0.4+r.baseSpd*mult*0.6)*0.3;
-      }
-    });
-  }
-
-  // Weather slider sync
-  const wx=state.weatherSummary;
-  if(wx){
-    const pct={storm:80,snow:75,fog:45,rain:30,wind:15,clear:0}[wx.condition]||0;
-    sliders.weather=pct;
-    const sl=document.getElementById('sl-weather');
-    const sv=document.getElementById('sv-weather');
-    if(sl)sl.value=pct;if(sv)sv.textContent=pct+'%';
-  }
-
-  // Live incidents — merge ERS events + WZDx point incidents
-  if(state.activeIncidents){
-    incidents=incidents.filter(i=>!i.id?.toString().startsWith('live-'));
-    state.activeIncidents
-      .filter(i=>i.lat&&i.lon&&i.source!=='wzdx') // WZDx go to map layer
-      .forEach(i=>{
-        if(!incidents.find(x=>x.id===`live-${i.id}`)){
-          incidents.push({id:`live-${i.id}`,type:i.type,route:i.route,
-            lat:i.lat,lon:i.lon,icon:i.icon,msg:i.msg,severity:i.severity});
-        }
-      });
-    redrawIncidentMarkers();
-  }
-
-  // Work zone layer — real GPS geometry from WZDx
-  if(state.workZoneFeatures){
-    updateWorkzoneSource(state.workZoneFeatures);
-  }
-
-  // System status indicator
-  const statusMap={critical:'crit',warning:'warn',advisory:'warn',normal:'ok'};
-  const labelMap={critical:'CRITICAL',warning:'WARNING',advisory:'ADVISORY',normal:'NOMINAL'};
-  const dot=document.getElementById('sys-dot');
-  const lbl=document.getElementById('sys-label');
-  if(dot)dot.className='dot '+(statusMap[state.status]||'ok');
-  if(lbl)lbl.textContent=labelMap[state.status]||'NOMINAL';
-  setLiveBadge(true);
-  updateLivePanel(state);
-}
-
-function setLiveBadge(live){
-  const b=document.getElementById('live-badge');
-  if(!b)return;
-  b.textContent=live?'★ LIVE':'○ SIM';
-  b.style.color=live?'#1a8c1a':'#886600';
-}
-
-function updateLivePanel(state){
-  const panel=document.getElementById('live-data-panel');
-  if(!panel)return;
-  const wx=state.weatherSummary||{};
-  const mb=state.mbtaSummary||{};
-  const meta=state.meta||{};
-  const gt=state.gotime||{};
-  const counts=meta.counts||{};
-  const updated=meta.generatedAt
-    ?new Date(meta.generatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})
-    :'-';
-
-  // Source status dots
-  const srcDots=Object.entries(meta.sources||{}).map(([k,v])=>{
-    const ok=v==='ok';const pend=v==='pending_key';
-    const col=ok?'#1a8c1a':pend?'#886600':'#cc1100';
-    const sym=ok?'✓':pend?'○':'✗';
-    return `<span style="color:${col}">${sym}${k}</span>`;
-  }).join(' ');
-
-  // Weather color
-  const wxCol=wx.impact==='severe'?'#cc1100':wx.impact==='moderate'?'#886600':wx.impact==='minor'?'#886600':'#1a8c1a';
-
-  // MBTA health color
-  const mbtaH=mb.health??100;
-  const mbtaCol=mbtaH>80?'#1a8c1a':mbtaH>60?'#886600':'#cc1100';
-
-  // GoTime panel
-  const gtRows=gt.available&&gt.segments?.length
-    ?gt.segments.slice(0,4).map(s=>`
-      <div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--muted);overflow:hidden;white-space:nowrap;max-width:110px">${s.name||s.routeId}</span>
-        <span style="color:${s.speedMult<70?'#cc1100':s.speedMult<90?'#886600':'#1a8c1a'};font-weight:700">${s.currentMin}min</span>
-      </div>`).join('')
-    :`<div style="color:var(--muted);font-style:italic">
-        ${gt.message||'GoTime: awaiting API key'}
-      </div>`;
-
-  panel.innerHTML=`
-    <div style="font-size:6px;color:var(--muted);margin-bottom:5px">
-      Updated ${updated} · ${meta.processingMs||0}ms<br>
-      ${srcDots}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px">
-      <div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:4px 5px">
-        <div style="font-size:6px;color:var(--muted)">WEATHER</div>
-        <div style="font-weight:700;font-size:8px;color:${wxCol}">${wx.label||'–'}</div>
-        <div style="font-size:6px;color:var(--muted)">Wind ${wx.wind||0} mph</div>
-      </div>
-      <div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:4px 5px">
-        <div style="font-size:6px;color:var(--muted)">MBTA</div>
-        <div style="font-weight:700;font-size:8px;color:${mbtaCol}">${mbtaH}% health</div>
-        <div style="font-size:6px;color:var(--muted)">${mb.activeAlerts||0} alerts</div>
-      </div>
-    </div>
-    ${mb.topAlert?`<div style="font-size:6px;color:#886600;margin-bottom:4px;padding:2px 4px;background:var(--dim);border-left:2px solid #886600;line-height:1.5">🚇 ${mb.topAlert.slice(0,100)}</div>`:''}
-    <div style="font-size:6px;color:var(--muted);margin-bottom:3px;font-weight:700">
-      INCIDENTS: ${counts.ersEvents||0} events · ${counts.workZones||0} work zones
-    </div>
-    <div style="font-size:7px;margin-bottom:4px;border-top:1px solid var(--border);padding-top:4px">
-      <div style="color:var(--muted);font-size:6px;margin-bottom:3px;font-weight:700">
-        GOTIME TRAVEL TIMES ${gt.available?'● LIVE':'○ PENDING KEY'}
-      </div>
-      ${gtRows}
-    </div>`;
-}
-
-function startLiveData(){
-  fetchLiveState().then(state=>{
-    if(state) logEvent('info','⚡ Live data connected - <span class="inc-route">'+WORKER_URL+'</span>');
-    else logEvent('info','◌ Worker unreachable - running simulation - retrying every 30s');
-  });
-  setInterval(fetchLiveState,POLL_MS);
-  setInterval(()=>{if(activeRoute)recalcRoute();},POLL_MS);
-}
-
-
-/* ── addAlert shim (used by calcRoute) ── */
+/* ── LIVE DATA ── */
+const WORKER_URL='https://ma-traffic-twin.jsj-ai.workers.dev';const POLL_MS=30000;let liveActive=false,fetchErrs=0;
+async function fetchLiveState(){try{const res=await fetch(`${WORKER_URL}/api/state`,{signal:AbortSignal.timeout(8000)});if(!res.ok)throw new Error(`HTTP ${res.status}`);const state=await res.json();fetchErrs=0;liveActive=true;applyLiveState(state);return state;}catch(err){fetchErrs++;if(fetchErrs>=3){liveActive=false;setLiveBadge(false);}return null;}}
+function applyLiveState(state){if(!state)return;if(state.routeAdjustments){ROUTES.forEach(r=>{const mult=state.routeAdjustments[r.id];if(mult!==undefined){const sim=r.baseSpd*todMult(r.type,new Date().getHours());r.speed=r.speed*0.7+(sim*0.4+r.baseSpd*mult*0.6)*0.3;}});}const wx=state.weatherSummary;if(wx){const pct={storm:80,snow:75,fog:45,rain:30,wind:15,clear:0}[wx.condition]||0;sliders.weather=pct;const sl=document.getElementById('sl-weather'),sv=document.getElementById('sv-weather');if(sl)sl.value=pct;if(sv)sv.textContent=pct+'%';}if(state.activeIncidents){incidents=incidents.filter(i=>!i.id?.toString().startsWith('live-'));state.activeIncidents.filter(i=>i.lat&&i.lon&&i.source!=='wzdx').forEach(i=>{if(!incidents.find(x=>x.id===`live-${i.id}`)){incidents.push({id:`live-${i.id}`,type:i.type,route:i.route,lat:i.lat,lon:i.lon,icon:i.icon,msg:i.msg,severity:i.severity});}});redrawIncidentMarkers();}if(state.workZoneFeatures)updateWorkzoneSource(state.workZoneFeatures);const statusMap={critical:'crit',warning:'warn',advisory:'warn',normal:'ok'};const labelMap={critical:'CRITICAL',warning:'WARNING',advisory:'ADVISORY',normal:'NOMINAL'};const dot=document.getElementById('sys-dot'),lbl=document.getElementById('sys-label');if(dot)dot.className='dot '+(statusMap[state.status]||'ok');if(lbl)lbl.textContent=labelMap[state.status]||'NOMINAL';setLiveBadge(true);updateLivePanel(state);}
+function setLiveBadge(live){const b=document.getElementById('live-badge');if(!b)return;b.textContent=live?'★ LIVE':'○ SIM';b.style.color=live?'#1a8c1a':'#886600';}
+function updateLivePanel(state){const panel=document.getElementById('live-data-panel');if(!panel)return;const wx=state.weatherSummary||{},mb=state.mbtaSummary||{},meta=state.meta||{},gt=state.gotime||{},counts=meta.counts||{};const updated=meta.generatedAt?new Date(meta.generatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'-';const srcDots=Object.entries(meta.sources||{}).map(([k,v])=>{const ok=v==='ok';const col=ok?'#1a8c1a':v==='pending_key'?'#886600':'#cc1100';return `<span style="color:${col}">${ok?'✓':'○'}${k}</span>`;}).join(' ');const wxCol=wx.impact==='severe'?'#cc1100':wx.impact==='moderate'||wx.impact==='minor'?'#886600':'#1a8c1a';const mbtaH=mb.health??100,mbtaCol=mbtaH>80?'#1a8c1a':mbtaH>60?'#886600':'#cc1100';const gtRows=gt.available&&gt.segments?.length?gt.segments.slice(0,4).map(s=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);overflow:hidden;white-space:nowrap;max-width:110px">${s.name||s.routeId}</span><span style="color:${s.speedMult<70?'#cc1100':s.speedMult<90?'#886600':'#1a8c1a'};font-weight:700">${s.currentMin}min</span></div>`).join(''):`<div style="color:var(--muted);font-style:italic">${gt.message||'GoTime: awaiting API key'}</div>`;panel.innerHTML=`<div style="font-size:6px;color:var(--muted);margin-bottom:5px">Updated ${updated} · ${meta.processingMs||0}ms<br>${srcDots}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px"><div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:4px 5px"><div style="font-size:6px;color:var(--muted)">WEATHER</div><div style="font-weight:700;font-size:8px;color:${wxCol}">${wx.label||'–'}</div><div style="font-size:6px;color:var(--muted)">Wind ${wx.wind||0} mph</div></div><div style="background:var(--dim);border:1px solid var(--border);border-radius:2px;padding:4px 5px"><div style="font-size:6px;color:var(--muted)">MBTA</div><div style="font-weight:700;font-size:8px;color:${mbtaCol}">${mbtaH}% health</div><div style="font-size:6px;color:var(--muted)">${mb.activeAlerts||0} alerts</div></div></div>${mb.topAlert?`<div style="font-size:6px;color:#886600;margin-bottom:4px;padding:2px 4px;background:var(--dim);border-left:2px solid #886600;line-height:1.5">🚇 ${mb.topAlert.slice(0,100)}</div>`:''}<div style="font-size:6px;color:var(--muted);margin-bottom:3px;font-weight:700">INCIDENTS: ${counts.ersEvents||0} events · ${counts.workZones||0} work zones</div><div style="font-size:7px;margin-bottom:4px;border-top:1px solid var(--border);padding-top:4px"><div style="color:var(--muted);font-size:6px;margin-bottom:3px;font-weight:700">GOTIME ${gt.available?'● LIVE':'○ PENDING KEY'}</div>${gtRows}</div>`;}
+function startLiveData(){fetchLiveState().then(state=>{if(state)logEvent('info','⚡ Live data connected - <span class="inc-route">'+WORKER_URL+'</span>');else logEvent('info','◌ Worker unreachable - running simulation - retrying every 30s');});setInterval(fetchLiveState,POLL_MS);setInterval(()=>{if(activeRoute)recalcRoute();},POLL_MS);}
 function addAlert(sev,msg){logEvent(sev,msg);}
 
-/* ── INIT ── */
-populateSelects();
-updateClock();
-updateFooter();
-// Map 'load' event above handles: buildSegments, startSim, startLiveData, loadOSMGeometry
-
+populateSelects();updateClock();updateFooter();
 </script>
 </body>
 </html>
