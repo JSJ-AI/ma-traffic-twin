@@ -834,6 +834,16 @@ async function fetchMBTAAlerts(){
 }
 
 function switchTab(tab){
+// Deactivate current panels/tabs
+  document.querySelectorAll('.tab-panel.active').forEach(p => p.classList.remove('active'));
+  
+  // Guard: only toggle if element exists
+  const tabBtn = document.getElementById('tab-' + tab);
+  if (tabBtn) tabBtn.classList.add('active');
+  
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
+  
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
