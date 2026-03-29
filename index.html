@@ -555,52 +555,210 @@ populateSelects();updateClock();updateFooter();
 /* ═══════════════════════════════════════════════════════════════════════
    MBTA DATA & MAP
 ═══════════════════════════════════════════════════════════════════════ */
-const MBTA_COLORS={'Red':'#DA291C','Orange':'#ED8B00','Green-B':'#00843D','Green-C':'#00843D','Green-D':'#00843D','Green-E':'#00843D','Blue':'#003DA5','CR':'#80276C','Silver':'#7C878E'};
-const MBTA_LINES=[
-  {id:'Red-S',line:'Red',coords:[[-71.0622,42.3954],[-71.0648,42.3903],[-71.0590,42.3869],[-71.0534,42.3825],[-71.0476,42.3780],[-71.0578,42.3662],[-71.0567,42.3558],[-71.0519,42.3499],[-71.0557,42.3366],[-71.0523,42.3303],[-71.0489,42.3275],[-71.0519,42.3075],[-71.0557,42.2916],[-71.0631,42.2784],[-71.0712,42.2513]]},
-  {id:'Red-N',line:'Red',coords:[[-71.0622,42.3954],[-71.1197,42.3960],[-71.1421,42.3967],[-71.1427,42.3987]]},
-  {id:'Orange',line:'Orange',coords:[[-71.0691,42.3365],[-71.0634,42.3526],[-71.0664,42.3598],[-71.0629,42.3662],[-71.0622,42.3730],[-71.0589,42.3805],[-71.0630,42.3877],[-71.0691,42.3921],[-71.0735,42.3965],[-71.0788,42.4028],[-71.0881,42.4190],[-71.0941,42.4326],[-71.0938,42.4391]]},
-  {id:'Green-B',line:'Green-B',coords:[[-71.0625,42.3554],[-71.0742,42.3564],[-71.0836,42.3526],[-71.0888,42.3487],[-71.1118,42.3512],[-71.1274,42.3500],[-71.1358,42.3381]]},
-  {id:'Green-D',line:'Green-D',coords:[[-71.0788,42.3554],[-71.1009,42.3430],[-71.1268,42.3341],[-71.1682,42.3228],[-71.2279,42.3079],[-71.2549,42.2991]]},
-  {id:'Green-E',line:'Green-E',coords:[[-71.0625,42.3554],[-71.0773,42.3308],[-71.0963,42.3233],[-71.1010,42.3201]]},
-  {id:'Blue',line:'Blue',coords:[[-71.0622,42.3609],[-71.0432,42.3614],[-71.0241,42.3706],[-71.0036,42.3756],[-70.9921,42.3784],[-70.9667,42.3693]]},
-  {id:'CR-Newbury',line:'CR',coords:[[-71.0568,42.3554],[-71.0510,42.4011],[-70.9951,42.4452],[-70.9246,42.5001]]},
-  {id:'CR-Worcester',line:'CR',coords:[[-71.0568,42.3554],[-71.1983,42.3201],[-71.3720,42.2891],[-71.7999,42.2624]]},
-  {id:'CR-Providence',line:'CR',coords:[[-71.0568,42.3554],[-71.0981,42.2756],[-71.2215,42.1219],[-71.4596,41.8253]]},
-  {id:'CR-Fitchburg',line:'CR',coords:[[-71.0568,42.3554],[-71.1427,42.3987],[-71.3543,42.4501],[-71.7999,42.5801]]},
-];
-const MBTA_STATIONS=[
-  ['DTX','Downtown Crossing','Orange',-71.0634,42.3556],['PKS','Park Street','Green-B',-71.0625,42.3564],
-  ['BOS','South Station','Red',-71.0554,42.3519],['NQY','North Station','Orange',-71.0610,42.3662],
-  ['HYM','Haymarket','Orange',-71.0569,42.3632],['GOV','Government Center','Green-B',-71.0597,42.3598],
-  ['BLU','Bowdoin','Blue',-71.0622,42.3609],['AQU','Aquarium','Blue',-71.0514,42.3596],
-  ['KEN','Kenmore','Green-B',-71.0955,42.3481],['COP','Copley','Green-B',-71.0779,42.3499],
-  ['BKM','Back Bay','Orange',-71.0753,42.3472],['CHE','Chestnut Hill','Green-D',-71.1691,42.3231],
-  ['ALW','Alewife','Red',-71.1427,42.3987],['DAV','Davis','Red',-71.1222,42.3970],
-  ['HAR','Harvard','Red',-71.1188,42.3742],['CEN','Central','Red',-71.1034,42.3657],
-  ['KMT','Kendall/MIT','Red',-71.0867,42.3626],['CST','Charles/MGH','Red',-71.0706,42.3614],
-  ['JFK','JFK/UMass','Red',-71.0527,42.3199],['OAK','Oak Grove','Orange',-71.0706,42.4365],
-  ['MAL','Malden Center','Orange',-71.0741,42.4270],['FOR','Forest Hills','Orange',-71.1135,42.3002],
-  ['WOF','Wonderland','Blue',-70.9178,42.3681],['REV','Revere Beach','Blue',-70.9921,42.4076],
-];
+// MBTA line colors — exact hex from MBTA API
+const MBTA_COLORS={
+  'Red':'#DA291C','Mattapan':'#DA291C',
+  'Orange':'#ED8B00',
+  'Green-B':'#00843D','Green-C':'#00843D','Green-D':'#00843D','Green-E':'#00843D',
+  'Blue':'#003DA5',
+  'CR':'#80276C',
+};
+// Route IDs to fetch shapes for
+const MBTA_SUBWAY_ROUTES=['Red','Mattapan','Orange','Green-B','Green-C','Green-D','Green-E','Blue'];
+const MBTA_CR_ROUTES=['CR-Fairmount','CR-Fitchburg','CR-Worcester','CR-Franklin','CR-Haverhill','CR-Kingston','CR-Lowell','CR-Needham','CR-Newburyport','CR-Providence','CR-Greenbush','CR-NewBedford'];
+
+// Decode Google/MBTA encoded polyline → [[lon,lat],...]
+function decodePolyline(encoded) {
+  const coords = [];
+  let idx = 0, lat = 0, lng = 0;
+  while (idx < encoded.length) {
+    let b, shift = 0, result = 0;
+    do { b = encoded.charCodeAt(idx++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : result >> 1;
+    shift = 0; result = 0;
+    do { b = encoded.charCodeAt(idx++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : result >> 1;
+    coords.push([lng / 1e5, lat / 1e5]); // [lon, lat] for GeoJSON
+  }
+  return coords;
+}
+
+// Fetch real MBTA shapes and stations from API
+async function loadMBTARealData() {
+  const allRoutes = [...MBTA_SUBWAY_ROUTES, ...MBTA_CR_ROUTES];
+  const lineFeatures = [];
+  const stationFeatures = [];
+
+  // Fetch shapes for all routes in parallel
+  await Promise.all(allRoutes.map(async routeId => {
+    try {
+      const r = await fetch(`https://api-v3.mbta.com/shapes?filter[route]=${routeId}&fields[shape]=polyline`, {signal: AbortSignal.timeout(10000)});
+      if (!r.ok) return;
+      const data = await r.json();
+      // Take the longest shape (main trunk) + up to 2 variants
+      const sorted = (data.data || []).sort((a,b) => b.attributes.polyline.length - a.attributes.polyline.length).slice(0,3);
+      const lineColor = MBTA_COLORS[routeId] || MBTA_COLORS['CR'];
+      sorted.forEach(shape => {
+        const coords = decodePolyline(shape.attributes.polyline);
+        if (coords.length < 2) return;
+        lineFeatures.push({
+          type:'Feature',
+          geometry:{type:'LineString', coordinates: coords},
+          properties:{routeId, color: lineColor, shapeId: shape.id}
+        });
+      });
+    } catch(e) {}
+  }));
+
+  // Fetch stations — subway only, parent stations
+  try {
+    const r = await fetch(`https://api-v3.mbta.com/stops?filter[route]=${MBTA_SUBWAY_ROUTES.join(',')}&fields[stop]=name,latitude,longitude,location_type`, {signal: AbortSignal.timeout(10000)});
+    if (r.ok) {
+      const data = await r.json();
+      // Deduplicate by parent station ID
+      const seen = new Set();
+      (data.data || []).forEach(stop => {
+        const pid = stop.relationships?.parent_station?.data?.id || stop.id;
+        if (seen.has(pid)) return;
+        seen.add(pid);
+        const lat = stop.attributes.latitude, lon = stop.attributes.longitude;
+        if (!lat || !lon) return;
+        stationFeatures.push({
+          type:'Feature',
+          geometry:{type:'Point', coordinates:[lon, lat]},
+          properties:{
+            id: pid,
+            name: stop.attributes.name,
+            stopId: stop.id,
+          }
+        });
+      });
+    }
+  } catch(e) {}
+
+  return {lineFeatures, stationFeatures};
+}
 
 let mbtaMap=null,mbtaVehicleMarkers={},mbtaInitialized=false,mbtaOverlayOn=false;
+
+// Station delay status — updated by fetchMBTAAlerts
+const mbtaStationAlerts = {}; // stopId → array of alert effects
 
 function initMBTAMap(){
   if(mbtaInitialized)return;
   mbtaInitialized=true;
-  mbtaMap=new maplibregl.Map({container:'mbta-map',style:'https://tiles.openfreemap.org/styles/bright',center:[-71.08,42.35],zoom:11});
-  mbtaMap.on('load',()=>{
+
+  mbtaMap=new maplibregl.Map({
+    container:'mbta-map',
+    style:'https://tiles.openfreemap.org/styles/bright',
+    center:[-71.08,42.35],zoom:11
+  });
+
+  mbtaMap.on('load', async ()=>{
     mbtaMap.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
-    const lf=MBTA_LINES.map(l=>({type:'Feature',geometry:{type:'LineString',coordinates:l.coords},properties:{color:MBTA_COLORS[l.line]||'#888'}}));
-    mbtaMap.addSource('ml',{type:'geojson',data:{type:'FeatureCollection',features:lf}});
-    mbtaMap.addLayer({id:'ml-c',type:'line',source:'ml',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'rgba(255,255,255,0.6)','line-width':['interpolate',['linear'],['zoom'],10,6,14,12],'line-opacity':0.6}});
-    mbtaMap.addLayer({id:'ml-f',type:'line',source:'ml',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['get','color'],'line-width':['interpolate',['linear'],['zoom'],10,4,14,8],'line-opacity':0.9}});
-    MBTA_STATIONS.forEach(([id,name,line,lon,lat])=>{
-      const el=document.createElement('div');el.className='mbta-station-dot';el.style.borderColor=MBTA_COLORS[line]||'#333';
-      const popup=new maplibregl.Popup({offset:8,closeButton:false}).setHTML(`<b>${name}</b><br><span style="color:${MBTA_COLORS[line]||'#333'}">${line}</span>`);
-      new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lon,lat]).setPopup(popup).addTo(mbtaMap);
+
+    // Show loading badge
+    const badge=document.getElementById('mbta-live-badge');
+    if(badge){badge.textContent='⏳ LOADING';badge.style.color='#886600';}
+
+    // Fetch real shapes + stations from MBTA API
+    const {lineFeatures, stationFeatures} = await loadMBTARealData();
+
+    // Add line layers
+    mbtaMap.addSource('ml',{type:'geojson',data:{type:'FeatureCollection',features:lineFeatures}});
+    // White casing underneath
+    mbtaMap.addLayer({id:'ml-c',type:'line',source:'ml',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'#ffffff','line-width':['interpolate',['linear'],['zoom'],9,5,13,10,16,16],'line-opacity':0.7}
     });
+    // Colored line on top
+    mbtaMap.addLayer({id:'ml-f',type:'line',source:'ml',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':['get','color'],'line-width':['interpolate',['linear'],['zoom'],9,3,13,7,16,12],'line-opacity':0.95}
+    });
+
+    // Add station dots as GeoJSON circles for hover
+    // Add numeric id to each station feature for setFeatureState
+    stationFeatures.forEach((f,i)=>{ f.id = i; f.properties._idx = i; });
+    // Build lookup: place-id → feature index
+    window._mbtaStationIdx = {};
+    stationFeatures.forEach((f,i)=>{ window._mbtaStationIdx[f.properties.id] = i; });
+    mbtaMap.addSource('ms',{type:'geojson',data:{type:'FeatureCollection',features:stationFeatures},promoteId:'_idx'});
+    // Outer ring
+    mbtaMap.addLayer({id:'ms-ring',type:'circle',source:'ms',
+      paint:{
+        'circle-radius':['interpolate',['linear'],['zoom'],10,5,13,9,16,14],
+        'circle-color':'#ffffff',
+        'circle-stroke-width':2,
+        'circle-stroke-color':'#333333',
+        'circle-opacity':1,
+      }
+    });
+    // Inner dot — green=ok, red=delay
+    mbtaMap.addLayer({id:'ms-dot',type:'circle',source:'ms',
+      paint:{
+        'circle-radius':['interpolate',['linear'],['zoom'],10,3,13,5,16,8],
+        'circle-color':['case',['boolean',['feature-state','delayed'],false],'#cc1100','#1a8c1a'],
+        'circle-opacity':0.9,
+      }
+    });
+    // Station name labels (show at zoom 13+)
+    mbtaMap.addLayer({id:'ms-label',type:'symbol',source:'ms',
+      minzoom:13,
+      layout:{
+        'text-field':['get','name'],
+        'text-size':10,
+        'text-offset':[0,1.2],
+        'text-anchor':'top',
+        'text-allow-overlap':false,
+      },
+      paint:{
+        'text-color':'#1a1008',
+        'text-halo-color':'rgba(255,255,255,0.9)',
+        'text-halo-width':1.5,
+      }
+    });
+
+    // Hover tooltip on stations
+    const tooltip = document.getElementById('tooltip');
+    mbtaMap.on('mouseenter','ms-ring', e=>{
+      mbtaMap.getCanvas().style.cursor='pointer';
+      const p = e.features[0].properties;
+      const delayed = mbtaStationAlerts[p.id]?.length > 0;
+      const alertText = delayed ? `<div style="color:#cc1100;margin-top:3px">⚠ ${mbtaStationAlerts[p.id][0]}</div>` : '<div style="color:#1a8c1a;margin-top:3px">✓ No alerts</div>';
+      document.getElementById('tip-title').textContent = p.name;
+      document.getElementById('tip-speed').textContent = delayed ? '⚠ DELAY' : '✓ Normal';
+      document.getElementById('tip-speed').style.color = delayed ? '#cc1100' : '#1a8c1a';
+      document.getElementById('tip-vol').textContent = '';
+      document.getElementById('tip-time').textContent = '';
+      document.getElementById('tip-status').textContent = '';
+      if(tooltip){
+        tooltip.style.display='block';
+        tooltip.style.left=(e.point.x+14)+'px';
+        tooltip.style.top=(e.point.y-10)+'px';
+      }
+    });
+    mbtaMap.on('mouseleave','ms-ring',()=>{
+      mbtaMap.getCanvas().style.cursor='';
+      if(tooltip) tooltip.style.display='none';
+    });
+    // Click station to show full popup
+    mbtaMap.on('click','ms-ring', e=>{
+      const p = e.features[0].properties;
+      const delayed = mbtaStationAlerts[p.id]?.length > 0;
+      const alertHtml = delayed
+        ? mbtaStationAlerts[p.id].map(a=>`<div style="color:#cc1100;font-size:8px">⚠ ${a}</div>`).join('')
+        : '<div style="color:#1a8c1a;font-size:8px">✓ No active service alerts</div>';
+      new maplibregl.Popup({offset:12,closeButton:true})
+        .setLngLat(e.lngLat)
+        .setHTML(`<b style="font-size:10px">${p.name}</b>${alertHtml}`)
+        .addTo(mbtaMap);
+    });
+
+    if(badge){badge.textContent='✓ LOADED';badge.style.color='#1a8c1a';}
+    logEvent && logEvent('clear',`✓ MBTA real track geometry loaded — ${lineFeatures.length} shapes, ${stationFeatures.length} stations`);
+
+    // Start live data
     fetchMBTAVehicles();setInterval(fetchMBTAVehicles,15000);
     fetchMBTAAlerts();setInterval(fetchMBTAAlerts,60000);
   });
@@ -637,18 +795,41 @@ async function fetchMBTAVehicles(){
 
 async function fetchMBTAAlerts(){
   try{
-    const res=await fetch('https://api-v3.mbta.com/alerts?filter[lifecycle]=NEW,ONGOING&filter[route_type]=0,1,2&page[limit]=15',{signal:AbortSignal.timeout(8000)});
-    if(!res.ok)throw new Error();const data=await res.json();const alerts=data.data||[];
+    const res=await fetch('https://api-v3.mbta.com/alerts?filter[lifecycle]=NEW,ONGOING&filter[route_type]=0,1,2&page[limit]=30',{signal:AbortSignal.timeout(8000)});
+    if(!res.ok)throw new Error();
+    const data=await res.json();const alerts=data.data||[];
     const ac=document.getElementById('mbta-alerts-count');if(ac)ac.textContent=alerts.length;
-    const list=document.getElementById('mbta-alerts-list');if(!list)return;
-    if(!alerts.length){list.innerHTML='<div style="color:var(--green);font-size:9px;">No active alerts ✓</div>';return;}
-    list.innerHTML=alerts.slice(0,8).map(a=>{
+
+    // Build station→alerts map for dot coloring
+    Object.keys(mbtaStationAlerts).forEach(k=>delete mbtaStationAlerts[k]);
+    alerts.forEach(a=>{
       const effect=(a.attributes.effect||'').replace(/_/g,' ');
-      const header=a.attributes.header||'';
-      const routes=[...new Set((a.attributes.informed_entity||[]).map(e=>e.route).filter(Boolean))].join(', ');
-      const color=MBTA_COLORS[routes.split(',')[0]?.trim()]||'#ED8B00';
-      return `<div class="mbta-alert-item" style="border-color:${color}"><span>⚠</span><div><strong style="color:${color}">${routes||'System'}</strong> — ${effect}<br><span style="color:var(--muted);font-size:8px">${header.substring(0,90)}</span></div></div>`;
-    }).join('');
+      (a.attributes.informed_entity||[]).forEach(e=>{
+        if(e.stop){
+          if(!mbtaStationAlerts[e.stop])mbtaStationAlerts[e.stop]=[];
+          if(!mbtaStationAlerts[e.stop].includes(effect))mbtaStationAlerts[e.stop].push(effect);
+        }
+      });
+    });
+
+    // Update station dot colors on map via feature state
+    if(mbtaMap && mbtaMap.getSource('ms') && window._mbtaStationIdx){
+      Object.entries(window._mbtaStationIdx).forEach(([placeId, idx])=>{
+        const delayed = !!(mbtaStationAlerts[placeId]?.length);
+        mbtaMap.setFeatureState({source:'ms', id: idx},{delayed});
+      });
+    }
+
+    const list=document.getElementById('mbta-alerts-list');if(!list)return;
+    if(!alerts.length){list.innerHTML='<div style="color:var(--green);font-size:9px;padding:4px 0;">✓ No active alerts</div>';return;}
+    list.innerHTML=alerts.filter(a=>['0','1','2'].includes(String(a.attributes.informed_entity?.[0]?.route_type))||a.attributes.informed_entity?.some(e=>['Red','Orange','Green-B','Green-C','Green-D','Green-E','Blue','Mattapan'].includes(e.route)))
+      .slice(0,8).map(a=>{
+        const effect=(a.attributes.effect||'').replace(/_/g,' ');
+        const header=a.attributes.header||'';
+        const routes=[...new Set((a.attributes.informed_entity||[]).map(e=>e.route).filter(Boolean))].slice(0,3).join(', ');
+        const color=MBTA_COLORS[routes.split(',')[0]?.trim()]||'#ED8B00';
+        return `<div class="mbta-alert-item" style="border-color:${color}"><span>⚠</span><div><strong style="color:${color}">${routes||'System'}</strong> — ${effect}<br><span style="color:var(--muted);font-size:8px">${header.substring(0,90)}</span></div></div>`;
+      }).join('') || '<div style="color:var(--green);font-size:9px;padding:4px 0;">✓ No subway alerts</div>';
   }catch(e){}
 }
 
