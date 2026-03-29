@@ -124,6 +124,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .inc-dot{position:absolute;inset:0;border-radius:50%;background:#cc1100;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;}
 .maplibregl-popup-content{font-family:'Share Tech Mono',monospace;font-size:8px;background:rgba(244,239,224,0.98)!important;border:1px solid #8a7050;padding:6px 8px;}
 @media(max-width:768px){.content{grid-template-columns:1fr;}.right-panel{display:none;}}
+
+/* ── TAB NAV ── */
+.tab-nav{display:flex;gap:0;background:#2a1808;border-bottom:2px solid #c8a060;flex-shrink:0;}
+.tab-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;
+  padding:8px 20px;border:none;border-right:1px solid rgba(200,160,96,0.3);
+  background:transparent;color:#a08060;cursor:pointer;transition:all .15s;text-transform:uppercase;font-weight:700;}
+.tab-btn:hover{color:#ffe0a0;background:rgba(255,220,160,0.05);}
+.tab-btn.active{background:rgba(255,220,160,0.12);color:#ffe0a0;border-bottom:2px solid #ffe0a0;margin-bottom:-2px;}
+.tab-panel{display:none;flex:1;min-height:0;overflow:hidden;}
+.tab-panel.active{display:flex;}
+
+/* ── MBTA TAB ── */
+.mbta-content{display:grid;grid-template-columns:1fr 300px;flex:1;min-height:0;overflow:hidden;}
+#mbta-map{position:absolute;inset:0;}
+.mbta-map-area{position:relative;overflow:hidden;background:#e8e4d8;min-height:0;height:100%;}
+.mbta-panel{background:var(--surface);border-left:2px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.mbta-alert-item{display:flex;gap:6px;padding:5px 7px;border-radius:2px;margin-bottom:3px;
+  border-left:2px solid #ED8B00;background:rgba(237,139,0,0.06);font-size:9px;color:#2a1808;line-height:1.5;}
+.mbta-vehicle-dot{width:10px;height:10px;border-radius:50%;border:2px solid #fff;
+  cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.5);transform:translate(-50%,-50%);}
+.mbta-station-dot{width:7px;height:7px;border-radius:50%;background:#fff;
+  border:2px solid #333;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);transform:translate(-50%,-50%);}
+.arrival-row{display:flex;justify-content:space-between;padding:4px 0;
+  border-bottom:1px solid var(--border);font-size:9px;color:#2a1808;}
+.arrival-min{font-weight:700;color:#003399;}
 </style>
 </head>
 <body>
@@ -143,7 +169,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
     <button class="hbtn on" id="btn-sensors" onclick="toggleSensors()">◉ SENSORS</button>
     <button class="hbtn on" id="btn-labels" onclick="toggleLabels()">⊞ EXITS</button>
     <button class="hbtn on" id="btn-incidents" onclick="toggleIncidents()">⚠ INCIDENTS</button>
-    <button class="radar-btn" id="btn-radar" onclick="toggleRadarLayer()">🌧 RADAR</button>
+    <button class="radar-btn" id="btn-radar" onclick="toggleRadarLayer()">🌧 RADAR</button><button class="radar-btn" id="btn-mbta-overlay" onclick="toggleMBTAOverlay()">🚇 MBTA</button>
   </div>
   <div class="hdr-clock" id="sim-clock">Loading...</div>
 </div>
@@ -414,9 +440,26 @@ async function loadOSMGeometry(){
   const badge=document.getElementById('osm-badge'),ftOsm=document.getElementById('ft-osm');
   badge.textContent='⏳ Fetching OSM roads…';
   const query=`[out:json][timeout:60];\nway["highway"~"motorway|trunk|primary|secondary"]["ref"](41.1,-73.6,42.9,-69.8);\nout geom qt;`;
+  const OVERPASS_MIRRORS=[
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
+  ];
   let elements;
-  try{const r=await fetch('https://overpass.kumi.systems/api/interpreter',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:AbortSignal.timeout(65000)});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();elements=data.elements||[];}
-  catch(e){badge.textContent='⚠ OSM unavailable — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='fallback';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','⚠ OSM Overpass unreachable — using approximate route geometry');return;}
+  let lastErr='';
+  let loaded=false;
+  for(const mirror of OVERPASS_MIRRORS){
+    try{
+      badge.textContent='⏳ Fetching OSM roads ('+mirror.split('/')[2]+')…';
+      const r=await fetch(mirror,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:AbortSignal.timeout(30000)});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const data=await r.json();
+      elements=data.elements||[];
+      loaded=true;
+      break;
+    }catch(e){lastErr=e.message;logEvent('warn','Overpass '+mirror.split('/')[2]+' failed: '+e.message);}
+  }
+  if(!loaded){badge.textContent='⚠ OSM unavailable — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='fallback';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','⚠ All Overpass mirrors failed — using approximate route geometry');return;}
   const newFeatures=[];let matched=0,skipped=0;
   elements.filter(el=>el.type==='way'&&el.geometry?.length>=2).forEach(way=>{const ref=way.tags?.ref,routeId=refToRouteId(ref);if(!routeId){skipped++;return;}const route=ROUTES.find(r=>r.id===routeId);if(!route){skipped++;return;}const coords=way.geometry.map(n=>[n.lon,n.lat]);const mid=coords[Math.floor(coords.length/2)];const seg=nearestSegment(mid[1],mid[0],routeId);newFeatures.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{osmId:way.id,routeId,segId:seg?.id||null,label:(route.label)+(seg?` • Exit ${seg.exitA.exit}→${seg.exitB.exit}`:''),speed:Math.round(seg?.speed||route.speed||65),color:speedColor(seg?.speed||route.speed||65,route.type),roadType:route.type,distMi:seg?.distMi||1,volume:Math.round(seg?.volume||route.volume||1200),ref:ref||''}});matched++;});
   if(matched>0){osmFeatures=newFeatures;osmWaysLoaded=true;updateTrafficSource();['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});badge.textContent=`✓ ${matched} OSM road segments`;badge.style.color='#1a5c1a';if(ftOsm)ftOsm.textContent=`${matched} ways`;logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);document.getElementById('ft-segs').textContent=matched;}
@@ -429,9 +472,17 @@ function redrawIncidentMarkers(){Object.values(incidentMarkerMap).forEach(m=>m.r
 
 function tick(){
   simTime++;const t=simTime*0.03,trafficLoad=sliders.traffic/100,weatherFactor=1-sliders.weather/200,constFactor=1-sliders.const/400,rushFactor=rushHour?0.55:1.0;
-  ROUTES.forEach(r=>{const wave=0.85+0.15*Math.sin(t*0.1+r.id.charCodeAt(0)*0.3),loadFactor=0.88+(1.0-trafficLoad)*0.12;let speed=r.baseSpd*wave*loadFactor*weatherFactor*constFactor*rushFactor;if(r.incidents?.length)speed*=0.4;speed*=(1+(Math.random()-0.5)*0.05*2);speed=Math.max(5,Math.min(r.baseSpd,speed));r.speed=r.speed*0.85+speed*0.15;r.volume=Math.max(50,Math.min(3000,trafficLoad*2200*wave*(rushHour?1.4:1)*(r.type==='local'?0.3:1)));r.history.push(r.speed);r.history.shift();r.congestionFactor=r.speed/r.baseSpd;});
-  SEGMENTS.forEach(seg=>{const route=ROUTES.find(r=>r.id===seg.routeId);if(!route)return;const noise=(Math.random()-0.5)*0.06,incPen=seg.incidents.length>0?0.45:1.0;const target=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));seg.speed=seg.speed*0.92+target*0.08;seg.volume=route.volume*(1+(Math.random()-0.5)*0.08);seg.history.push(seg.speed);seg.history.shift();});
-  if(map.getSource&&simTime%2===0)updateTrafficSource();
+  ROUTES.forEach(r=>{const wave=0.98+0.02*Math.sin(t*0.015+r.id.charCodeAt(0)*0.3),loadFactor=0.92+(1.0-trafficLoad)*0.08;let speed=r.baseSpd*wave*loadFactor*weatherFactor*constFactor*rushFactor;if(r.incidents?.length)speed*=0.4;speed*=(1+(Math.random()-0.5)*0.01);speed=Math.max(5,Math.min(r.baseSpd,speed));r.speed=r.speed*0.97+speed*0.03;r.volume=Math.max(50,Math.min(3000,trafficLoad*2200*wave*(rushHour?1.4:1)*(r.type==='local'?0.3:1)));r.history.push(r.speed);r.history.shift();r.congestionFactor=r.speed/r.baseSpd;});
+  SEGMENTS.forEach(seg=>{const route=ROUTES.find(r=>r.id===seg.routeId);if(!route)return;const noise=(Math.random()-0.5)*0.01,incPen=seg.incidents.length>0?0.45:1.0;const target=Math.max(5,Math.min(seg.baseSpd,route.speed*(1+noise)*incPen));seg.speed=seg.speed*0.98+target*0.02;seg.volume=route.volume*(1+(Math.random()-0.5)*0.08);seg.history.push(seg.speed);seg.history.shift();});
+  // Only redraw if any segment crossed a color threshold
+  if(map.getSource){
+    const needsRedraw=SEGMENTS.some(seg=>{
+      const newColor=speedColor(seg.speed,seg.type);
+      if(seg._lastColor!==newColor){seg._lastColor=newColor;return true;}
+      return false;
+    });
+    if(needsRedraw||simTime%30===0)updateTrafficSource();
+  }
   const allSpeeds=ROUTES.filter(r=>r.type!=='local').map(r=>r.speed);const avgSpeed=allSpeeds.reduce((a,b)=>a+b,0)/allSpeeds.length;const totalVol=ROUTES.filter(r=>r.type!=='local').reduce((a,r)=>a+r.volume,0)/ROUTES.length;const congestPct=allSpeeds.filter(s=>s<40).length/allSpeeds.length*100;
   setGauge('avgspeed',avgSpeed.toFixed(0),(avgSpeed/70)*100,avgSpeed>50?'#1a8c1a':avgSpeed>35?'#cc8800':'#cc1100');setGauge('volume',Math.round(totalVol),(totalVol/3000)*100,'#003399');setGauge('incidents',incidents.length,Math.min(100,incidents.length*20),'#cc1100');setGauge('congestion',congestPct.toFixed(0),congestPct,'#886600');
   const dot=document.getElementById('sys-dot'),lbl=document.getElementById('sys-label');if(incidents.length>3||congestPct>70){dot.className='dot crit';lbl.textContent='CRITICAL';}else if(incidents.length>0||congestPct>40){dot.className='dot warn';lbl.textContent='WARNING';}else{dot.className='dot ok';lbl.textContent='NOMINAL';}
@@ -500,6 +551,174 @@ function startLiveData(){fetchLiveState().then(state=>{if(state)logEvent('info',
 function addAlert(sev,msg){logEvent(sev,msg);}
 
 populateSelects();updateClock();updateFooter();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MBTA DATA & MAP
+═══════════════════════════════════════════════════════════════════════ */
+const MBTA_COLORS={'Red':'#DA291C','Orange':'#ED8B00','Green-B':'#00843D','Green-C':'#00843D','Green-D':'#00843D','Green-E':'#00843D','Blue':'#003DA5','CR':'#80276C','Silver':'#7C878E'};
+const MBTA_LINES=[
+  {id:'Red-S',line:'Red',coords:[[-71.0622,42.3954],[-71.0648,42.3903],[-71.0590,42.3869],[-71.0534,42.3825],[-71.0476,42.3780],[-71.0578,42.3662],[-71.0567,42.3558],[-71.0519,42.3499],[-71.0557,42.3366],[-71.0523,42.3303],[-71.0489,42.3275],[-71.0519,42.3075],[-71.0557,42.2916],[-71.0631,42.2784],[-71.0712,42.2513]]},
+  {id:'Red-N',line:'Red',coords:[[-71.0622,42.3954],[-71.1197,42.3960],[-71.1421,42.3967],[-71.1427,42.3987]]},
+  {id:'Orange',line:'Orange',coords:[[-71.0691,42.3365],[-71.0634,42.3526],[-71.0664,42.3598],[-71.0629,42.3662],[-71.0622,42.3730],[-71.0589,42.3805],[-71.0630,42.3877],[-71.0691,42.3921],[-71.0735,42.3965],[-71.0788,42.4028],[-71.0881,42.4190],[-71.0941,42.4326],[-71.0938,42.4391]]},
+  {id:'Green-B',line:'Green-B',coords:[[-71.0625,42.3554],[-71.0742,42.3564],[-71.0836,42.3526],[-71.0888,42.3487],[-71.1118,42.3512],[-71.1274,42.3500],[-71.1358,42.3381]]},
+  {id:'Green-D',line:'Green-D',coords:[[-71.0788,42.3554],[-71.1009,42.3430],[-71.1268,42.3341],[-71.1682,42.3228],[-71.2279,42.3079],[-71.2549,42.2991]]},
+  {id:'Green-E',line:'Green-E',coords:[[-71.0625,42.3554],[-71.0773,42.3308],[-71.0963,42.3233],[-71.1010,42.3201]]},
+  {id:'Blue',line:'Blue',coords:[[-71.0622,42.3609],[-71.0432,42.3614],[-71.0241,42.3706],[-71.0036,42.3756],[-70.9921,42.3784],[-70.9667,42.3693]]},
+  {id:'CR-Newbury',line:'CR',coords:[[-71.0568,42.3554],[-71.0510,42.4011],[-70.9951,42.4452],[-70.9246,42.5001]]},
+  {id:'CR-Worcester',line:'CR',coords:[[-71.0568,42.3554],[-71.1983,42.3201],[-71.3720,42.2891],[-71.7999,42.2624]]},
+  {id:'CR-Providence',line:'CR',coords:[[-71.0568,42.3554],[-71.0981,42.2756],[-71.2215,42.1219],[-71.4596,41.8253]]},
+  {id:'CR-Fitchburg',line:'CR',coords:[[-71.0568,42.3554],[-71.1427,42.3987],[-71.3543,42.4501],[-71.7999,42.5801]]},
+];
+const MBTA_STATIONS=[
+  ['DTX','Downtown Crossing','Orange',-71.0634,42.3556],['PKS','Park Street','Green-B',-71.0625,42.3564],
+  ['BOS','South Station','Red',-71.0554,42.3519],['NQY','North Station','Orange',-71.0610,42.3662],
+  ['HYM','Haymarket','Orange',-71.0569,42.3632],['GOV','Government Center','Green-B',-71.0597,42.3598],
+  ['BLU','Bowdoin','Blue',-71.0622,42.3609],['AQU','Aquarium','Blue',-71.0514,42.3596],
+  ['KEN','Kenmore','Green-B',-71.0955,42.3481],['COP','Copley','Green-B',-71.0779,42.3499],
+  ['BKM','Back Bay','Orange',-71.0753,42.3472],['CHE','Chestnut Hill','Green-D',-71.1691,42.3231],
+  ['ALW','Alewife','Red',-71.1427,42.3987],['DAV','Davis','Red',-71.1222,42.3970],
+  ['HAR','Harvard','Red',-71.1188,42.3742],['CEN','Central','Red',-71.1034,42.3657],
+  ['KMT','Kendall/MIT','Red',-71.0867,42.3626],['CST','Charles/MGH','Red',-71.0706,42.3614],
+  ['JFK','JFK/UMass','Red',-71.0527,42.3199],['OAK','Oak Grove','Orange',-71.0706,42.4365],
+  ['MAL','Malden Center','Orange',-71.0741,42.4270],['FOR','Forest Hills','Orange',-71.1135,42.3002],
+  ['WOF','Wonderland','Blue',-70.9178,42.3681],['REV','Revere Beach','Blue',-70.9921,42.4076],
+];
+
+let mbtaMap=null,mbtaVehicleMarkers={},mbtaInitialized=false,mbtaOverlayOn=false;
+
+function initMBTAMap(){
+  if(mbtaInitialized)return;
+  mbtaInitialized=true;
+  mbtaMap=new maplibregl.Map({container:'mbta-map',style:'https://tiles.openfreemap.org/styles/bright',center:[-71.08,42.35],zoom:11});
+  mbtaMap.on('load',()=>{
+    mbtaMap.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
+    const lf=MBTA_LINES.map(l=>({type:'Feature',geometry:{type:'LineString',coordinates:l.coords},properties:{color:MBTA_COLORS[l.line]||'#888'}}));
+    mbtaMap.addSource('ml',{type:'geojson',data:{type:'FeatureCollection',features:lf}});
+    mbtaMap.addLayer({id:'ml-c',type:'line',source:'ml',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'rgba(255,255,255,0.6)','line-width':['interpolate',['linear'],['zoom'],10,6,14,12],'line-opacity':0.6}});
+    mbtaMap.addLayer({id:'ml-f',type:'line',source:'ml',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['get','color'],'line-width':['interpolate',['linear'],['zoom'],10,4,14,8],'line-opacity':0.9}});
+    MBTA_STATIONS.forEach(([id,name,line,lon,lat])=>{
+      const el=document.createElement('div');el.className='mbta-station-dot';el.style.borderColor=MBTA_COLORS[line]||'#333';
+      const popup=new maplibregl.Popup({offset:8,closeButton:false}).setHTML(`<b>${name}</b><br><span style="color:${MBTA_COLORS[line]||'#333'}">${line}</span>`);
+      new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lon,lat]).setPopup(popup).addTo(mbtaMap);
+    });
+    fetchMBTAVehicles();setInterval(fetchMBTAVehicles,15000);
+    fetchMBTAAlerts();setInterval(fetchMBTAAlerts,60000);
+  });
+}
+
+async function fetchMBTAVehicles(){
+  try{
+    const res=await fetch('https://api-v3.mbta.com/vehicles?filter[route_type]=0,1&page[limit]=200',{signal:AbortSignal.timeout(8000)});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();const vehicles=data.data||[];
+    const seen=new Set();
+    vehicles.forEach(v=>{
+      const id=v.id,attrs=v.attributes,r=v.relationships?.route?.data?.id||'';
+      const color=MBTA_COLORS[r]||MBTA_COLORS[r.split('-')[0]]||'#888';
+      const lat=attrs.latitude,lon=attrs.longitude;if(!lat||!lon)return;
+      seen.add(id);
+      if(mbtaVehicleMarkers[id]){mbtaVehicleMarkers[id].setLngLat([lon,lat]);}
+      else{
+        const el=document.createElement('div');el.className='mbta-vehicle-dot';el.style.background=color;
+        const popup=new maplibregl.Popup({offset:10,closeButton:false}).setHTML(`<b>${r}</b><br>${attrs.current_status||''}`);
+        mbtaVehicleMarkers[id]=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lon,lat]).setPopup(popup).addTo(mbtaMap);
+      }
+    });
+    Object.keys(mbtaVehicleMarkers).forEach(id=>{if(!seen.has(id)){mbtaVehicleMarkers[id].remove();delete mbtaVehicleMarkers[id];}});
+    const vc=document.getElementById('mbta-vehicles');if(vc)vc.textContent=vehicles.length;
+    const badge=document.getElementById('mbta-live-badge');if(badge){badge.textContent='★ LIVE';badge.style.color='#1a8c1a';}
+    const list=document.getElementById('mbta-vehicle-list');
+    if(list)list.innerHTML=vehicles.slice(0,20).map(v=>{
+      const r=v.relationships?.route?.data?.id||'?';const c=MBTA_COLORS[r]||MBTA_COLORS[r.split('-')[0]]||'#888';
+      return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)"><span style="color:${c};font-weight:700">${r}</span><span style="color:var(--muted);font-size:8px">${(v.attributes.current_status||'').replace(/_/g,' ').toLowerCase()}</span></div>`;
+    }).join('');
+  }catch(e){const b=document.getElementById('mbta-live-badge');if(b){b.textContent='○ OFFLINE';b.style.color='#cc1100';}}
+}
+
+async function fetchMBTAAlerts(){
+  try{
+    const res=await fetch('https://api-v3.mbta.com/alerts?filter[lifecycle]=NEW,ONGOING&filter[route_type]=0,1,2&page[limit]=15',{signal:AbortSignal.timeout(8000)});
+    if(!res.ok)throw new Error();const data=await res.json();const alerts=data.data||[];
+    const ac=document.getElementById('mbta-alerts-count');if(ac)ac.textContent=alerts.length;
+    const list=document.getElementById('mbta-alerts-list');if(!list)return;
+    if(!alerts.length){list.innerHTML='<div style="color:var(--green);font-size:9px;">No active alerts ✓</div>';return;}
+    list.innerHTML=alerts.slice(0,8).map(a=>{
+      const effect=(a.attributes.effect||'').replace(/_/g,' ');
+      const header=a.attributes.header||'';
+      const routes=[...new Set((a.attributes.informed_entity||[]).map(e=>e.route).filter(Boolean))].join(', ');
+      const color=MBTA_COLORS[routes.split(',')[0]?.trim()]||'#ED8B00';
+      return `<div class="mbta-alert-item" style="border-color:${color}"><span>⚠</span><div><strong style="color:${color}">${routes||'System'}</strong> — ${effect}<br><span style="color:var(--muted);font-size:8px">${header.substring(0,90)}</span></div></div>`;
+    }).join('');
+  }catch(e){}
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='mbta'){initMBTAMap();setTimeout(()=>mbtaMap?.resize(),150);}
+}
+
+function toggleMBTAOverlay(){
+  mbtaOverlayOn=!mbtaOverlayOn;
+  document.getElementById('btn-mbta-overlay').classList.toggle('on',mbtaOverlayOn);
+  if(mbtaOverlayOn){
+    if(!map.getSource('mbta-overlay')){
+      const lf=MBTA_LINES.map(l=>({type:'Feature',geometry:{type:'LineString',coordinates:l.coords},properties:{color:MBTA_COLORS[l.line]||'#888'}}));
+      map.addSource('mbta-overlay',{type:'geojson',data:{type:'FeatureCollection',features:lf}});
+      map.addLayer({id:'mbta-ov-c',type:'line',source:'mbta-overlay',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'rgba(255,255,255,0.5)','line-width':5,'line-opacity':0.6}});
+      map.addLayer({id:'mbta-ov-f',type:'line',source:'mbta-overlay',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':['get','color'],'line-width':3,'line-opacity':0.85}});
+    }else{
+      map.setLayoutProperty('mbta-ov-f','visibility','visible');
+      map.setLayoutProperty('mbta-ov-c','visibility','visible');
+    }
+    logEvent('info','🚇 MBTA overlay ON');
+  }else{
+    if(map.getLayer('mbta-ov-f')){map.setLayoutProperty('mbta-ov-f','visibility','none');map.setLayoutProperty('mbta-ov-c','visibility','none');}
+    logEvent('clear','🚇 MBTA overlay OFF');
+  }
+}
+
 </script>
+
+<!-- MBTA TAB PANEL -->
+<div class="tab-panel" id="panel-mbta">
+  <div class="mbta-content">
+    <div class="mbta-map-area"><div id="mbta-map"></div>
+      <div class="legend" style="bottom:50px;left:12px;">
+        <div class="legend-title">MBTA Lines</div>
+        <div class="leg-row"><div class="leg-line" style="background:#DA291C"></div><span>Red Line</span></div>
+        <div class="leg-row"><div class="leg-line" style="background:#ED8B00"></div><span>Orange Line</span></div>
+        <div class="leg-row"><div class="leg-line" style="background:#00843D"></div><span>Green Line</span></div>
+        <div class="leg-row"><div class="leg-line" style="background:#003DA5"></div><span>Blue Line</span></div>
+        <div class="leg-row"><div class="leg-line" style="background:#80276C"></div><span>Commuter Rail</span></div>
+        <div class="leg-row" style="margin-top:4px"><div class="leg-dot" style="background:#fff;border:2px solid #333;width:9px;height:9px;"></div><span>Station</span></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#DA291C"></div><span>Live Vehicle</span></div>
+      </div>
+    </div>
+    <div class="mbta-panel">
+      <div class="psec">
+        <div class="psec-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>🚇 System Status</span>
+          <span id="mbta-live-badge" style="font-size:8px;color:#886600;font-family:'Share Tech Mono',monospace;">○ LOADING</span>
+        </div>
+        <div class="gauge-grid">
+          <div class="gauge"><div class="gauge-val" id="mbta-vehicles" style="color:var(--cyan)">0</div><div class="gauge-lbl">VEHICLES</div></div>
+          <div class="gauge"><div class="gauge-val" id="mbta-alerts-count" style="color:var(--red)">0</div><div class="gauge-lbl">ALERTS</div></div>
+        </div>
+      </div>
+      <div class="psec">
+        <div class="psec-title">⚡ Service Alerts</div>
+        <div id="mbta-alerts-list" style="font-size:9px;color:var(--muted);">Loading...</div>
+      </div>
+      <div class="incidents">
+        <div class="inc-title">Live Vehicles</div>
+        <div id="mbta-vehicle-list" style="font-size:9px;color:var(--muted);">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
