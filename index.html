@@ -140,7 +140,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .tab-panel.active{display:flex;}
 
 /* ── MBTA TAB ── */
-.mbta-content{display:grid;grid-template-columns:1fr 300px;flex:1;min-height:0;overflow:hidden;}
+.mbta-content{display:grid;grid-template-columns:1fr 300px;width:100%;flex:1;min-height:0;overflow:hidden;}
 #mbta-map{position:absolute;inset:0;}
 .mbta-map-area{position:relative;overflow:hidden;background:#e8e4d8;min-height:0;height:100%;}
 .mbta-panel{background:var(--surface);border-left:2px solid var(--border);
@@ -702,6 +702,7 @@ function initMBTAMap(){
   });
 
   mbtaMap.on('load', async ()=>{
+    mbtaMap.resize();
     mbtaMap.setGlyphs('https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf');
 
     // Show loading badge
@@ -887,7 +888,7 @@ function switchTab(tab){
   if(panel)panel.classList.add('active');
   const btn=document.getElementById('tab-'+tab);
   if(btn)btn.classList.add('active');
-  if(tab==='mbta')setTimeout(initMBTAMap,50);
+  if(tab==='mbta')setTimeout(()=>{initMBTAMap();if(window.mbtaMap)window.mbtaMap.resize();},200);
 }
 
 function toggleMBTAOverlay(){
