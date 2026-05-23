@@ -421,7 +421,7 @@ function buildSegments(){
       SEGMENTS.push({id:`${rid}-${i}`,routeId:rid,label:(route?.label||rid)+` • Exit ${A.exit}→${B.exit}`,type:route?.type||'arterial',baseSpd:route?(route.type==='local'?35:route.type==='arterial'?45:65):65,exitA:A,exitB:B,distMi,speed:65,volume:1200,incidents:[],history:new Array(60).fill(65)});}
   });
 }
-const map=new maplibregl.Map({container:'map',style:'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',center:[-71.5,42.0],zoom:8,maxBounds:[[-74.5,40.8],[-69.5,43.4]]});
+var map; // declared globally — initialized inside window.load for mobile sizing
 const exitMarkerMap={},sensorMarkerMap={},incidentMarkerMap={};
 let osmWaysLoaded=false,osmFeatures=[];
 function buildTrafficGeoJSON(){return{type:'FeatureCollection',features:SEGMENTS.map(seg=>{const coords=segCoords(seg);return{type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{id:seg.id,routeId:seg.routeId,label:seg.label,speed:Math.round(seg.speed),color:speedColor(seg.speed,seg.type),roadType:seg.type,distMi:seg.distMi,volume:Math.round(seg.volume)}};})}}
@@ -432,8 +432,10 @@ function updateIncidentSource(){const src=map.getSource('incidents');if(!src)ret
 let activeRoute=null,activeAlt=null;
 function updateRoutePathSource(){const src=map.getSource('route-path');if(!src)return;const exitMap={};EXITS_DB.forEach(e=>exitMap[e.id]=e);const features=[];if(activeRoute?.path?.length>=2){const coords=activeRoute.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);if(coords.length>=2)features.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{color:'#ff8800',width:7,opacity:0.92,isAlt:false}});}if(activeAlt?.path?.length>=2){const coords=activeAlt.path.map(p=>exitMap[p.node]).filter(Boolean).map(e=>[e.lon,e.lat]);if(coords.length>=2)features.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{color:'#003399',width:5,opacity:0.7,isAlt:true}});}if(features.length&&activeRoute){const first=exitMap[activeRoute.path[0]?.node],last=exitMap[activeRoute.path[activeRoute.path.length-1]?.node];if(first)features.push({type:'Feature',geometry:{type:'Point',coordinates:[first.lon,first.lat]},properties:{marker:'S',color:'#ff8800'}});if(last)features.push({type:'Feature',geometry:{type:'Point',coordinates:[last.lon,last.lat]},properties:{marker:'E',color:'#ff8800'}});}src.setData({type:'FeatureCollection',features});}
 
-map.on('load',()=>{
-  setTimeout(function(){map.resize();},100);
+window.addEventListener('load',function(){
+  map=new maplibregl.Map({container:'map',style:'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',center:[-71.5,42.0],zoom:8,maxBounds:[[-74.5,40.8],[-69.5,43.4]]});
+  map.on('load',()=>{
+    map.resize(); // force correct container size on mobile
 
   map.getStyle().layers.forEach(layer=>{
     if(layer.type!=='line')return;const id=layer.id;
@@ -475,7 +477,8 @@ map.on('load',()=>{
   logEvent('clear','MA Traffic Twin v3 — MapLibre GL + OpenStreetMap');
   logEvent('clear',`${ROUTES.length} routes • ${SEGMENTS.length} segments • ${SENSORS.length} sensors`);
   loadOSMGeometry();
-});
+  }); // end map.on load
+}); // end window.addEventListener load
 
 const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
 function refToRouteId(ref){if(!ref)return null;for(const r of ref.split(/[;,]/).map(s=>s.trim())){if(REF_MAP[r])return REF_MAP[r];}return null;}
