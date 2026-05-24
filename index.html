@@ -453,7 +453,7 @@ window.addEventListener('load',function(){
   map.addLayer({id:'nws-radar-layer',type:'raster',source:'nws-radar',paint:{'raster-opacity':0.65},layout:{visibility:'none'}},firstLabel);
 
   /* Traffic source */
-  map.addSource('traffic',{type:'geojson',data:{type:'FeatureCollection',features:[]},buffer:4,tolerance:0.3});
+  map.addSource('traffic',{type:'geojson',data:{type:'FeatureCollection',features:[]},buffer:128,tolerance:0.375});
   map.addLayer({id:'traffic-casing',type:'line',source:'traffic',filter:['in',['get','roadType'],['literal',['interstate','expressway']]],layout:{'line-join':'round','line-cap':'round','visibility':'none'},paint:{'line-color':'rgba(20,10,5,0.45)','line-width':['interpolate',['linear'],['zoom'],7,['match',['get','roadType'],'interstate',6,'expressway',5,4],10,['match',['get','roadType'],'interstate',10,'expressway',8,6],13,['match',['get','roadType'],'interstate',13,'expressway',10,8],16,['match',['get','roadType'],'interstate',18,'expressway',14,10]],'line-opacity':0.7}},firstLabel);
   map.addLayer({id:'traffic-fill',type:'line',source:'traffic',layout:{'line-join':'round','line-cap':'round','visibility':'none'},paint:{'line-color':['get','color'],'line-width':['interpolate',['linear'],['zoom'],7,['match',['get','roadType'],'interstate',4,'expressway',3,'arterial',2,1.5],10,['match',['get','roadType'],'interstate',7,'expressway',5,'arterial',4,2.5],13,['match',['get','roadType'],'interstate',10,'expressway',7,'arterial',5,3],16,['match',['get','roadType'],'interstate',14,'expressway',10,'arterial',7,4]],'line-opacity':0.90}},firstLabel);
   map.addSource('workzones',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
@@ -481,7 +481,7 @@ window.addEventListener('load',function(){
 }); // end window.addEventListener load
 
 const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
-function refToRouteId(ref){if(!ref)return null;for(const r of ref.split(/[;,]/).map(s=>s.trim())){if(REF_MAP[r])return REF_MAP[r];}return null;}
+function refToRouteId(ref){if(!ref)return null;for(const r of ref.split(/[;,]/).map(s=>s.trim())){if(REF_MAP[r])return REF_MAP[r];const rs=r.replace(/-/g,' ');if(REF_MAP[rs])return REF_MAP[rs];const rh=r.replace(/ /g,'-');if(REF_MAP[rh])return REF_MAP[rh];}return null;}
 function nearestSegment(lat,lon,routeId){const segs=SEGMENTS.filter(s=>s.routeId===routeId);if(!segs.length)return null;let best=null,bestD=Infinity;segs.forEach(s=>{const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;const d=Math.hypot((lat-mLat)*111320,(lon-mLon)*78470);if(d<bestD){bestD=d;best=s;}});return best;}
 
 async function loadOSMGeometry(){
@@ -637,8 +637,10 @@ async function loadMBTARealData() {
   const lineFeatures = [];
   const stationFeatures = [];
 
-  // Fetch shapes for all routes in parallel
-  await Promise.all(allRoutes.map(async routeId => {
+  // Fetch shapes throttled 3-at-a-time to avoid MBTA API rate-limiting
+  const BATCH=3,DELAY=400;
+  for(let bi=0;bi<allRoutes.length;bi+=BATCH){
+    await Promise.all(allRoutes.slice(bi,bi+BATCH).map(async routeId => {
     try {
       const r = await fetch(`https://api-v3.mbta.com/shapes?filter[route]=${routeId}&fields[shape]=polyline`, {signal: AbortSignal.timeout(10000)});
       if (!r.ok) return;
@@ -656,7 +658,9 @@ async function loadMBTARealData() {
         });
       });
     } catch(e) {}
-  }));
+    }));
+    if(bi+BATCH<allRoutes.length) await new Promise(r=>setTimeout(r,DELAY));
+  }
 
   // Fetch stations — subway only, parent stations
   try {
