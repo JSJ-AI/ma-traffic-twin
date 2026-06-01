@@ -435,7 +435,7 @@ function updateRoutePathSource(){const src=map.getSource('route-path');if(!src)r
 
 window.addEventListener('load',function(){
   map=new maplibregl.Map({container:'map',style:'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',center:[-71.5,42.0],zoom:8,maxBounds:[[-74.5,40.8],[-69.5,43.4]]});
-  map.on('load',()=>{
+  function __mttInitMap(){
     map.resize(); // force correct container size on mobile
 
   map.getStyle().layers.forEach(layer=>{
@@ -473,12 +473,24 @@ window.addEventListener('load',function(){
   map.on('mousemove','traffic-fill',(e)=>{if(!e.features?.length)return;map.getCanvas().style.cursor='pointer';const p=e.features[0].properties,tip=document.getElementById('tooltip');document.getElementById('tip-title').textContent=p.label||p.routeId;document.getElementById('tip-speed').textContent=(p.speed||0)+' mph';document.getElementById('tip-vol').textContent=Math.round(p.volume||0)+' veh/hr';document.getElementById('tip-time').textContent=(p.distMi||0).toFixed(1)+' mi segment';document.getElementById('tip-status').textContent=p.speed>45?'Free Flow':p.speed>25?'Slow':'Congested';tip.style.display='block';tip.style.left=(e.point.x+14)+'px';tip.style.top=(e.point.y-10)+'px';});
   map.on('mouseleave','traffic-fill',()=>{map.getCanvas().style.cursor='';document.getElementById('tooltip').style.display='none';});
 
-  updateTrafficSource();updateExitMarkers();updateSensorMarkers();
-  buildSegments();populateSelects();startLiveData();startSim();
+  buildSegments();updateTrafficSource();updateExitMarkers();updateSensorMarkers();
+  populateSelects();startLiveData();startSim();
   logEvent('clear','MA Traffic Twin v3 — MapLibre GL + OpenStreetMap');
   logEvent('clear',`${ROUTES.length} routes • ${SEGMENTS.length} segments • ${SENSORS.length} sensors`);
   loadOSMGeometry();
-  }); // end map.on load
+  }
+
+  /* --- robust init: run road/map setup whether load fires now, later, or stalls --- */
+  if (map.isStyleLoaded()) { __mttInitMap(); }
+  else {
+    let __mttDone = false;
+    const __mttTryInit = () => { if (__mttDone) return; if (!map.isStyleLoaded()) return; __mttDone = true; __mttInitMap(); };
+    map.on('load', __mttTryInit);
+    map.on('idle', __mttTryInit);
+    map.on('styledata', __mttTryInit);
+    let __mttN = 0;
+    const __mttPoll = setInterval(() => { __mttN++; __mttTryInit(); if (__mttDone || __mttN > 80) clearInterval(__mttPoll); }, 250);
+  }
 }); // end window.addEventListener load
 
 const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
