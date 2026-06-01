@@ -116,10 +116,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 .alt-route-item.selected-alt{border-color:#1d4ed8;background:rgba(29,78,216,0.07);}
 .alt-head{display:flex;justify-content:space-between;margin-bottom:2px;font-size:8px;font-weight:700;}
 #route-result{display:none;}#route-result.visible{display:block;}
-.exit-dot{width:22px;height:22px;background:transparent;border:none;cursor:pointer;position:absolute;}
-.exit-dot::before{content:'';position:absolute;top:50%;left:50%;width:10px;height:10px;background:#1a5c1a;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.45);transform:translate(-50%,-50%);}
-.sensor-dot{width:20px;height:20px;background:transparent;border:none;cursor:pointer;position:absolute;}
-.sensor-dot::before{content:'';position:absolute;top:50%;left:50%;width:9px;height:9px;background:#0044aa;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.45);transform:translate(-50%,-50%);}
+.exit-dot{width:7px;height:7px;background:#1a5c1a;border:1.5px solid #fff;border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.4);transform:translate(-50%,-50%);}
+.sensor-dot{width:5px;height:5px;background:#0044aa;border:1px solid #fff;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);}
 @keyframes pulse-ring{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
 .inc-marker-wrap{position:relative;width:24px;height:24px;transform:translate(-50%,-50%);pointer-events:auto;}
 .inc-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(204,0,0,.65);animation:pulse-ring 1.4s ease-out infinite;pointer-events:none;}
@@ -188,8 +186,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
       <div class="leg-row"><div class="leg-line" style="background:var(--slow)"></div><span>Slow (25–45 mph)</span></div>
       <div class="leg-row"><div class="leg-line" style="background:var(--stop)"></div><span>Congested (&lt;25 mph)</span></div>
       <div class="leg-row" style="margin-top:4px"><div class="leg-dot" style="background:#cc1100"></div><span>Incident</span></div>
-      <div class="leg-row"><div class="leg-dot" style="background:#1a5c1a"></div><span>Exit</span></div>
-      <div class="leg-row"><div class="leg-dot" style="background:#0044aa"></div><span>Sensor</span></div>
+      <div class="leg-row"><div class="leg-dot" style="background:#1a5c1a"></div><span>Exit / Sensor</span></div>
     </div>
     <div class="osm-badge" id="osm-badge">⏳ Loading road geometry…</div>
     <div class="api-note">
@@ -484,7 +481,7 @@ window.addEventListener('load',function(){
   }); // end map.on load
 }); // end window.addEventListener load
 
-const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','US 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
+const REF_MAP={'I 90':'I-90','I 93':'I-93N','I 95':'I-95N','MA 128':'I-95N','I 495':'I-495','I 290':'I-290','I 291':'I-291','I 91':'I-91','MA 2':'RT2','MA 2A':'RT2A','MA 3':'RT3','MA 6':'RT6','MA 9':'RT9','MA 16':'RT16','MA 18':'RT18','MA 20':'RT20','MA 24':'RT24','MA 28':'RT28','MA 30':'RT30','MA 38':'RT38','MA 44':'RT44','MA 62':'RT62','MA 109':'RT109','MA 110':'RT110','MA 119':'RT119','MA 135':'RT135','MA 138':'RT138','MA 140':'RT140','US 1':'RT1','US 1A':'RT1A-BOSTON','MA 1A':'RT1A-BOSTON'};
 function refToRouteId(ref){if(!ref)return null;for(const r of ref.split(/[;,]/).map(s=>s.trim())){if(REF_MAP[r])return REF_MAP[r];const rs=r.replace(/-/g,' ');if(REF_MAP[rs])return REF_MAP[rs];const rh=r.replace(/ /g,'-');if(REF_MAP[rh])return REF_MAP[rh];}return null;}
 function nearestSegment(lat,lon,routeId){const segs=SEGMENTS.filter(s=>s.routeId===routeId);if(!segs.length)return null;let best=null,bestD=Infinity;segs.forEach(s=>{const mLat=(s.exitA.lat+s.exitB.lat)/2,mLon=(s.exitA.lon+s.exitB.lon)/2;const d=Math.hypot((lat-mLat)*111320,(lon-mLon)*78470);if(d<bestD){bestD=d;best=s;}});return best;}
 
@@ -492,12 +489,6 @@ async function loadOSMGeometry(){
   const badge=document.getElementById('osm-badge'),ftOsm=document.getElementById('ft-osm');
   badge.textContent='⏳ Fetching OSM roads…';
   const query=`[out:json][timeout:60];\nway["highway"~"motorway|trunk|primary|secondary"]["ref"](41.1,-73.6,42.9,-69.8);\nout geom qt;`;
-  const showTrafficLayers=()=>['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});
-  let usedCache=false;
-  // (3) Cache-first: instantly draw last-good OSM roads if cached & fresh (<7 days)
-  try{const c=JSON.parse(localStorage.getItem('mtt_osm_cache_v1')||'null');if(c&&Array.isArray(c.f)&&c.f.length&&(Date.now()-c.t)<604800000){osmFeatures=c.f;osmWaysLoaded=true;updateTrafficSource();showTrafficLayers();badge.textContent='\u2713 '+c.f.length+' OSM road segments (cached)';badge.style.color='#1a5c1a';if(ftOsm)ftOsm.textContent=c.f.length+' ways (cached)';usedCache=true;}}catch(e){}
-  // (1) Otherwise draw simplified built-in roads immediately so the map is never blank
-  if(!usedCache){updateTrafficSource();showTrafficLayers();badge.textContent='\u231b Loading roads\u2026';}
   const OVERPASS_MIRRORS=[
     'https://overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
@@ -509,7 +500,7 @@ async function loadOSMGeometry(){
   for(const mirror of OVERPASS_MIRRORS){
     try{
       badge.textContent='⏳ Fetching OSM roads ('+mirror.split('/')[2]+')…';
-      const r=await fetch(mirror,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:AbortSignal.timeout(9000)});
+      const r=await fetch(mirror,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query),signal:AbortSignal.timeout(30000)});
       if(!r.ok)throw new Error('HTTP '+r.status);
       const data=await r.json();
       elements=data.elements||[];
@@ -517,15 +508,15 @@ async function loadOSMGeometry(){
       break;
     }catch(e){lastErr=e.message;logEvent('warn','Overpass '+mirror.split('/')[2]+' failed: '+e.message);}
   }
-  if(!loaded){if(usedCache){logEvent('warn','Overpass refresh failed; kept cached roads');return;}badge.textContent='⚠ OSM unavailable — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='fallback';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','⚠ All Overpass mirrors failed — using approximate route geometry');return;}
+  if(!loaded){badge.textContent='⚠ OSM unavailable — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='fallback';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','⚠ All Overpass mirrors failed — using approximate route geometry');return;}
   const newFeatures=[];let matched=0,skipped=0;
   elements.filter(el=>el.type==='way'&&el.geometry?.length>=2).forEach(way=>{const ref=way.tags?.ref,routeId=refToRouteId(ref);if(!routeId){skipped++;return;}const route=ROUTES.find(r=>r.id===routeId);if(!route){skipped++;return;}const coords=way.geometry.map(n=>[n.lon,n.lat]);const mid=coords[Math.floor(coords.length/2)];const seg=nearestSegment(mid[1],mid[0],routeId);newFeatures.push({type:'Feature',geometry:{type:'LineString',coordinates:coords},properties:{osmId:way.id,routeId,segId:seg?.id||null,label:(route.label)+(seg?` • Exit ${seg.exitA.exit}→${seg.exitB.exit}`:''),speed:Math.round(seg?.speed||route.speed||65),color:speedColor(seg?.speed||route.speed||65,route.type),roadType:route.type,distMi:seg?.distMi||1,volume:Math.round(seg?.volume||route.volume||1200),ref:ref||''}});matched++;});
-  if(matched>0){osmFeatures=newFeatures;osmWaysLoaded=true;updateTrafficSource();try{localStorage.setItem('mtt_osm_cache_v1',JSON.stringify({t:Date.now(),f:newFeatures}));}catch(e){}['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});badge.textContent=`✓ ${matched} OSM road segments`;badge.style.color='#1a5c1a';if(ftOsm)ftOsm.textContent=`${matched} ways`;logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);document.getElementById('ft-segs').textContent=matched;}
+  if(matched>0){osmFeatures=newFeatures;osmWaysLoaded=true;updateTrafficSource();['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});badge.textContent=`✓ ${matched} OSM road segments`;badge.style.color='#1a5c1a';if(ftOsm)ftOsm.textContent=`${matched} ways`;logEvent('clear',`✓ OSM geometry loaded — ${matched} road segments (${skipped} unmatched)`);document.getElementById('ft-segs').textContent=matched;}
   else{badge.textContent='⚠ No OSM matches — using route geometry';badge.style.color='#cc8800';if(ftOsm)ftOsm.textContent='no match';['traffic-casing','traffic-fill'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});logEvent('warn','OSM returned no matching ways — using approximate geometry');}
 }
 
-function updateExitMarkers(){if(!showLabels){Object.values(exitMarkerMap).forEach(m=>m.remove());Object.keys(exitMarkerMap).forEach(k=>delete exitMarkerMap[k]);return;}EXITS_DB.forEach(ex=>{if(exitMarkerMap[ex.id])return;const el=document.createElement('div');el.className='exit-dot';const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false}).setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);const m=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);exitMarkerMap[ex.id]=m;});}
-function updateSensorMarkers(){if(!showSensors){Object.values(sensorMarkerMap).forEach(m=>m.remove());Object.keys(sensorMarkerMap).forEach(k=>delete sensorMarkerMap[k]);return;}SENSORS.forEach(s=>{if(sensorMarkerMap[s.id])return;const el=document.createElement('div');el.className='sensor-dot';const popup=new maplibregl.Popup({offset:10,closeButton:false,closeOnClick:false}).setHTML('<b>Traffic Sensor</b><br>'+s.routeLabel+'<br>Inductive-loop detector &middot; speed &amp; volume');const m=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([s.lon,s.lat]).addTo(map);el.addEventListener('mouseenter',function(){popup.setLngLat([s.lon,s.lat]).addTo(map);});el.addEventListener('mouseleave',function(){popup.remove();});el.addEventListener('click',function(){popup.setLngLat([s.lon,s.lat]).addTo(map);});sensorMarkerMap[s.id]=m;});}
+function updateExitMarkers(){if(!showLabels){Object.values(exitMarkerMap).forEach(m=>m.remove());Object.keys(exitMarkerMap).forEach(k=>delete exitMarkerMap[k]);return;}EXITS_DB.forEach(ex=>{if(exitMarkerMap[ex.id])return;const el=document.createElement('div');el.className='exit-dot';const popup=new maplibregl.Popup({offset:8,closeButton:false,closeOnClick:false}).setHTML(`<b>Exit ${ex.exit}</b><br>${ex.route}<br>${ex.name}`);const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([ex.lon,ex.lat]).setPopup(popup).addTo(map);exitMarkerMap[ex.id]=m;});}
+function updateSensorMarkers(){if(!showSensors){Object.values(sensorMarkerMap).forEach(m=>m.remove());Object.keys(sensorMarkerMap).forEach(k=>delete sensorMarkerMap[k]);return;}SENSORS.forEach(s=>{if(sensorMarkerMap[s.id])return;const el=document.createElement('div');el.className='sensor-dot';const m=new maplibregl.Marker({element:el,anchor:'top-left'}).setLngLat([s.lon,s.lat]).addTo(map);sensorMarkerMap[s.id]=m;});}
 function redrawIncidentMarkers(){Object.values(incidentMarkerMap).forEach(m=>m.remove());Object.keys(incidentMarkerMap).forEach(k=>delete incidentMarkerMap[k]);incidents.forEach(inc=>{const wrap=document.createElement('div');wrap.className='inc-marker-wrap';wrap.innerHTML=`<div class="inc-ring"></div><div class="inc-dot">${inc.icon}</div>`;const popup=new maplibregl.Popup({offset:16,closeButton:false}).setHTML(`<b>${inc.icon} ${inc.type.toUpperCase()}</b><br><b>${inc.route}</b><br>${inc.msg}`);const m=new maplibregl.Marker({element:wrap,anchor:'top-left'}).setLngLat([inc.lon,inc.lat]).setPopup(popup).addTo(map);if(!showIncidents)m.getElement().style.display='none';incidentMarkerMap[inc.id]=m;});updateIncidentSource();}
 
 function tick(){
